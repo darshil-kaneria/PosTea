@@ -12,7 +12,7 @@ const PORT = process.env.PORT || 23556;
 const password = process.env.DB_ACCESS;
 const mysql = require('mysql');
 
-var conn = mysql.createConnection({
+var conn = mysql.createPool({
     host: "postea-business.mysql.database.azure.com", 
     user: "posteabusiness@postea-business", 
     password: password, 
@@ -20,12 +20,13 @@ var conn = mysql.createConnection({
     port: 3306, 
 });
 
-conn.connect(function(err) {
+conn.getConnection(function(err, connection) {
     if (err) {
       return console.error('error: ' + err.message);
     }
   
     console.log('Database connection established');
+    connection.release();
   });
 
 //Create a fork object
