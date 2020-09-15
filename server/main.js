@@ -8,7 +8,25 @@
 
 const express = require('express');
 const app = express();
-const PORT = process.env.PORT || 23556
+const PORT = process.env.PORT || 23556;
+const password = process.env.DB_ACCESS;
+const mysql = require('mysql');
+
+var conn = mysql.createConnection({
+    host: "postea-business.mysql.database.azure.com", 
+    user: "posteabusiness@postea-business", 
+    password: password, 
+    database: 'postea-db', 
+    port: 3306, 
+});
+
+conn.connect(function(err) {
+    if (err) {
+      return console.error('error: ' + err.message);
+    }
+  
+    console.log('Database connection established');
+  });
 
 //Create a fork object
 const fork = require("child_process").fork;
