@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
           children: [
             Text("This timer is changing"),
             Consumer<TimerCount>(builder: (context, data, child){
-              return Text(data.counter.toString());
+              return Text(data.getTime().toString());
             })
           ],
 
