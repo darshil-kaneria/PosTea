@@ -33,6 +33,7 @@ conn.getConnection(function(err, connection) {
 const fork = require("child_process").fork;
 app.get('/', (req, res)=>{
     
+    console.log("request received on home");
     const child = fork('./test_concurrency_one.js');
     child.send({"number": parseInt(req.query.number)});
     child.on("message", message => res.send(message));
