@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "896343519724",
+    "firebase_url": "https://postea-eabea.firebaseio.com",
+    "project_id": "postea-eabea",
+    "storage_bucket": "postea-eabea.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:896343519724:android:33c05d6a5676a413eb10c9",
+        "android_client_info": {
+          "package_name": "com.postea.postea_app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "896343519724-ht36rmqgi5gikbceprmqn4dsoms8f0er.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.postea.postea_app",
+            "certificate_hash": "9690b0add934c37a132f799071e986066a400eb9"
+          }
+        },
+        {
+          "client_id": "896343519724-o4d52d2o07a6i5e3gp5cupmas7h1s1fe.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA3XaslG6Pw3WNa9NZuMJdlFFnEZFtAKN4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "896343519724-o4d52d2o07a6i5e3gp5cupmas7h1s1fe.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
