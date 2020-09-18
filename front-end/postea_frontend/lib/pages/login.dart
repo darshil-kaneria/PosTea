@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../colors.dart';
+import 'loggedIn.dart';
 
 class Login extends StatelessWidget {
-
   var _usernameController = TextEditingController();
   var _passwordController = TextEditingController();
 
   @override
-  void dispose(){
-
+  void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
   }
@@ -105,22 +106,39 @@ class Login extends StatelessWidget {
                             elevation: 1,
                             color: loginButton,
                             highlightColor: Colors.red[700],
-                            onPressed: () {
+                            onPressed: () async {
                               // Login details retrieved here
+                              try {
+                                User user = (await FirebaseAuth.instance
+                                        .signInWithEmailAndPassword(
+                                            email: _usernameController.text,
+                                            password: _passwordController.text))
+                                    .user;
 
+                                if (user != null) {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => LoggedIn()));
+                                }
+                              } catch (e) {
+                                print(e);
+                                _usernameController.text = "";
+                                _passwordController.text = "";
+                              }
                               var username = _usernameController.text;
                               var password = _passwordController.text;
 
-                              print("Username is $username and password is $password");
+                              print(
+                                  "Username is $username and password is $password");
 
                               // Send these to auth handling class
                             },
                             child: Text(
                               "Login",
                               style: TextStyle(
-                                fontFamily: "OpenSans",
-                                color: Colors.white70
-                              ),
+                                  fontFamily: "OpenSans",
+                                  color: Colors.white70),
                             ),
                             shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
