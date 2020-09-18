@@ -10,8 +10,13 @@ void main() => runApp(PosTea());
 class PosTea extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    // Adding comments to fix auth-frontend merge
     return MaterialApp(
-      home: Wrapper(),
+      title: "PosTea app",
+      home: ChangeNotifierProvider(
+        create: (context) => TimerCount(), 
+        child: HomePage(),
+        )
     );
   }
 }
