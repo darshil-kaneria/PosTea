@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'data_models/timer.dart';
 import 'pages/homepage.dart';
 
-import './pages/wrapper.dart';
+import 'pages/wrapper.dart';
 
 void main() => runApp(PosTea());
 
