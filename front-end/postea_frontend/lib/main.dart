@@ -11,7 +11,7 @@ class PosTea extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: "PosTea",
+      title: "PosTea app",
       home: ChangeNotifierProvider(
         create: (context) => TimerCount(), 
         child: Login(),
