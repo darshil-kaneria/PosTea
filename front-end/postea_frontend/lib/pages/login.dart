@@ -2,6 +2,17 @@ import 'package:flutter/material.dart';
 import '../colors.dart';
 
 class Login extends StatelessWidget {
+
+  var _usernameController = TextEditingController();
+  var _passwordController = TextEditingController();
+
+  @override
+  void dispose(){
+
+    _usernameController.dispose();
+    _passwordController.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -41,6 +52,7 @@ class Login extends StatelessWidget {
                         Container(
                             padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
                             child: TextField(
+                              controller: _usernameController,
                               decoration: InputDecoration(
                                 contentPadding: EdgeInsets.only(left: 30),
                                 hintText: "Username",
@@ -60,6 +72,7 @@ class Login extends StatelessWidget {
                         Container(
                             padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
                             child: TextField(
+                              controller: _passwordController,
                               obscureText: true,
                               decoration: InputDecoration(
                                   contentPadding: EdgeInsets.only(left: 30),
@@ -92,7 +105,16 @@ class Login extends StatelessWidget {
                             elevation: 1,
                             color: loginButton,
                             highlightColor: Colors.red[700],
-                            onPressed: () {},
+                            onPressed: () {
+                              // Login details retrieved here
+
+                              var username = _usernameController.text;
+                              var password = _passwordController.text;
+
+                              print("Username is $username and password is $password");
+
+                              // Send these to auth handling class
+                            },
                             child: Text(
                               "Login",
                               style: TextStyle(
