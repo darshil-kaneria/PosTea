@@ -1,6 +1,8 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/colors.dart';
+import 'package:postea_frontend/pages/loggedIn.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -172,7 +174,7 @@ class _SignUpState extends State<SignUp> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50),
                             side: BorderSide(color: Colors.red[700])),
-                        onPressed: () {
+                        onPressed: () async {
                           changeHelperText(_pos);
 
                           if (_pos == 0) {
@@ -202,6 +204,20 @@ class _SignUpState extends State<SignUp> {
 
                             _password = _passwordTextController.text;
                             _passwordTextController.text = "";
+
+                            User user = (await FirebaseAuth.instance
+                                    .createUserWithEmailAndPassword(
+                                        email: _email, password: _password))
+                                .user;
+
+                            if (user != null) {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => LoggedIn()));
+
+                              user.sendEmailVerification();
+                            }
 
                             print(
                                 "email: $_email, Username: $_username, Password: $_password");
