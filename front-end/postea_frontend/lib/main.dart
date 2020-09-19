@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'data_models/timer.dart';
 // import 'pages/homepage.dart';
 import 'pages/route_generator.dart';
-
+import 'package:firebase_core/firebase_core.dart';
 import 'pages/wrapper.dart';
 import './pages/login.dart';
 
