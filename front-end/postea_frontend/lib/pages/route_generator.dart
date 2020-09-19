@@ -29,7 +29,9 @@ class Router {
         );
       case '/home': return MaterialPageRoute(builder: (_) => HomePage());// do homepage
       case '/profile': // do profile
-      default: return MaterialPageRoute(builder: (_) => HomePage());
+        return MaterialPageRoute(builder: (_)=> Login());
+      default: return MaterialPageRoute(builder: (_)=>Login());
+      //default: return MaterialPageRoute(builder: (_) => HomePage());
     }
   }
 }

@@ -1,6 +1,7 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/colors.dart';
+import 'package:postea_frontend/customWidgets/showUpAnimation.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -24,6 +25,12 @@ class _SignUpState extends State<SignUp> {
 
   var _scrollController = new ScrollController();
   var _pos;
+
+  var alignStart = Alignment.topCenter;
+  var aLignEnd = Alignment.bottomRight;
+
+  bool _revealPass = false;
+
   @override
   void initState() {
     _nextButtonText = "Next";
@@ -32,11 +39,21 @@ class _SignUpState extends State<SignUp> {
     super.initState();
   }
 
-  void changeHelperText(var screenWidth) {
+  void changePassVisibility(var _revealPass) {
     setState(() {
-      if (_pos == 0)
+      if (_revealPass) {
+        _revealPass = false;
+      } else
+        _revealPass = true;
+      print("PRESSED changed to $_revealPass");
+    });
+  }
+
+  void changeHelperText(var screenWidth, var screenHeight) {
+    setState(() {
+      if (_pos == 0) {
         _helperText = _usernameText;
-      else if (_pos == screenWidth) {
+      } else if (_pos == screenWidth) {
         _helperText = _passwordText;
         _nextButtonText = "Sign Up";
       }
@@ -67,7 +84,8 @@ class _SignUpState extends State<SignUp> {
           },
         ),
       ),
-      body: Container(
+      body: AnimatedContainer(
+        duration: Duration(milliseconds: 500),
         height: screenHeight,
         width: screenWidth,
         decoration: BoxDecoration(
@@ -90,15 +108,18 @@ class _SignUpState extends State<SignUp> {
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Container(
-                      padding: EdgeInsets.only(left: 20),
-                      height: screenHeight / 8,
-                      width: screenWidth,
-                      child: AutoSizeText(_helperText,
-                          style: TextStyle(
-                              fontSize: 50,
-                              fontFamily: 'OpenSans',
-                              fontWeight: FontWeight.bold)),
+                    ShowUpAnimation(
+                      delay: 200,
+                      child: Container(
+                        padding: EdgeInsets.only(left: 20),
+                        height: screenHeight / 8,
+                        width: screenWidth,
+                        child: AutoSizeText(_helperText,
+                            style: TextStyle(
+                                fontSize: 50,
+                                fontFamily: 'OpenSans',
+                                fontWeight: FontWeight.bold)),
+                      ),
                     ),
                     Container(
                         height: screenHeight / 4,
@@ -115,6 +136,17 @@ class _SignUpState extends State<SignUp> {
                                     child: TextField(
                                         controller: _emailTextController,
                                         decoration: InputDecoration(
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.red[400]),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(100)),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: loginButton),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(50))),
                                             contentPadding:
                                                 EdgeInsets.only(left: 30),
                                             hintText: "Email ID",
@@ -136,10 +168,17 @@ class _SignUpState extends State<SignUp> {
                                             contentPadding:
                                                 EdgeInsets.only(left: 30),
                                             hintText: "Username",
-                                            border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        50)))),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.red[400]),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(100)),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: loginButton),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(50))))),
                                   ),
                                 ),
                               ),
@@ -150,8 +189,33 @@ class _SignUpState extends State<SignUp> {
                                     padding: const EdgeInsets.all(40.0),
                                     child: TextField(
                                         controller: _passwordTextController,
-                                        obscureText: true,
+                                        obscureText: !_revealPass,
                                         decoration: InputDecoration(
+                                            suffixIcon: IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  this._revealPass =
+                                                      !(this._revealPass);
+                                                });
+                                              },
+                                              icon: Icon(
+                                                _revealPass
+                                                    ? Icons.visibility
+                                                    : Icons.visibility_off,
+                                                color: Colors.red[400],
+                                              ),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.red[400]),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(100)),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: loginButton),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(50))),
                                             contentPadding:
                                                 EdgeInsets.only(left: 30),
                                             hintText: "Password",
@@ -173,8 +237,7 @@ class _SignUpState extends State<SignUp> {
                             borderRadius: BorderRadius.circular(50),
                             side: BorderSide(color: Colors.red[700])),
                         onPressed: () {
-                          changeHelperText(_pos);
-
+                          changeHelperText(_pos, screenHeight);
                           if (_pos == 0) {
                             // basic checking and store the email
 
