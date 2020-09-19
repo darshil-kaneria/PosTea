@@ -1,6 +1,5 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:postea_frontend/main.dart';
 import 'package:postea_frontend/pages/homepage.dart';
 import 'login.dart';
 import 'signup.dart';

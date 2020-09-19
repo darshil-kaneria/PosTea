@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'data_models/timer.dart';
 // import 'pages/homepage.dart';
-import 'pages/login.dart';
 import 'pages/route_generator.dart';
 
 void main() => runApp(PosTea());
