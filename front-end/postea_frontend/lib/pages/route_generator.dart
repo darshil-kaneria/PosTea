@@ -30,7 +30,7 @@ class Router {
       case '/home': return MaterialPageRoute(builder: (_) => HomePage());// do homepage
       case '/profile': // do profile
         return MaterialPageRoute(builder: (_)=> Login());
-      default: return MaterialPageRoute(builder: (_)=>Login());
+      default: return null;
       //default: return MaterialPageRoute(builder: (_) => HomePage());
     }
   }

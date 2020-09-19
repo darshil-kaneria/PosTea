@@ -2,6 +2,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/colors.dart';
 import 'package:postea_frontend/customWidgets/showUpAnimation.dart';
+import 'package:postea_frontend/data_models/process_signup.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -9,6 +10,7 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+
   var _emailText = "What's your \nEmail ID?";
   var _usernameText = "Select a \nUsername";
   var _passwordText = "Enter your \nPassword";
@@ -239,10 +241,12 @@ class _SignUpState extends State<SignUp> {
                         onPressed: () {
                           changeHelperText(_pos, screenHeight);
                           if (_pos == 0) {
-                            // basic checking and store the email
 
                             _email = _emailTextController.text;
-                            _emailTextController.text = "";
+
+                            Object retEmail = ProcessSignUp(email: _email).validateEmail();
+
+                            // Handle any email errors below
 
                             _scrollController.animateTo(screenWidth,
                                 duration: Duration(milliseconds: 300),
@@ -250,10 +254,11 @@ class _SignUpState extends State<SignUp> {
 
                             _pos = screenWidth;
                           } else if (_pos == screenWidth) {
-                            // basic checking and store the username
 
                             _username = _usernameTextController.text;
-                            _usernameTextController.text = "";
+
+                            Object retUsername = ProcessSignUp(username: _username).validateUsername();
+                            // Handle any username errors below
 
                             _scrollController.animateTo(screenWidth * 2,
                                 duration: Duration(milliseconds: 300),
@@ -264,7 +269,10 @@ class _SignUpState extends State<SignUp> {
                             // basic checking and store the password
 
                             _password = _passwordTextController.text;
-                            _passwordTextController.text = "";
+
+                            Object retPassword = ProcessSignUp(password: _password).validatePassword();
+                            
+                            // Handle any password errors below
 
                             print(
                                 "email: $_email, Username: $_username, Password: $_password");

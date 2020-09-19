@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:postea_frontend/data_models/process_login.dart';
 import '../colors.dart';
 
 class Login extends StatefulWidget {
@@ -137,10 +138,15 @@ class _LoginState extends State<Login> {
 
                               print(
                                   "Username is $username and password is $password");
-                              _usernameController.clear();
-                              _passwordController.clear();
+
+                              bool isValid = ProcessLogin(username: username, password: password).validateString();
+
 
                               // Send these to auth handling class
+
+                              Object ret = ProcessLogin(username: username, password: password).authenticate();
+
+                              // Extract error message if any.
                             },
                             child: Text(
                               "Login",
