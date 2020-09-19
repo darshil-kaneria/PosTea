@@ -4,7 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../colors.dart';
 import 'loggedIn.dart';
 
-class Login extends StatelessWidget {
+class Login extends StatefulWidget {
+  @override
+  _LoginState createState() => _LoginState();
+}
+
+class _LoginState extends State<Login> {
   var _usernameController = TextEditingController();
   var _passwordController = TextEditingController();
 
@@ -12,26 +17,46 @@ class Login extends StatelessWidget {
   void dispose() {
     _usernameController.dispose();
     _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      bottom: true,
-      child: Container(
-        decoration: BoxDecoration(
-            gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-              bgGradStart,
-              bgGradEnd,
-            ],
-                stops: [
-              0.3,
-              1
-            ])),
+    return Container(
+      decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
+            bgGradStart,
+            bgGradEnd,
+          ],
+              stops: [
+            0.3,
+            1
+          ])),
+      child: TweenAnimationBuilder(
+        tween: Tween<double>(begin: 0, end: 1),
+        duration: Duration(milliseconds: 500),
+        curve: Curves.easeIn,
+        builder: (BuildContext context, double _value, Widget child) {
+          return Opacity(
+            opacity: _value,
+            child: child,
+          );
+        },
         child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            automaticallyImplyLeading: false,
+          ),
+          extendBodyBehindAppBar: true,
           backgroundColor: Colors.transparent,
           body: SingleChildScrollView(
             child: Column(
@@ -66,7 +91,7 @@ class Login extends StatelessWidget {
                                   borderSide:
                                       BorderSide(color: Colors.red[400]),
                                   borderRadius:
-                                      BorderRadius.all(Radius.circular(50)),
+                                      BorderRadius.all(Radius.circular(100)),
                                 ),
                               ),
                             )),
@@ -87,7 +112,7 @@ class Login extends StatelessWidget {
                                     borderSide:
                                         BorderSide(color: Colors.red[400]),
                                     borderRadius:
-                                        BorderRadius.all(Radius.circular(50)),
+                                        BorderRadius.all(Radius.circular(100)),
                                   )),
                             ))
                       ],
@@ -131,27 +156,41 @@ class Login extends StatelessWidget {
 
                               print(
                                   "Username is $username and password is $password");
+                              _usernameController.clear();
+                              _passwordController.clear();
 
                               // Send these to auth handling class
                             },
                             child: Text(
                               "Login",
                               style: TextStyle(
-                                  fontFamily: "OpenSans",
-                                  color: Colors.white70),
+                                  fontFamily: "Helvetica",
+                                  color: Colors.white,
+                                  fontSize: 18),
                             ),
                             shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
+                                borderRadius: BorderRadius.circular(100),
                                 side: BorderSide(color: Colors.redAccent)),
                           ),
                         ),
-                        Text(
-                          "Forgot my password",
-                          style: TextStyle(color: Colors.black26),
+                        GestureDetector(
+                          onTap: () {
+                            // Implement forgot password
+                          },
+                          child: Text(
+                            "Forgot my password",
+                            style: TextStyle(color: Colors.black54),
+                          ),
                         ),
-                        Text(
-                          "Sign Up",
-                          style: TextStyle(color: Colors.black26),
+                        GestureDetector(
+                          onTap: () {
+                            // Implement signup
+                            Navigator.of(context).pushNamed('/signup');
+                          },
+                          child: Text(
+                            "Sign Up",
+                            style: TextStyle(color: Colors.black54),
+                          ),
                         )
                       ],
                     ))
