@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -13,6 +14,34 @@ class _LoginState extends State<Login> {
   var _usernameController = TextEditingController();
   var _passwordController = TextEditingController();
 
+  void logInUser(email, password) async {
+    print(email);
+    print(password);
+    try {
+      User user = (await FirebaseAuth.instance
+              .signInWithEmailAndPassword(email: email, password: password))
+          .user;
+
+      if (user != null) {
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => LoggedIn()));
+      }
+    } catch (e) {
+      print(e);
+      _usernameController.text = "";
+      _passwordController.text = "";
+    }
+  }
+
+  void checkUserLoggedIn() {
+    User user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => LoggedIn()));
+    }
+  }
+
   @override
   void dispose() {
     _usernameController.dispose();
@@ -22,7 +51,8 @@ class _LoginState extends State<Login> {
 
   @override
   void initState() {
-    super.initState();
+    checkUserLoggedIn();
+    //super.initState();
   }
 
   @override
@@ -81,7 +111,7 @@ class _LoginState extends State<Login> {
                               controller: _usernameController,
                               decoration: InputDecoration(
                                 contentPadding: EdgeInsets.only(left: 30),
-                                hintText: "Username",
+                                hintText: "Username or Email",
                                 hoverColor: Colors.black,
                                 enabledBorder: OutlineInputBorder(
                                     borderSide: BorderSide(color: loginButton),
@@ -133,29 +163,47 @@ class _LoginState extends State<Login> {
                             highlightColor: Colors.red[700],
                             onPressed: () async {
                               // Login details retrieved here
-                              try {
-                                User user = (await FirebaseAuth.instance
-                                        .signInWithEmailAndPassword(
-                                            email: _usernameController.text,
-                                            password: _passwordController.text))
-                                    .user;
 
-                                if (user != null) {
-                                  Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => LoggedIn()));
-                                }
-                              } catch (e) {
-                                print(e);
-                                _usernameController.text = "";
-                                _passwordController.text = "";
-                              }
-                              var username = _usernameController.text;
+                              var username =
+                                  _usernameController.text.trimRight();
                               var password = _passwordController.text;
 
                               print(
                                   "Username is $username and password is $password");
+
+                              var _email = username;
+                              bool emailValid = RegExp(
+                                      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                  .hasMatch(_email);
+
+                              if (!emailValid) {
+                                final databaseReference = FirebaseDatabase
+                                    .instance
+                                    .reference()
+                                    .child("users");
+
+                                print("hello");
+
+                                databaseReference
+                                    .once()
+                                    .then((DataSnapshot snapshot) {
+                                  Map<dynamic, dynamic> values = snapshot.value;
+                                  values.forEach((key, value) {
+                                    _email = values[username].toString();
+                                    final _finalemail = _email.substring(
+                                        _email.indexOf(':') + 2,
+                                        _email.length - 1);
+                                    print("final email is " +
+                                        _finalemail +
+                                        "\n_email is " +
+                                        _email);
+                                    logInUser(_finalemail, password);
+                                  });
+                                });
+                              } else {
+                                logInUser(_email, _passwordController.text);
+                              }
+
                               _usernameController.clear();
                               _passwordController.clear();
 

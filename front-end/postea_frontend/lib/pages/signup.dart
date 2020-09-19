@@ -1,5 +1,6 @@
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/colors.dart';
 import 'package:postea_frontend/pages/loggedIn.dart';
@@ -205,18 +206,34 @@ class _SignUpState extends State<SignUp> {
                             _password = _passwordTextController.text;
                             _passwordTextController.text = "";
 
+                            // Creating New Account
                             User user = (await FirebaseAuth.instance
                                     .createUserWithEmailAndPassword(
                                         email: _email, password: _password))
                                 .user;
+                            /* Finish Creating New Account */
 
+                            // checking if user creation is successful
                             if (user != null) {
+                              // Navigating user to next screen
                               Navigator.push(
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => LoggedIn()));
 
+                              // Sending an email verification to the user.
                               user.sendEmailVerification();
+
+                              // storing username and email to firebase realtime database
+                              final databaseReference =
+                                  FirebaseDatabase.instance.reference();
+
+                              databaseReference
+                                  .child('users')
+                                  .child(_username)
+                                  .child(_username)
+                                  .set(_email);
+                              /* Finish storing username and email to firebase realtime database */
                             }
 
                             print(
