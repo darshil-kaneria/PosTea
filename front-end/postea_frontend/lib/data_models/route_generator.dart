@@ -1,8 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/pages/homepage.dart';
-import 'login.dart';
-import 'signup.dart';
+import 'package:postea_frontend/pages/login.dart';
+import 'package:postea_frontend/pages/profile.dart';
+import 'package:postea_frontend/pages/signup.dart';
 
 class Router {
 
@@ -29,7 +30,7 @@ class Router {
         );
       case '/home': return MaterialPageRoute(builder: (_) => HomePage());// do homepage
       case '/profile': // do profile
-        return MaterialPageRoute(builder: (_)=> Login());
+        return MaterialPageRoute(builder: (_)=> Profile());
       default: return null;
       //default: return MaterialPageRoute(builder: (_) => HomePage());
     }
