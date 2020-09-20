@@ -1,11 +1,12 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:postea_frontend/data_models/process_login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 import '../colors.dart';
 import 'loggedIn.dart';
 
 class Login extends StatefulWidget {
+  final bool loginSuccess = false;
   @override
   _LoginState createState() => _LoginState();
 }
@@ -14,7 +15,16 @@ class _LoginState extends State<Login> {
   var _usernameController = TextEditingController();
   var _passwordController = TextEditingController();
 
-  void logInUser(email, password) async {
+  void checkUserLoggedIn() {
+    User user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      Navigator.push(
+          context, MaterialPageRoute(builder: (context) => LoggedIn()));
+    }
+  }
+
+  logInUser(String email, String password) async {
     print(email);
     print(password);
     try {
@@ -22,23 +32,22 @@ class _LoginState extends State<Login> {
               .signInWithEmailAndPassword(email: email, password: password))
           .user;
 
+      print("hello from logInUser()");
+
       if (user != null) {
+        print("hello from logInUser() success");
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => LoggedIn()));
+        // this.loginSucces = true;
+      } else {
+        print("hello from logInUser() err");
+        // this.loginSucces = false;
       }
     } catch (e) {
       print(e);
-      _usernameController.text = "";
-      _passwordController.text = "";
-    }
-  }
-
-  void checkUserLoggedIn() {
-    User user = FirebaseAuth.instance.currentUser;
-
-    if (user != null) {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => LoggedIn()));
+      // username = "";
+      password = "";
+      // this.loginSucces = false;
     }
   }
 
@@ -51,8 +60,8 @@ class _LoginState extends State<Login> {
 
   @override
   void initState() {
-    checkUserLoggedIn();
-    //super.initState();
+    //checkUserLoggedIn();
+    super.initState();
   }
 
   @override
@@ -171,6 +180,10 @@ class _LoginState extends State<Login> {
                               print(
                                   "Username is $username and password is $password");
 
+                              //bool isValid = ProcessLogin(username: username, password: password).validateString();
+
+                              // Send these to auth handling class
+
                               var _email = username;
                               bool emailValid = RegExp(
                                       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
@@ -201,13 +214,17 @@ class _LoginState extends State<Login> {
                                   });
                                 });
                               } else {
-                                logInUser(_email, _passwordController.text);
+                                logInUser(_email, password);
                               }
 
-                              _usernameController.clear();
-                              _passwordController.clear();
+                              // var ret = ProcessLogin(
+                              //     username: username, password: password);
 
-                              // Send these to auth handling class
+                              // bool logIn = ret.authenticate();
+
+                              // print("logIn is " + logIn.toString());
+
+                              // Extract error message if any.
                             },
                             child: Text(
                               "Login",

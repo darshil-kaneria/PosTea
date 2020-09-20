@@ -1,9 +1,11 @@
 import 'package:auto_size_text/auto_size_text.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/colors.dart';
-import 'package:postea_frontend/pages/loggedIn.dart';
+import 'package:postea_frontend/customWidgets/showUpAnimation.dart';
+import 'package:postea_frontend/data_models/process_signup.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import './loggedIn.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -27,6 +29,12 @@ class _SignUpState extends State<SignUp> {
 
   var _scrollController = new ScrollController();
   var _pos;
+
+  var alignStart = Alignment.topCenter;
+  var aLignEnd = Alignment.bottomRight;
+
+  bool _revealPass = false;
+
   @override
   void initState() {
     _nextButtonText = "Next";
@@ -35,11 +43,21 @@ class _SignUpState extends State<SignUp> {
     super.initState();
   }
 
-  void changeHelperText(var screenWidth) {
+  void changePassVisibility(var _revealPass) {
     setState(() {
-      if (_pos == 0)
+      if (_revealPass) {
+        _revealPass = false;
+      } else
+        _revealPass = true;
+      print("PRESSED changed to $_revealPass");
+    });
+  }
+
+  void changeHelperText(var screenWidth, var screenHeight) {
+    setState(() {
+      if (_pos == 0) {
         _helperText = _usernameText;
-      else if (_pos == screenWidth) {
+      } else if (_pos == screenWidth) {
         _helperText = _passwordText;
         _nextButtonText = "Sign Up";
       }
@@ -70,7 +88,8 @@ class _SignUpState extends State<SignUp> {
           },
         ),
       ),
-      body: Container(
+      body: AnimatedContainer(
+        duration: Duration(milliseconds: 500),
         height: screenHeight,
         width: screenWidth,
         decoration: BoxDecoration(
@@ -93,15 +112,18 @@ class _SignUpState extends State<SignUp> {
               child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    Container(
-                      padding: EdgeInsets.only(left: 20),
-                      height: screenHeight / 8,
-                      width: screenWidth,
-                      child: AutoSizeText(_helperText,
-                          style: TextStyle(
-                              fontSize: 50,
-                              fontFamily: 'OpenSans',
-                              fontWeight: FontWeight.bold)),
+                    ShowUpAnimation(
+                      delay: 200,
+                      child: Container(
+                        padding: EdgeInsets.only(left: 20),
+                        height: screenHeight / 8,
+                        width: screenWidth,
+                        child: AutoSizeText(_helperText,
+                            style: TextStyle(
+                                fontSize: 50,
+                                fontFamily: 'OpenSans',
+                                fontWeight: FontWeight.bold)),
+                      ),
                     ),
                     Container(
                         height: screenHeight / 4,
@@ -118,6 +140,17 @@ class _SignUpState extends State<SignUp> {
                                     child: TextField(
                                         controller: _emailTextController,
                                         decoration: InputDecoration(
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.red[400]),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(100)),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: loginButton),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(50))),
                                             contentPadding:
                                                 EdgeInsets.only(left: 30),
                                             hintText: "Email ID",
@@ -139,10 +172,17 @@ class _SignUpState extends State<SignUp> {
                                             contentPadding:
                                                 EdgeInsets.only(left: 30),
                                             hintText: "Username",
-                                            border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        50)))),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.red[400]),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(100)),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: loginButton),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(50))))),
                                   ),
                                 ),
                               ),
@@ -153,8 +193,33 @@ class _SignUpState extends State<SignUp> {
                                     padding: const EdgeInsets.all(40.0),
                                     child: TextField(
                                         controller: _passwordTextController,
-                                        obscureText: true,
+                                        obscureText: !_revealPass,
                                         decoration: InputDecoration(
+                                            suffixIcon: IconButton(
+                                              onPressed: () {
+                                                setState(() {
+                                                  this._revealPass =
+                                                      !(this._revealPass);
+                                                });
+                                              },
+                                              icon: Icon(
+                                                _revealPass
+                                                    ? Icons.visibility
+                                                    : Icons.visibility_off,
+                                                color: Colors.red[400],
+                                              ),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Colors.red[400]),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(100)),
+                                            ),
+                                            enabledBorder: OutlineInputBorder(
+                                                borderSide: BorderSide(
+                                                    color: loginButton),
+                                                borderRadius: BorderRadius.all(
+                                                    Radius.circular(50))),
                                             contentPadding:
                                                 EdgeInsets.only(left: 30),
                                             hintText: "Password",
@@ -176,13 +241,14 @@ class _SignUpState extends State<SignUp> {
                             borderRadius: BorderRadius.circular(50),
                             side: BorderSide(color: Colors.red[700])),
                         onPressed: () async {
-                          changeHelperText(_pos);
-
+                          changeHelperText(_pos, screenHeight);
                           if (_pos == 0) {
-                            // basic checking and store the email
-
                             _email = _emailTextController.text;
-                            _emailTextController.text = "";
+
+                            Object retEmail =
+                                ProcessSignUp(email: _email).validateEmail();
+
+                            // Handle any email errors below
 
                             _scrollController.animateTo(screenWidth,
                                 duration: Duration(milliseconds: 300),
@@ -190,10 +256,20 @@ class _SignUpState extends State<SignUp> {
 
                             _pos = screenWidth;
                           } else if (_pos == screenWidth) {
-                            // basic checking and store the username
-
                             _username = _usernameTextController.text;
-                            _usernameTextController.text = "";
+
+                            bool retUsername =
+                                ProcessSignUp(username: _username)
+                                    .validateUsername();
+
+                            // Handle any username errors below
+
+                            // duplicate username exists
+                            if (!retUsername) {
+                              Scaffold.of(context).showSnackBar(SnackBar(
+                                  content:
+                                      Text("This username already exists.")));
+                            }
 
                             _scrollController.animateTo(screenWidth * 2,
                                 duration: Duration(milliseconds: 300),
@@ -204,37 +280,56 @@ class _SignUpState extends State<SignUp> {
                             // basic checking and store the password
 
                             _password = _passwordTextController.text;
-                            _passwordTextController.text = "";
 
-                            // Creating New Account
-                            User user = (await FirebaseAuth.instance
-                                    .createUserWithEmailAndPassword(
-                                        email: _email, password: _password))
-                                .user;
-                            /* Finish Creating New Account */
+                            Object retPassword =
+                                ProcessSignUp(password: _password)
+                                    .validatePassword();
 
-                            // checking if user creation is successful
-                            if (user != null) {
-                              // Navigating user to next screen
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => LoggedIn()));
+                            // Handle any password errors below
 
-                              // Sending an email verification to the user.
-                              user.sendEmailVerification();
+                            // Map<Object, Object> signUp = ProcessSignUp(
+                            //         username: _username, password: _password)
+                            //     .processSignupRequest();
 
-                              // storing username and email to firebase realtime database
-                              final databaseReference =
-                                  FirebaseDatabase.instance.reference();
+                            try {
+                              // Creating New Account
+                              User user = (await FirebaseAuth.instance
+                                      .createUserWithEmailAndPassword(
+                                          email: _email, password: _password))
+                                  .user;
+                              /* Finish Creating New Account */
 
-                              databaseReference
-                                  .child('users')
-                                  .child(_username)
-                                  .child(_username)
-                                  .set(_email);
-                              /* Finish storing username and email to firebase realtime database */
+                              // checking if user creation is successful
+                              if (user != null) {
+                                // this.errObj = {0: "OK"};
+
+                                // Sending an email verification to the user.
+                                user.sendEmailVerification();
+
+                                // storing username and email to firebase realtime database
+                                final databaseReference =
+                                    FirebaseDatabase.instance.reference();
+
+                                databaseReference
+                                    .child('users')
+                                    .child(_username)
+                                    .child(_username)
+                                    .set(_email);
+
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => LoggedIn()));
+                                /* Finish storing username and email to firebase realtime database */
+                              } else {
+                                // this.errObj = {1: "Sign Up Unsuccessful"};
+                              }
+                            } catch (e) {
+                              print(e);
+                              // this.errObj = {e.hashCode: e};
                             }
+
+                            // return this.errObj;
 
                             print(
                                 "email: $_email, Username: $_username, Password: $_password");

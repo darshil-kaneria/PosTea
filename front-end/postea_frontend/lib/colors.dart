@@ -11,3 +11,5 @@ Color loginButtonStart = Color(0xFFff4b5c);
 Color loginButtonEnd = Color(0xFFfabea7);
 Color bgGradStart = Color(0xFFf6f6f6);
 Color bgGradEnd = Color(0xFFffe2e2);
+Color bg2 = Color(0xFFfaf3dd);
+Color bg3 = Color(0xFFd6e0f0);
