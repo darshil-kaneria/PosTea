@@ -180,9 +180,11 @@ class _LoginState extends State<Login> {
                               print(
                                   "Username is $username and password is $password");
 
-                              //bool isValid = ProcessLogin(username: username, password: password).validateString();
+                              bool isValid = ProcessLogin(
+                                      username: username, password: password)
+                                  .validateString();
 
-                              // Send these to auth handling class
+                              //Send these to auth handling class
 
                               var _email = username;
                               bool emailValid = RegExp(
