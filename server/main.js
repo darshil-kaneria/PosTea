@@ -29,6 +29,7 @@ conn.getConnection(function(err, connection) {
     connection.release();
   });
 
+  
 //Create a fork object
 const fork = require("child_process").fork;
 app.get('/', (req, res)=>{
@@ -40,4 +41,28 @@ app.get('/', (req, res)=>{
 
 });
 
+app.get('/profile', (req,res)=> {
+  addUsername(req.username, req.is_private, req.name, req.biodata)
+});
+
+function addUserInfo(username, is_private, name, biodata) {
+  var sql = "INSERT INTO profile (username, is_private, name, bio_data) VALUES ?";
+  var values = [
+    [username, is_private, name, biodata]
+    ];
+  con.query(sql, [values], function (err, result) {
+    if (err) throw err;
+  });
+}
+app.get('/username', (req,res)=>{
+  addUsername(req.username)
+});
+
+function addUsername(username) {
+  var currdate = new Date();
+  var sql = "INSERT INTO account (username, acc_creat_date) VALUES ("+username+","+currdate+")";
+  conn.query(sql, function (err, result) {
+    if (err) throw err;
+    console.log("1 record inserted");
+});
 app.listen(PORT, ()=>console.log("listening on port "+PORT));
