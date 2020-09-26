@@ -14,7 +14,7 @@ class PosTea extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: "PosTea app",
-        initialRoute: '/login',
+        initialRoute: '/profile',
         onGenerateRoute: Router.generateRoute,
       ),
     );

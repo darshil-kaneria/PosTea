@@ -39,6 +39,7 @@ class _ProfileState extends State<Profile> {
                 // Profile circle
                 Center(
                   child: Container(
+                    child: Image.network("https://picsum.photos/"),
                     height: screenHeight / 7,
                     width: screenHeight / 7,
                     alignment: Alignment.center,

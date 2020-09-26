@@ -30,7 +30,15 @@ class Router {
         );
       case '/home': return MaterialPageRoute(builder: (_) => HomePage());// do homepage
       case '/profile': // do profile
-        return MaterialPageRoute(builder: (_)=> Profile());
+        return PageRouteBuilder(
+          transitionDuration: Duration(milliseconds: 300),
+          pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secAnimation) {
+            return Profile();
+            },
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(opacity: animation, child: SlideTransition(position: Tween<Offset>(begin: Offset(0,-1), end: Offset(0,0)).animate(CurvedAnimation(parent: animation, curve: Curves.decelerate)), child: child,));
+          },
+        );
       default: return null;
       //default: return MaterialPageRoute(builder: (_) => HomePage());
     }
