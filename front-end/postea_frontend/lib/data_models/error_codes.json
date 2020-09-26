@@ -1,0 +1,21 @@
+[
+    {
+    "100": "Invalid Email",
+    "101": "Invalid Username",
+    "102": "Invalid Password",
+    "103": "Email already exists",
+    "104": "Username Already Exists",
+    "105": "Sign Up failed",
+
+    "400": "Bad Request",
+    "401": "Unauthorized",
+    "403": "Forbidden",
+    "404": "Not Found",
+    "500": "Internal Server Error",
+    "502": "Bad Gateway",
+    "503": "Service Unavailable",
+    "504": "Gateway Timeout",
+
+    "900": "Unidentified error"
+    }
+]
