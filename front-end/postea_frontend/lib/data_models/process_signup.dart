@@ -13,7 +13,7 @@ class ProcessSignUp {
 
   ProcessSignUp({this.email, this.username, this.password});
 
-  Object validateEmail() {
+  Future<List> validateEmail() async {
     Pattern pattern = r'(^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$)';
     RegExp regex = new RegExp(pattern);
     if (!regex.hasMatch(email)) {
@@ -22,6 +22,25 @@ class ProcessSignUp {
       return [errCode, errMsg];
     } else {
       //check if duplicate email exists in firebase
+      final databaseReference =
+          FirebaseDatabase.instance.reference().child("users");
+
+      await databaseReference.once().then((DataSnapshot snapshot) {
+        Map<dynamic, dynamic> values = snapshot.value;
+        values.forEach((key, value) {
+          value.forEach((key, value) {
+            if (value == email) {
+              errCode = 103;
+              errMsg = "Email already exists!";
+            }
+          });
+          // _email = values[username].toString();
+          // final _finalemail =
+          //     _email.substring(_email.indexOf(':') + 2, _email.length - 1);
+          //print("final email is " + _finalemail + "\n_email is " + _email);
+        });
+      });
+      print(errCode.toString() + " " + errMsg);
       return [errCode, errMsg];
     }
   }
@@ -75,8 +94,8 @@ class ProcessSignUp {
 
     try {
       // Creating New Account
-      User user = (await FirebaseAuth.instance.createUserWithEmailAndPassword(
-              email: email, password: password))
+      User user = (await FirebaseAuth.instance
+              .createUserWithEmailAndPassword(email: email, password: password))
           .user;
       /* Finish Creating New Account */
 

@@ -203,17 +203,10 @@ class _LoginState extends State<Login> {
                                     .once()
                                     .then((DataSnapshot snapshot) {
                                   Map<dynamic, dynamic> values = snapshot.value;
-                                  values.forEach((key, value) {
-                                    _email = values[username].toString();
-                                    final _finalemail = _email.substring(
-                                        _email.indexOf(':') + 2,
-                                        _email.length - 1);
-                                    print("final email is " +
-                                        _finalemail +
-                                        "\n_email is " +
-                                        _email);
-                                    logInUser(_finalemail, password);
-                                  });
+                                  print(values[username][username].toString());
+                                  _email =
+                                      values[username][username].toString();
+                                  logInUser(_email, password);
                                 });
                               } else {
                                 logInUser(_email, password);

@@ -73,16 +73,12 @@ class _SignUpState extends State<SignUp> {
       } else if (_pos == screenWidth) {
         _helperText = _usernameText;
         print("HEREHERE2");
-      }
-      else if(_pos == screenWidth *2){
-          print("HEREHERE3");
-         _helperText = _passwordText;
-        
-      }
-      else if(_pos == screenWidth *3){
-          _helperText = _almostThere;
+      } else if (_pos == screenWidth * 2) {
+        print("HEREHERE3");
+        _helperText = _passwordText;
+      } else if (_pos == screenWidth * 3) {
+        _helperText = _almostThere;
         _nextButtonText = "Sign Up";
-
       }
     });
   }
@@ -148,7 +144,7 @@ class _SignUpState extends State<SignUp> {
                     Container(
                         height: screenHeight / 4,
                         child: ListView(
-                           // physics: NeverScrollableScrollPhysics(),
+                            // physics: NeverScrollableScrollPhysics(),
                             controller: _scrollController,
                             scrollDirection: Axis.horizontal,
                             children: <Widget>[
@@ -160,7 +156,9 @@ class _SignUpState extends State<SignUp> {
                                     child: TextField(
                                         controller: _emailTextController,
                                         decoration: InputDecoration(
-                                          errorText: _emailValidate? _validateText: null,
+                                            errorText: _emailValidate
+                                                ? _validateText
+                                                : null,
                                             focusedBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: Colors.red[400]),
@@ -182,7 +180,6 @@ class _SignUpState extends State<SignUp> {
                                   ),
                                 ),
                               ),
-                              
                               SizedBox(
                                 width: screenWidth,
                                 child: Center(
@@ -191,7 +188,9 @@ class _SignUpState extends State<SignUp> {
                                     child: TextField(
                                         controller: _usernameTextController,
                                         decoration: InputDecoration(
-                                          errorText: _usernameValidate?_validateText:null,
+                                            errorText: _usernameValidate
+                                                ? _validateText
+                                                : null,
                                             contentPadding:
                                                 EdgeInsets.only(left: 30),
                                             hintText: "Username",
@@ -252,23 +251,24 @@ class _SignUpState extends State<SignUp> {
                                                         50)))),
                                   ),
                                 ),
-                              ),                              
+                              ),
                               SizedBox(
                                 width: screenWidth,
                                 child: Center(
                                   child: Padding(
                                     padding: const EdgeInsets.all(40.0),
                                     child: CheckboxListTile(
-                                      controlAffinity: ListTileControlAffinity.leading,
-                                      activeColor: Colors.red[300],
-                                      title: Text("I am 13 years of age or older"),
-                                      value: _checkBoxVal, 
-                                      onChanged: (newVal) {
-                                        setState(() {
-                                          _checkBoxVal = newVal;
-                                        });
-                                      }
-                                      ),
+                                        controlAffinity:
+                                            ListTileControlAffinity.leading,
+                                        activeColor: Colors.red[300],
+                                        title: Text(
+                                            "I am 13 years of age or older"),
+                                        value: _checkBoxVal,
+                                        onChanged: (newVal) {
+                                          setState(() {
+                                            _checkBoxVal = newVal;
+                                          });
+                                        }),
                                   ),
                                 ),
                               ),
@@ -283,22 +283,19 @@ class _SignUpState extends State<SignUp> {
                             borderRadius: BorderRadius.circular(50),
                             side: BorderSide(color: Colors.red[700])),
                         onPressed: () async {
-                          
                           if (_pos == 0) {
                             _email = _emailTextController.text;
 
-                          List retEmail =
-                                ProcessSignUp(email: _email).validateEmail();
-                          if(retEmail[0] == 0){
-                            _emailValidate = true;
-                          }
-                          else{
-                            print(retEmail[1]);
-                            return;
-                          }
-                          
-                          print(retEmail);
-                          
+                            List retEmail = await ProcessSignUp(email: _email)
+                                .validateEmail();
+                            if (retEmail[0] == 0) {
+                              _emailValidate = true;
+                            } else {
+                              print(retEmail[1]);
+                              return;
+                            }
+
+                            print(retEmail);
 
                             // Handle any email errors below
 
@@ -322,14 +319,10 @@ class _SignUpState extends State<SignUp> {
                               // Scaffold.of(context).showSnackBar(SnackBar(
                               //     content:
                               //         Text("This username already exists.")));
-                               _usernameValidate = true;
-                               print(retUsername);
-                               
-                              
-                            }
-                            else{
-
-                             print(retUsername);
+                              _usernameValidate = true;
+                              print(retUsername);
+                            } else {
+                              print(retUsername);
                               _usernameValidate = false;
                               return;
                             }
@@ -340,7 +333,7 @@ class _SignUpState extends State<SignUp> {
 
                             _pos = screenWidth * 2;
                             changeHelperText(screenWidth, screenHeight);
-                          } else if(_pos == screenWidth * 2){
+                          } else if (_pos == screenWidth * 2) {
                             // basic checking and store the password
 
                             _password = _passwordTextController.text;
@@ -355,10 +348,9 @@ class _SignUpState extends State<SignUp> {
                             //         username: _username, password: _password)
                             //     .processSignupRequest();
 
-                            if(retPassword[0] == 0){
+                            if (retPassword[0] == 0) {
                               _validateAll = true;
-                            }
-                            else{
+                            } else {
                               _validateAll = false;
                               print("failed");
                               print(retPassword);
@@ -369,19 +361,20 @@ class _SignUpState extends State<SignUp> {
                             print(
                                 "email: $_email, Username: $_username, Password: $_password");
                             _scrollController.animateTo(screenWidth * 3,
-                            duration: Duration(milliseconds: 300),
-                            curve: Curves.ease);
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.ease);
 
                             _pos = screenWidth * 3;
                             changeHelperText(screenWidth, screenHeight);
-                                
-                          } else if (_pos == screenWidth * 3){
+                          } else if (_pos == screenWidth * 3) {
+                            if (_checkBoxVal == true) {
+                              List retSignUp = await ProcessSignUp(
+                                      email: _email,
+                                      username: _username,
+                                      password: _password)
+                                  .processSignupRequest();
 
-                            if(_checkBoxVal == true){
-                              List retSignUp = await ProcessSignUp(email: _email, username: _username, password: _password).processSignupRequest();
-
-                              if(retSignUp[0] == 0){
-
+                              if (retSignUp[0] == 0) {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
@@ -389,7 +382,6 @@ class _SignUpState extends State<SignUp> {
                               }
                             }
                           }
-                          
                         },
                         child: Container(
                             child: Text(
