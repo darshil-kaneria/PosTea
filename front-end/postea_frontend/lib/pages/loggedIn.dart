@@ -8,11 +8,22 @@ class LoggedIn extends StatelessWidget {
         title: Text('Welcome to your Dashboard!'),
       ),
       body: Center(
-        child: Text(
-          'This is my Dashboard!',
-          textAlign: TextAlign.center,
-          style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
-        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+          Text(
+            'This is my Dashboard!',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 25, fontWeight: FontWeight.bold),
+          ),
+          RaisedButton(
+            onPressed: (){
+
+            }, 
+            child: Text("Logout")
+            )
+        ]),
       ),
     );
   }

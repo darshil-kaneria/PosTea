@@ -15,14 +15,14 @@ class _LoginState extends State<Login> {
   var _usernameController = TextEditingController();
   var _passwordController = TextEditingController();
 
-  void checkUserLoggedIn() {
-    User user = FirebaseAuth.instance.currentUser;
+  // void checkUserLoggedIn() {
+  //   User user = FirebaseAuth.instance.currentUser;
 
-    if (user != null) {
-      Navigator.push(
-          context, MaterialPageRoute(builder: (context) => LoggedIn()));
-    }
-  }
+  //   if (user != null) {
+  //     Navigator.push(
+  //         context, MaterialPageRoute(builder: (context) => LoggedIn()));
+  //   }
+  // }
 
   logInUser(String email, String password) async {
     print(email);
@@ -60,8 +60,9 @@ class _LoginState extends State<Login> {
 
   @override
   void initState() {
-    //checkUserLoggedIn();
+    
     super.initState();
+    // checkUserLoggedIn();
   }
 
   @override
