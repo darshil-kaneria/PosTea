@@ -206,6 +206,10 @@ class _LoginState extends State<Login> {
                                   print(values[username][username].toString());
                                   _email =
                                       values[username][username].toString();
+
+                                  if (_email == null) {
+                                    // do error checking for invalid credentials
+                                  }
                                   logInUser(_email, password);
                                 });
                               } else {
