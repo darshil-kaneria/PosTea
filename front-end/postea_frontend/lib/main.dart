@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:postea_frontend/pages/loggedIn.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -15,7 +16,37 @@ void main() async {
   runApp(PosTea());
 }
 
-class PosTea extends StatelessWidget {
+class PosTea extends StatefulWidget {
+  @override
+  _PosTeaState createState() => _PosTeaState();
+}
+
+class _PosTeaState extends State<PosTea> {
+
+  var firstScreen = '/login';
+
+void checkUserLoggedIn() {
+    User user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      setState(() {
+        firstScreen = '/home';
+      });
+    }
+    else {
+      setState(() {
+        firstScreen = '/login';
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    checkUserLoggedIn();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -23,7 +54,7 @@ class PosTea extends StatelessWidget {
       child: MaterialApp(
         debugShowCheckedModeBanner: false,
         title: "PosTea app",
-        initialRoute: '/login',
+        initialRoute: firstScreen,
         onGenerateRoute: Router.generateRoute,
       ),
     );
