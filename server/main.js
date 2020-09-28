@@ -1,8 +1,7 @@
 /**
- * Create a child process which executes test_concurrency_one.js
- * The child process is created when a client hits the '/' endpoint.
- * To test this functionality, go to postea-server.herokuapp.com/?number=<enter_number>
- * To test different execution times, try numbers like 100000000, 1000000, 100 in place of <enter_number>
+ * This file is divided into two parts; User endpoints and Dev endpoints. The former are supposed to be used to communicate with the user and
+ * the database while the latter are supposed to be used as dev tools only.
+ * To allow for a larger request processing capacity, each function must be added in a seperate file and should be forked into a new child when needed.
  * Do not exceed more than 255 processes since that is how many processes heroku supplies with the free dyno that we are currently running.
  */
 
@@ -21,10 +20,14 @@ app.get('/', (req, res)=>{
 
 });
 
-// Handle requests to make a post on PosTea
-app.get('/post', (req, res) => {
+/**
+ * User endpoints
+ */
 
-const handlePosts = fork('./add_profile.js');
+// Handle requests to make a post on PosTea
+app.get('/adduser', (req, res) => {
+
+const handlePosts = fork('./func/add_profile.js');
 var data = {
   username: req.query.account
 };
@@ -34,3 +37,18 @@ handlePosts.on("message", message => res.send(message));
 });
 
 app.listen(PORT, ()=>console.log("listening on port "+PORT));
+
+/**
+ * Dev endpoints - use with caution.
+ */
+
+ // Clears all data for a specific table
+app.get('/cleartable', (req, res) => {
+
+  const clearTableChild = fork('./func/clear_table.js');
+  var data = {
+    table: req.query.table
+  };
+  clearTableChild.send(data);
+  clearTableChild.on("message", message => res.send(message));
+});
