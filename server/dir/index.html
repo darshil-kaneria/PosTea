@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="text/javascript">
+            function fn() {
+                var str = document.getElementById("text").value;
+                options = {
+                    method: "POST",
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({str: str})
+                }
+                fetch("/makePost", options)
+                alert("Thank You for typing! We are still working on adding your post to the database. Sit tight!");
+            }
+        </script>
+    </head>
+    <body>
+        <h1>Postea App</h1>
+        <input id="text" placeholder="Enter your post">
+        <br>
+        <button id="btn1" onclick="fn()">Make Post</button>
+    </body>
+</html>

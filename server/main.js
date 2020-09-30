@@ -7,8 +7,10 @@
 
 const express = require('express');
 const app = express();
+app.use(express.static("dir"));
+app.use(express.json({limit: '2mb'}));
 const PORT = process.env.PORT || 23556;
-  
+
 //Create a fork object - test concurrency only
 const fork = require("child_process").fork;
 app.get('/', (req, res)=>{
@@ -34,6 +36,12 @@ var data = {
 handlePosts.send(data);
 handlePosts.on("message", message => res.send(message));
 
+});
+
+app.post('/makePost', (req, res) => {
+  const handleUserPosts = fork('./func/add_post.js');
+  handleUserPosts.send(req.body);
+  res.send(req.body);
 });
 
 app.listen(PORT, ()=>console.log("listening on port "+PORT));
