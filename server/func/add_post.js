@@ -24,3 +24,10 @@ const addPost = async (userPost, connection) => {
     });
 };
 
+const getPost = async(userPost, userid) => {
+    var query = "SELECT * FROM user_post "
+
+}
+
+
+
