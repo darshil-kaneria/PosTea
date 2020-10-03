@@ -27,7 +27,7 @@ app.get('/', (req, res)=>{
  */
 
 // Handle requests to make a post on PosTea
-app.get('/adduser', (req, res) => {
+app.post('/adduser', (req, res) => {
 
 const handlePosts = fork('./func/add_user.js');
 var data = {
@@ -38,11 +38,14 @@ handlePosts.on("message", message => res.send(message));
 
 });
 
-app.get('/addprofile', (req, res) => {
+app.post('/addprofile', (req, res) => {
 
   const handlePosts = fork('./func/add_profile.js');
   var data = {
-    username: req.query.account
+    username: req.query.account,
+    is_private: req.query.is_private, 
+    name: req.query.name, 
+    bio_data: req.query.bio_data
   };
   handlePosts.send(data);
   handlePosts.on("message", message => res.send(message));
