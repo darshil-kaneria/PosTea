@@ -1,8 +1,13 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/colors.dart';
 import 'package:postea_frontend/customWidgets/showUpAnimation.dart';
 import 'package:postea_frontend/data_models/process_signup.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import './loggedIn.dart';
 
 class SignUp extends StatefulWidget {
   @override
@@ -10,10 +15,11 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
-
   var _emailText = "What's your \nEmail ID?";
   var _usernameText = "Select a \nUsername";
   var _passwordText = "Enter your \nPassword";
+  var _almostThere = "You're almost \ndone!";
+  var _checkBoxVal = false;
   var _helperText;
   var _nextButtonText;
 
@@ -30,6 +36,13 @@ class _SignUpState extends State<SignUp> {
 
   var alignStart = Alignment.topCenter;
   var aLignEnd = Alignment.bottomRight;
+
+  bool _emailValidate = false;
+  bool _usernameValidate = false;
+  bool _passwordValidate = false;
+  bool _validateAll = false;
+
+  var _validateText = "";
 
   bool _revealPass = false;
 
@@ -52,16 +65,21 @@ class _SignUpState extends State<SignUp> {
   }
 
   void changeHelperText(var screenWidth, var screenHeight) {
+    print("POS is $_pos");
     setState(() {
       if (_pos == 0) {
-        _helperText = _usernameText;
+        _helperText = _emailText;
+        print("HEREHERE1");
       } else if (_pos == screenWidth) {
+        _helperText = _usernameText;
+        print("HEREHERE2");
+      } else if (_pos == screenWidth * 2) {
+        print("HEREHERE3");
         _helperText = _passwordText;
+      } else if (_pos == screenWidth * 3) {
+        _helperText = _almostThere;
         _nextButtonText = "Sign Up";
       }
-
-      // else if(_pos == screenWidth*2)
-      //   _helperText = _passwordText;
     });
   }
 
@@ -126,7 +144,7 @@ class _SignUpState extends State<SignUp> {
                     Container(
                         height: screenHeight / 4,
                         child: ListView(
-                            physics: NeverScrollableScrollPhysics(),
+                            // physics: NeverScrollableScrollPhysics(),
                             controller: _scrollController,
                             scrollDirection: Axis.horizontal,
                             children: <Widget>[
@@ -138,6 +156,9 @@ class _SignUpState extends State<SignUp> {
                                     child: TextField(
                                         controller: _emailTextController,
                                         decoration: InputDecoration(
+                                            errorText: _emailValidate
+                                                ? _validateText
+                                                : null,
                                             focusedBorder: OutlineInputBorder(
                                               borderSide: BorderSide(
                                                   color: Colors.red[400]),
@@ -167,6 +188,9 @@ class _SignUpState extends State<SignUp> {
                                     child: TextField(
                                         controller: _usernameTextController,
                                         decoration: InputDecoration(
+                                            errorText: _usernameValidate
+                                                ? _validateText
+                                                : null,
                                             contentPadding:
                                                 EdgeInsets.only(left: 30),
                                             hintText: "Username",
@@ -228,6 +252,26 @@ class _SignUpState extends State<SignUp> {
                                   ),
                                 ),
                               ),
+                              SizedBox(
+                                width: screenWidth,
+                                child: Center(
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(40.0),
+                                    child: CheckboxListTile(
+                                        controlAffinity:
+                                            ListTileControlAffinity.leading,
+                                        activeColor: Colors.red[300],
+                                        title: Text(
+                                            "I am 13 years of age or older"),
+                                        value: _checkBoxVal,
+                                        onChanged: (newVal) {
+                                          setState(() {
+                                            _checkBoxVal = newVal;
+                                          });
+                                        }),
+                                  ),
+                                ),
+                              ),
                             ])),
                     ButtonTheme(
                       height: screenHeight / 16,
@@ -238,13 +282,20 @@ class _SignUpState extends State<SignUp> {
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(50),
                             side: BorderSide(color: Colors.red[700])),
-                        onPressed: () {
-                          changeHelperText(_pos, screenHeight);
+                        onPressed: () async {
                           if (_pos == 0) {
-
                             _email = _emailTextController.text;
 
-                            Object retEmail = ProcessSignUp(email: _email).validateEmail();
+                            List retEmail = await ProcessSignUp(email: _email)
+                                .validateEmail();
+                            if (retEmail[0] == 0) {
+                              _emailValidate = true;
+                            } else {
+                              print(retEmail[1]);
+                              return;
+                            }
+
+                            print(retEmail);
 
                             // Handle any email errors below
 
@@ -253,29 +304,83 @@ class _SignUpState extends State<SignUp> {
                                 curve: Curves.ease);
 
                             _pos = screenWidth;
+                            changeHelperText(screenWidth, screenHeight);
                           } else if (_pos == screenWidth) {
-
                             _username = _usernameTextController.text;
 
-                            Object retUsername = ProcessSignUp(username: _username).validateUsername();
+                            List retUsername =
+                                await ProcessSignUp(username: _username)
+                                    .validateUsername();
+
                             // Handle any username errors below
+
+                            // duplicate username exists
+                            if (retUsername[0] == 0) {
+                              // Scaffold.of(context).showSnackBar(SnackBar(
+                              //     content:
+                              //         Text("This username already exists.")));
+                              _usernameValidate = true;
+                              print(retUsername);
+                            } else {
+                              print(retUsername);
+                              _usernameValidate = false;
+                              return;
+                            }
 
                             _scrollController.animateTo(screenWidth * 2,
                                 duration: Duration(milliseconds: 300),
                                 curve: Curves.ease);
 
                             _pos = screenWidth * 2;
-                          } else {
+                            changeHelperText(screenWidth, screenHeight);
+                          } else if (_pos == screenWidth * 2) {
                             // basic checking and store the password
 
                             _password = _passwordTextController.text;
 
-                            Object retPassword = ProcessSignUp(password: _password).validatePassword();
-                            
+                            List retPassword =
+                                ProcessSignUp(password: _password)
+                                    .validatePassword();
+
                             // Handle any password errors below
+
+                            // Map<Object, Object> signUp = ProcessSignUp(
+                            //         username: _username, password: _password)
+                            //     .processSignupRequest();
+
+                            if (retPassword[0] == 0) {
+                              _validateAll = true;
+                            } else {
+                              _validateAll = false;
+                              print("failed");
+                              print(retPassword);
+                            }
+
+                            // return this.errObj;
 
                             print(
                                 "email: $_email, Username: $_username, Password: $_password");
+                            _scrollController.animateTo(screenWidth * 3,
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.ease);
+
+                            _pos = screenWidth * 3;
+                            changeHelperText(screenWidth, screenHeight);
+                          } else if (_pos == screenWidth * 3) {
+                            if (_checkBoxVal == true) {
+                              List retSignUp = await ProcessSignUp(
+                                      email: _email,
+                                      username: _username,
+                                      password: _password)
+                                  .processSignupRequest();
+
+                              if (retSignUp[0] == 0) {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => LoggedIn()));
+                              }
+                            }
                           }
                         },
                         child: Container(

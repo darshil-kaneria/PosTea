@@ -4,13 +4,12 @@ import 'package:postea_frontend/pages/homepage.dart';
 import 'package:postea_frontend/pages/login.dart';
 import 'package:postea_frontend/pages/profile.dart';
 import 'package:postea_frontend/pages/signup.dart';
+import 'package:postea_frontend/pages/loggedIn.dart';
 
 class Router {
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     //final args = settings.arguments;
-
-    
 
     switch(settings.name){
       case '/login': // do login
@@ -28,7 +27,7 @@ class Router {
             return FadeTransition(opacity: animation, child: SlideTransition(position: Tween<Offset>(begin: Offset(1,0), end: Offset(0,0)).animate(CurvedAnimation(parent: animation, curve: Curves.decelerate)), child: child,));
           },
         );
-      case '/home': return MaterialPageRoute(builder: (_) => HomePage());// do homepage
+      case '/home': return MaterialPageRoute(builder: (_) => LoggedIn());// do homepage
       case '/profile': // do profile
         return PageRouteBuilder(
           transitionDuration: Duration(milliseconds: 300),

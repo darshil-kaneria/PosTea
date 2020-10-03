@@ -1,8 +1,12 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/data_models/process_login.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../colors.dart';
+import 'loggedIn.dart';
 
 class Login extends StatefulWidget {
+  final bool loginSuccess = false;
   @override
   _LoginState createState() => _LoginState();
 }
@@ -10,6 +14,42 @@ class Login extends StatefulWidget {
 class _LoginState extends State<Login> {
   var _usernameController = TextEditingController();
   var _passwordController = TextEditingController();
+
+  // void checkUserLoggedIn() {
+  //   User user = FirebaseAuth.instance.currentUser;
+
+  //   if (user != null) {
+  //     Navigator.push(
+  //         context, MaterialPageRoute(builder: (context) => LoggedIn()));
+  //   }
+  // }
+
+  logInUser(String email, String password) async {
+    print(email);
+    print(password);
+    try {
+      User user = (await FirebaseAuth.instance
+              .signInWithEmailAndPassword(email: email, password: password))
+          .user;
+
+      print("hello from logInUser()");
+
+      if (user != null) {
+        print("hello from logInUser() success");
+        Navigator.push(
+            context, MaterialPageRoute(builder: (context) => LoggedIn()));
+        // this.loginSucces = true;
+      } else {
+        print("hello from logInUser() err");
+        // this.loginSucces = false;
+      }
+    } catch (e) {
+      print(e);
+      // username = "";
+      password = "";
+      // this.loginSucces = false;
+    }
+  }
 
   @override
   void dispose() {
@@ -20,7 +60,9 @@ class _LoginState extends State<Login> {
 
   @override
   void initState() {
+    
     super.initState();
+    // checkUserLoggedIn();
   }
 
   @override
@@ -79,13 +121,12 @@ class _LoginState extends State<Login> {
                               controller: _usernameController,
                               decoration: InputDecoration(
                                 contentPadding: EdgeInsets.only(left: 30),
-                                hintText: "Username",
+                                hintText: "Username or Email",
                                 hoverColor: Colors.black,
                                 enabledBorder: OutlineInputBorder(
-                                    borderSide:
-                                        BorderSide(color: loginButton),
-                                    borderRadius: BorderRadius.all(
-                                        Radius.circular(50))),
+                                    borderSide: BorderSide(color: loginButton),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(50))),
                                 focusedBorder: OutlineInputBorder(
                                   borderSide:
                                       BorderSide(color: Colors.red[400]),
@@ -130,21 +171,58 @@ class _LoginState extends State<Login> {
                             elevation: 1,
                             color: loginButton,
                             highlightColor: Colors.red[700],
-                            onPressed: () {
+                            onPressed: () async {
                               // Login details retrieved here
 
-                              var username = _usernameController.text;
+                              var username =
+                                  _usernameController.text.trimRight();
                               var password = _passwordController.text;
 
                               print(
                                   "Username is $username and password is $password");
 
-                              bool isValid = ProcessLogin(username: username, password: password).validateString();
+                              bool isValid = ProcessLogin(
+                                      username: username, password: password)
+                                  .validateString();
 
+                              //Send these to auth handling class
 
-                              // Send these to auth handling class
+                              var _email = username;
+                              bool emailValid = RegExp(
+                                      r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                  .hasMatch(_email);
 
-                              Object ret = ProcessLogin(username: username, password: password).authenticate();
+                              if (!emailValid) {
+                                final databaseReference = FirebaseDatabase
+                                    .instance
+                                    .reference()
+                                    .child("users");
+
+                                print("hello");
+
+                                databaseReference
+                                    .once()
+                                    .then((DataSnapshot snapshot) {
+                                  Map<dynamic, dynamic> values = snapshot.value;
+                                  print(values[username][username].toString());
+                                  _email =
+                                      values[username][username].toString();
+
+                                  if (_email == null) {
+                                    // do error checking for invalid credentials
+                                  }
+                                  logInUser(_email, password);
+                                });
+                              } else {
+                                logInUser(_email, password);
+                              }
+
+                              // var ret = ProcessLogin(
+                              //     username: username, password: password);
+
+                              // bool logIn = ret.authenticate();
+
+                              // print("logIn is " + logIn.toString());
 
                               // Extract error message if any.
                             },
