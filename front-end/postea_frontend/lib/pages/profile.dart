@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/colors.dart';
+import 'package:postea_frontend/data_models/process_profile.dart';
 
 class Profile extends StatefulWidget {
   @override
@@ -7,10 +8,22 @@ class Profile extends StatefulWidget {
 }
 
 class _ProfileState extends State<Profile> {
+
+  var profileName = "Carl Grey";
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    ProcessProfile.getProfileName();
+
+
+  }
   @override
   Widget build(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
+    
 
     return Scaffold(
       backgroundColor: bgColor,
@@ -39,7 +52,7 @@ class _ProfileState extends State<Profile> {
                 // Profile circle
                 Center(
                   child: Container(
-                    child: Image.network("https://picsum.photos/"),
+                    child: Container(),
                     height: screenHeight / 7,
                     width: screenHeight / 7,
                     alignment: Alignment.center,
@@ -53,7 +66,7 @@ class _ProfileState extends State<Profile> {
                 ),
                 // Profile Name
                 Text(
-                  "Carl Grey",
+                  profileName,
                   style: TextStyle(fontSize: 30),
                 ),
                 SizedBox(height: screenHeight / 25),

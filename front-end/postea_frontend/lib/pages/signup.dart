@@ -7,6 +7,7 @@ import 'package:postea_frontend/customWidgets/showUpAnimation.dart';
 import 'package:postea_frontend/data_models/process_signup.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:postea_frontend/pages/homepage.dart';
 import './loggedIn.dart';
 
 class SignUp extends StatefulWidget {
@@ -378,7 +379,7 @@ class _SignUpState extends State<SignUp> {
                                 Navigator.push(
                                     context,
                                     MaterialPageRoute(
-                                        builder: (context) => LoggedIn()));
+                                        builder: (context) => HomePage()));
                               }
                             }
                           }

@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/data_models/process_login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:postea_frontend/pages/homepage.dart';
 import '../colors.dart';
 import 'loggedIn.dart';
 
@@ -37,7 +38,7 @@ class _LoginState extends State<Login> {
       if (user != null) {
         print("hello from logInUser() success");
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => LoggedIn()));
+            context, MaterialPageRoute(builder: (context) => HomePage()));
         // this.loginSucces = true;
       } else {
         print("hello from logInUser() err");

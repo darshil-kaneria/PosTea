@@ -5,7 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'data_models/timer.dart';
 // import 'pages/homepage.dart';
-import 'pages/route_generator.dart';
+import 'data_models/route_generator.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'pages/wrapper.dart';
 import './pages/login.dart';
