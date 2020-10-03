@@ -29,7 +29,7 @@ app.get('/', (req, res)=>{
 // Handle requests to make a post on PosTea
 app.get('/adduser', (req, res) => {
 
-const handlePosts = fork('./func/add_profile.js');
+const handlePosts = fork('./func/add_user.js');
 var data = {
   username: req.query.account
 };
