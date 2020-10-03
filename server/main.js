@@ -38,6 +38,17 @@ handlePosts.on("message", message => res.send(message));
 
 });
 
+app.get('/addprofile', (req, res) => {
+
+  const handlePosts = fork('./func/add_profile.js');
+  var data = {
+    username: req.query.account
+  };
+  handlePosts.send(data);
+  handlePosts.on("message", message => res.send(message));
+  
+  });
+   
 app.post('/makePost', (req, res) => {
   const handleUserPosts = fork('./func/add_post.js');
   handleUserPosts.send(req.body);
