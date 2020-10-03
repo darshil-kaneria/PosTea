@@ -36,8 +36,12 @@ process.on("message", message => {
           } else {
             connection.query(addProfileQuery, [values], function (err, result) {
               if (err) {
-                addProfile(user, is_private, name, bio_data, connection);
+                if (err.code === 'ER_DUP_ENTRY') {
+                    addProfile(user, is_private, name, bio_data, connection);
+                } else {
                 console.log(err);
+                throw err;
+                }
               } 
                 resolve("Added");
               });
