@@ -91,6 +91,7 @@ app.get('/cleartable', (req, res) => {
 app.get('/getpost', (req, res) => {
   const getpost = fork('./func/clear_table.js')
   var data = {
+    table: req.query.table
 
 
   };
