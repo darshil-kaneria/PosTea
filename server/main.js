@@ -38,15 +38,14 @@ handlePosts.on("message", message => res.send(message));
 
 });
 
-app.get('/addtopicinfo', (req, res) => {
+app.post('/addtopicinfo', (req, res) => {
   const handtopic = fork('./func/add_topic.js');
-  var data = {
-    topic_name: req.query.topic_name,
-    top_description: req.query.topic_description,
-  }
-  handtopic.send(data);
-  handtopic.on("message");
-
+  // var data = {
+  //   topic_name: req.query.topic_name,
+  //   top_description: req.query.topic_description,
+  // }
+  handtopic.send(req.body);
+  handtopic.on("message", message => res.send(message));
 });
 
 app.post('/addprofile', (req, res) => {

@@ -16,3 +16,21 @@ document.getElementById("btn1").onclick = () => {
     };
     fetch("/makePost", options);
 }
+
+document.getElementById("btn2").onclick = () => {
+    var topicID = document.getElementById("topic_id").value;
+    var topicCreatorID = document.getElementById("topic_creator_id").value;
+    var topicText = document.getElementById("newTopicText").value;
+    var topicDescription = document.getElementById("topic_description").value;
+
+    console.log(topicCreatorID);
+    console.log(topicDescription);
+    options = {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ topicText: topicText, topicID: topicID, topicCreatorID: topicCreatorID, topicDescription: topicDescription})
+    };
+    fetch("/addTopicInfo", options);
+}

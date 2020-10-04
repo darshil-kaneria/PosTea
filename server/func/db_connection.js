@@ -5,7 +5,7 @@
  */
 
 const mysql = require('mysql');
-const password = process.env.DB_ACCESS  || "e3TxsUd6da66m2D"; // DO NOT FORGET to remove the hardcoded password (if used) before pushing to Github or Heroku.
+const password = process.env.DB_ACCESS || "e3TxsUd6da66m2D"; // DO NOT FORGET to remove the hardcoded password (if used) before pushing to Github or Heroku.
 
 var conn = mysql.createPool({
     host: "postea-business.mysql.database.azure.com", 
