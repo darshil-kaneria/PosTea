@@ -18,7 +18,6 @@ process.on("message", message => {
 });
 
 
-
  function addUser(user, connection) {
 
     var username = user;
