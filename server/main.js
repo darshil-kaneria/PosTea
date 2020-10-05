@@ -68,8 +68,17 @@ app.post('/makePost', (req, res) => {
   res.send(req.body);
 });
 
-app.listen(PORT, ()=>console.log("listening on port "+PORT));
+app.get("/refreshTimeline", (req, res) => {
+  const handleRefreshTimeline = fork('./func/refreshTimeline.js');
+  data = {
+    profileID: req.query.profile_id
+  }
+  handleRefreshTimeline.send(data);
+  handleRefreshTimeline.on("message", message => res.send(message));
+  
+})
 
+app.listen(PORT, ()=>console.log("listening on port "+PORT));
 /**
  * Dev endpoints - use with caution.
  */
