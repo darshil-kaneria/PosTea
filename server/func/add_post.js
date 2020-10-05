@@ -16,6 +16,8 @@ process.on("message", message => {
             comment: message.comment
         }
         await addPost(dict, connection);
+        connection.release();
+        process.exit();
     });
 });
 
