@@ -111,6 +111,18 @@ app.post('/updatebiodata', (req,res)=> {
   handleUpdate.on("message", message => res.send(message));
 });
 
+app.get('/deletepost', (req, res) => {
+  const handledelete = fork('/func/delete_post');
+  var data = {
+    postId: req.query.postId,
+    profileId: req.query.profileId
+
+  }
+  handledelete.send(data);
+  handledelete.on("message",message => res.send(message));
+
+});
+
 app.post('/makePost', (req, res) => {
   const handleUserPosts = fork('./func/add_post.js');
   handleUserPosts.send(req.body);
@@ -148,3 +160,5 @@ app.get('/getpost', (req, res) => {
 });
 
 */
+
+
