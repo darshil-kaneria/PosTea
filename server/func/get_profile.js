@@ -10,6 +10,8 @@ process.on("message", message => {
       connection.release();
       if (answer == "Account does not exist") {
         process.send({"Error": "User does not exist"});
+      } else if (answer[0].profile_id != message.profile_id) {
+        process.send({"Error": "Unauthorised Access"});
       } else {
         var privacy = "Yes";
         if (answer[0].is_private == 0) {
