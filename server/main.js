@@ -30,10 +30,10 @@ app.get('/', (req, res)=>{
 app.get('/adduser', (req, res) => {
 
 const handlePosts = fork('./func/add_user.js');
-var data = {
-  username: req.query.account
-};
-handlePosts.send(data);
+// var data = {
+//   username: req.query.account
+// };
+handlePosts.send(req.body);
 handlePosts.on("message", message => res.send(message));
 
 });

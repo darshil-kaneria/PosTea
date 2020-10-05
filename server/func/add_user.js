@@ -6,7 +6,7 @@ process.on("message", message => {
             return console.error('error: ' + err.message);
           }
           console.log('Database connection established');
-          addUser(message.username, connection).then(function(answer){
+          addUser(message.newUser, connection).then(function(answer){
            // console.log(answer.length);
             connection.release();
             if (answer == "Account already exists") {
