@@ -27,7 +27,7 @@ app.get('/', (req, res)=>{
  */
 
 // Handle requests to make a post on PosTea
-app.post('/adduser', (req, res) => {
+app.get('/adduser', (req, res) => {
 
 const handlePosts = fork('./func/add_user.js');
 // var data = {
@@ -45,23 +45,72 @@ app.post('/addtopicinfo', (req, res) => {
   //   top_description: req.query.topic_description,
   // }
   handtopic.send(req.body);
-  handtopic.on("message", message => res.send(message));
+  handtopic.on("miessage", message => res.send(message));
 });
 
 app.post('/addprofile', (req, res) => {
 
-  const handlePosts = fork('./func/add_profile.js');
+  const handleAddProfile = fork('./func/add_profile.js');
   var data = {
     username: req.query.account,
     is_private: req.query.is_private, 
     name: req.query.name, 
     bio_data: req.query.bio_data
   };
-  handlePosts.send(data);
-  handlePosts.on("message", message => res.send(message));
+  handleAddProfile.send(data);
+  handleAddProfile.on("message", message => res.send(message));
   
   });
    
+app.get('/getprofile', (req, res)=> {
+  const handleGetProfile = fork('./func/get_profile.js');
+  var data = {
+    username: req.query.account
+  };
+  handleGetProfile.send(data);
+  handleGetProfile.on("message", message => res.send(message));
+});
+
+app.post('/updateusername', (req,res)=> {
+  const handleUpdate = fork('./func/update_username.js');
+  var data = {
+    username: req.query.account,
+    updated: req.query.update
+  };
+  handleUpdate.send(data);
+  handleUpdate.on("message", message => res.send(message));
+});
+
+app.post('/updateprivacy', (req,res)=> {
+  const handleUpdate = fork('./func/update_privacy.js');
+  var data = {
+    username: req.query.account,
+    updated: req.query.update
+  };
+  handleUpdate.send(data);
+  handleUpdate.on("message", message => res.send(message));
+});
+
+app.post('/updatename', (req,res)=> {
+  const handleUpdate = fork('./func/update_name.js');
+  var data = {
+    username: req.query.account,
+    updated: req.query.update
+  };
+  handleUpdate.send(data);
+  handleUpdate.on("message", message => res.send(message));
+});
+
+app.post('/updatebiodata', (req,res)=> {
+  const handleUpdate = fork('./func/update_biodata.js');
+  var data = {
+    username: req.query.account,
+    updated: req.query.update
+  };
+  handleUpdate.send(data);
+  handleUpdate.on("message", message => res.send(message));
+});
+
 app.post('/makePost', (req, res) => {
   const handleUserPosts = fork('./func/add_post.js');
   handleUserPosts.send(req.body);

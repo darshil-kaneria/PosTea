@@ -6,12 +6,12 @@ process.on("message", message => {
       return console.error('error: ' + err.message);
     }
     console.log('Database connection established');
-    addProfile(message.username, message.is_private, message.name, message.bio_data, connection).then(function(answer) {
+    updateName(message.username, message.updated, connection).then(function(answer) {
       connection.release();
-      if (answer == "Account already exists") {
-        process.send({"Error": "User information already exists"});
+      if (answer == "Account does not exist") {
+        process.send({"Error": "No account with that username exists"});
       } else {
-      process.send({"Profile user information added": "Successfully"});
+        process.send({"User privacy setting updated": "Successfully"});
       }
       process.exit();
     
@@ -19,29 +19,24 @@ process.on("message", message => {
 });
 });
 
- function addProfile(user, is_private, name, bio_data, connection) {
+ function updateName(user, updated, connection) {
     var username = user;
-    var profile_id = Math.random();
     var selectQuery = "SELECT * FROM profile WHERE username = ?";
-    var addProfileQuery = "INSERT INTO profile (profile_id, username, is_private, name, bio_data) VALUES ?";
-    var values = [[profile_id, username, is_private, name, bio_data]];
+    console.log(updated);
+    var updateQuery = "UPDATE profile SET is_private = '"+updated+"' WHERE username = '"+username+"'";
     return new Promise(function(resolve, reject) {
       connection.query(selectQuery,[user],  function (err, result) {
         if (err) {
           console.log(err);
           throw err;}
         try {
-          if (result.length == 1) {
-            resolve("Account already exists");
+          if (result.length == 0) {
+            resolve("Account does not exist");
           } else {
-            connection.query(addProfileQuery, [values], function (err, result) {
+            connection.query(updateQuery, function (err, result) {
               if (err) {
-                if (err.code === 'ER_DUP_ENTRY') {
-                    addProfile(user, is_private, name, bio_data, connection);
-                } else {
                 console.log(err);
                 throw err;
-                }
               } 
                 resolve("Added");
               });
