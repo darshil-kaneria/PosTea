@@ -48,7 +48,7 @@ app.post('/addtopicinfo', (req, res) => {
   handtopic.on("miessage", message => res.send(message));
 });
 
-app.get('/addprofile', (req, res) => {
+app.post('/addprofile', (req, res) => {
 
   const handleAddProfile = fork('./func/add_profile.js');
   var data = {
@@ -71,7 +71,7 @@ app.get('/getprofile', (req, res)=> {
   handleGetProfile.on("message", message => res.send(message));
 });
 
-app.get('/updateusername', (req,res)=> {
+app.post('/updateusername', (req,res)=> {
   const handleUpdate = fork('./func/update_username.js');
   var data = {
     username: req.query.account,
@@ -81,7 +81,7 @@ app.get('/updateusername', (req,res)=> {
   handleUpdate.on("message", message => res.send(message));
 });
 
-app.get('/updateprivacy', (req,res)=> {
+app.post('/updateprivacy', (req,res)=> {
   const handleUpdate = fork('./func/update_privacy.js');
   var data = {
     username: req.query.account,
@@ -91,7 +91,7 @@ app.get('/updateprivacy', (req,res)=> {
   handleUpdate.on("message", message => res.send(message));
 });
 
-app.get('/updatename', (req,res)=> {
+app.post('/updatename', (req,res)=> {
   const handleUpdate = fork('./func/update_name.js');
   var data = {
     username: req.query.account,
@@ -101,7 +101,7 @@ app.get('/updatename', (req,res)=> {
   handleUpdate.on("message", message => res.send(message));
 });
 
-app.get('/updatebiodata', (req,res)=> {
+app.post('/updatebiodata', (req,res)=> {
   const handleUpdate = fork('./func/update_biodata.js');
   var data = {
     username: req.query.account,
