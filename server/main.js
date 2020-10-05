@@ -71,6 +71,46 @@ app.get('/getprofile', (req, res)=> {
   handleGetProfile.on("message", message => res.send(message));
 });
 
+app.get('/updateusername', (req,res)=> {
+  const handleUpdate = fork('./func/update_username.js');
+  var data = {
+    username: req.query.account,
+    updated: req.query.update
+  };
+  handleUpdate.send(data);
+  handleUpdate.on("message", message => res.send(message));
+});
+
+app.get('/updateprivacy', (req,res)=> {
+  const handleUpdate = fork('./func/update_privacy.js');
+  var data = {
+    username: req.query.account,
+    updated: req.query.update
+  };
+  handleUpdate.send(data);
+  handleUpdate.on("message", message => res.send(message));
+});
+
+app.get('/updatename', (req,res)=> {
+  const handleUpdate = fork('./func/update_name.js');
+  var data = {
+    username: req.query.account,
+    updated: req.query.update
+  };
+  handleUpdate.send(data);
+  handleUpdate.on("message", message => res.send(message));
+});
+
+app.get('/updatebiodata', (req,res)=> {
+  const handleUpdate = fork('./func/update_biodata.js');
+  var data = {
+    username: req.query.account,
+    updated: req.query.update
+  };
+  handleUpdate.send(data);
+  handleUpdate.on("message", message => res.send(message));
+});
+
 app.post('/makePost', (req, res) => {
   const handleUserPosts = fork('./func/add_post.js');
   handleUserPosts.send(req.body);
