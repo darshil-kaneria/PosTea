@@ -17,7 +17,7 @@ document.getElementById("btn1").onclick = () => {
         body: JSON.stringify({ msg: post, topic: topic, postTitle: postTitle, profileID: profileID, topicID: topicID, likes: likes, dislikes: dislikes, comment: comment})
     };
     fetch("/makePost", options);
-    alert("Request to add post sent successfully.")
+    alert("Request to add post sent successfully.");
 };
 
 document.getElementById("btn2").onclick = () => {
@@ -36,7 +36,7 @@ document.getElementById("btn2").onclick = () => {
         body: JSON.stringify({ topicText: topicText, topicID: topicID, topicCreatorID: topicCreatorID, topicDescription: topicDescription})
     };
     fetch("/addTopicInfo", options);
-    alert("Request to add topic sent successfully.")
+    alert("Request to add topic sent successfully.");
 };
 
 document.getElementById("newUserBtn").onclick = () => {
@@ -49,5 +49,21 @@ document.getElementById("newUserBtn").onclick = () => {
         body: JSON.stringify({newUser: newUser})
     };
     fetch("/adduser", options);
-    alert("Request to add user sent successfully.")
+    alert("Request to add user sent successfully.");
 };
+
+document.getElementById("addProfile").onclick = () => {
+    var username = document.getElementById("username").value;
+    var privateAcc = document.getElementById("privateAcc").value;
+    var name = document.getElementById("name").value;
+    var biodata = document.getElementById("biodata").value;
+    options = {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({username: username, privateAcc: privateAcc, name: name, biodata: biodata})
+    };
+    fetch("/addProfile", options);
+    alert("Request to add profile sent successfully.");
+}

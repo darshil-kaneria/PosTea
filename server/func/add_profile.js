@@ -6,7 +6,7 @@ process.on("message", message => {
       return console.error('error: ' + err.message);
     }
     console.log('Database connection established');
-    addProfile(message.username, message.is_private, message.name, message.bio_data, connection).then(function(answer) {
+    addProfile(message.username, message.privateAcc, message.name, message.biodata, connection).then(function(answer) {
       connection.release();
       if (answer == "Account already exists") {
         process.send({"Error": "User information already exists"});
@@ -21,7 +21,8 @@ process.on("message", message => {
 
  function addProfile(user, is_private, name, bio_data, connection) {
     var username = user;
-    var profile_id = Math.random();
+    var profile_id = -1;
+    profile_id = Math.floor(Math.random() * 100000);
     var selectQuery = "SELECT * FROM profile WHERE username = ?";
     var addProfileQuery = "INSERT INTO profile (profile_id, username, is_private, name, bio_data) VALUES ?";
     var values = [[profile_id, username, is_private, name, bio_data]];

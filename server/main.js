@@ -51,13 +51,13 @@ app.post('/addtopicinfo', (req, res) => {
 app.post('/addprofile', (req, res) => {
 
   const handleAddProfile = fork('./func/add_profile.js');
-  var data = {
-    username: req.query.account,
-    is_private: req.query.is_private, 
-    name: req.query.name, 
-    bio_data: req.query.bio_data
-  };
-  handleAddProfile.send(data);
+  // var data = {
+  //   username: req.query.account,
+  //   is_private: req.query.is_private, 
+  //   name: req.query.name, 
+  //   bio_data: req.query.bio_data
+  // };
+  handleAddProfile.send(req.body);
   handleAddProfile.on("message", message => res.send(message));
   
   });

@@ -25,9 +25,7 @@ process.on("message", message => {
 
 const addPost = async (dict, connection) => {
     var id = -1;
-    id = Math.floor(Math.random() * 100000)
-
-
+    id = Math.floor(Math.random() * 100000);
     console.log(id)
     var userPostMessage = dict.post;
     var topic = dict.topic
@@ -52,7 +50,7 @@ const addPost = async (dict, connection) => {
             } else {
                 await connection.query(queryString, [fields], (err, result) => {
                     if (err) {
-                        if (err.code == 'ER_DUP_ENTRY') {
+                        if (err.code === 'ER_DUP_ENTRY') {
                             addPost(dict, connection);
                         } else {
                             console.log("error: " + err.message);
