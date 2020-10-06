@@ -9,6 +9,7 @@ process.on("message", message => {
             title: message.postTitle,
             post: message.msg,
             topic: message.topic,
+            img: message.img,
             topicID: message.topicID,
             profileID: message.profileID,
             likes: message.likes,
@@ -34,7 +35,7 @@ const addPost = async (dict, connection) => {
     var addTopicContent = "INSERT INTO topic_content (topic_id, post_id) VALUES ?";
     var curr_date = new Date().toISOString().slice(0, 19).replace('T', ' ');
     var topicContentFields = [[dict.topicID, dict.profileID]];
-    var fields = [[id, dict.profileID, userPostMessage, dict.topicID, "none", curr_date, dict.likes, dict.dislikes, dict.comment, dict.title]];
+    var fields = [[id, dict.profileID, userPostMessage, dict.topicID, dict.img, curr_date, dict.likes, dict.dislikes, dict.comment, dict.title]];
 
     return new Promise(async (resolve, reject) => {
         await connection.query(queryTopicExists, async (err, result) => {

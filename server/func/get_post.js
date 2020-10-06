@@ -8,7 +8,7 @@ process.on("message", message => {
           }
           
           console.log('Database connection established');
-          await getPost(message.userid, connection);
+          await getPost(message.post_id, connection);
           connection.release();
           process.send({"post retrieved": "success"});
           process.exit();
@@ -16,14 +16,10 @@ process.on("message", message => {
         });
 });
 
-
-
-
-
-const getPost = async(userid) => {
-    var query = "SELECT * FROM user_post WHERE user_post.post_id = ? VALUE";
+const getPost = async(postId, connection) => {
+    var query = "SELECT * FROM user_post WHERE user_post.post_id = ?";
     return new Promise(function(resolve, reject) {
-        connection.query(query,[userid],function(err, result)  {
+       connection.query(query,[postId],function(err, result)  {
             if (err) {
                 console.log("error:" + err.message);
                 throw err;
@@ -32,6 +28,7 @@ const getPost = async(userid) => {
                 console.log("Post does not exist");
             } else {
                 console.log("Post retrieved");
+                console.log(result);
                 return result;
                 
             }

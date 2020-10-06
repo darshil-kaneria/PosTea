@@ -6,6 +6,7 @@ document.getElementById("btn1").onclick = () => {
     var topicID = document.getElementById("topicID").value;
     var likes = document.getElementById("likes").value;
     var dislikes = document.getElementById("dislikes").value;
+    var img = document.getElementById("img").value;
     var comment = document.getElementById("postComments").value;
     var postTitle = document.getElementById("postTitle").value;
 
@@ -14,7 +15,7 @@ document.getElementById("btn1").onclick = () => {
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ msg: post, topic: topic, postTitle: postTitle, profileID: profileID, topicID: topicID, likes: likes, dislikes: dislikes, comment: comment})
+        body: JSON.stringify({ msg: post, topic: topic, postTitle: postTitle, profileID: profileID, img: img, topicID: topicID, likes: likes, dislikes: dislikes, comment: comment})
     };
     fetch("/makePost", options);
     alert("Request to add post sent successfully.");

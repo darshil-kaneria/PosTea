@@ -129,6 +129,26 @@ app.post('/makePost', (req, res) => {
   res.send(req.body);
 });
 
+app.get('/getpost', (req, res) => {
+  const getpost = fork('./func/get_post.js');
+  var data = {
+    post_id: req.query.post_id
+  };
+  getpost.send(data);
+  getpost.on("message", message => res.send(message));
+  
+  
+});
+
+app.get('/getcomments', (req, res) => {
+  const handleComments = fork("./func/get_comments.js");
+  var data = {
+    post_id: req.query.post_id
+  }
+  handleComments.send(data);
+  handleComments.on("message", message => res.send(message));
+})
+
 app.get("/refreshTimeline", (req, res) => {
   const handleRefreshTimeline = fork('./func/refreshTimeline.js');
   data = {
@@ -139,6 +159,8 @@ app.get("/refreshTimeline", (req, res) => {
   handleRefreshTimeline.on("message", message => res.send(message));
   
 })
+
+
 
 app.listen(PORT, ()=>console.log("listening on port "+PORT));
 /**
@@ -156,19 +178,5 @@ app.get('/cleartable', (req, res) => {
   clearTableChild.on("message", message => res.send(message));
 });
 
-
-/*
-app.get('/getpost', (req, res) => {
-  const getpost = fork('./func/get_post.js')
-  var data = {
-    table: req.query.table
-
-
-  };
-  
-  
-});
-
-*/
 
 

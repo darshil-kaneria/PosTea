@@ -14,7 +14,6 @@ process.on("message", message => {
       process.send({"Profile user information added": "Successfully"});
       }
       process.exit();
-    
   });
 });
 });
