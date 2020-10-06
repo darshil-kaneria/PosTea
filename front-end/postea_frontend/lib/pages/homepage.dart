@@ -1,5 +1,9 @@
 import 'dart:async';
+// import 'dart:html';
+import 'dart:io';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flappy_search_bar/flappy_search_bar.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:postea_frontend/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/customWidgets/customNavBar.dart';
@@ -9,6 +13,9 @@ import 'package:postea_frontend/data_models/timer.dart';
 import 'package:provider/provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:postea_frontend/customWidgets/topic_pill.dart';
+import 'package:http/http.dart' as http;
+import 'package:postea_frontend/data_models/process_timeline.dart';
+import 'login.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -17,18 +24,53 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
 
+  // File _postImage;
+
   var _scrollController = new ScrollController();
   var postTextController = new TextEditingController();
   var postTitleController = new TextEditingController();
+  var checkPosScrollController = new ScrollController();
+ 
+  ProcessTimeline timeLine = new ProcessTimeline(1);
+
+  var offset = 0;
   
+  _scrollListener() {
+
+    if (checkPosScrollController.offset >= checkPosScrollController.position.maxScrollExtent &&
+        !checkPosScrollController.position.outOfRange) {
+      setState(() {
+      offset = offset+3;
+      updatePost();
+            });
+    }
+    
+ 
+ }
 
   @override
   void initState() {
-    Timer.periodic(Duration(seconds: 1), (timer) {
-      var timer = Provider.of<TimerCount>(context, listen: false);
-      timer.changeVal();
-     });
+    // Timer.periodic(Duration(seconds: 1), (timer) {
+    //   var timer = Provider.of<TimerCount>(context, listen: false);
+    //   timer.changeVal();
+    //  });
+    checkPosScrollController.addListener(_scrollListener);
+     setState(() {
+      offset = offset+3;
+      updatePost();
+            });
     super.initState();
+  }
+
+  pickImage() async {
+    // PickedFile img = await ImagePicker().getImage(source: ImageSource.gallery);
+    File img2 = await ImagePicker.pickImage(source: ImageSource.gallery);
+    print(img2);
+  }
+
+  Future<http.Response> updatePost() async{
+    await timeLine.setOffset(offset);
+    return await timeLine.getPosts();
   }
 
   @override
@@ -38,99 +80,134 @@ class _HomePageState extends State<HomePage> {
     var screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero,
+          children: [
+            DrawerHeader(child: Text(""),
+            decoration: BoxDecoration(
+              color: Colors.purple[900]
+            ),),
+            ListTile(
+                title: Text("Logout"),
+                onTap: () async {
+                  await FirebaseAuth.instance.signOut();
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Login()));
+                },
+            )
+          ],
+        ),
+      ),
       bottomNavigationBar: BottomNavigationBar(items: [
         BottomNavigationBarItem(icon: Icon(Icons.home), title: Text("Home"),),
         BottomNavigationBarItem(icon: Icon(Icons.create), title: Text("New Post"),),
         BottomNavigationBarItem(icon: Icon(Icons.trending_up), title: Text("Trending"))
       ],
       onTap: (value) {
+        if(value == 2){
+          setState(() {
+              offset = offset+2;
+              updatePost();
+            });
+        }
+        else if(value == 1)
         // Making a post logic
-        print("pressde");
         showDialog(
           context: context,
+          barrierDismissible: false,
           builder: (context) {
-            return Dialog(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
-              child: Container(
-                width: screenWidth/1.1,
-                height: screenHeight/1.8,
-                              child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                      padding: EdgeInsets.only(left: 18, right: 18, top: 15),
-                        color: Colors.transparent,
-                        child: TextField(
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Title",
-                          ),
-                          controller: postTitleController,
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 4,
-                      child: SingleChildScrollView(
-                        padding: EdgeInsets.symmetric(horizontal: 18),
-                        scrollDirection: Axis.vertical,                       
-                        child: TextField(
-                          maxLines: null,
-                          keyboardType: TextInputType.multiline,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: "Post description"
-                          ),
-                          controller: postTextController,
-                        ),
-                      ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        padding: EdgeInsets.only(left: 13, right: 13),
-                        color: Colors.transparent,
-                        child: Row(
-                          children: [
-                            IconButton(icon: Icon(Icons.camera_alt, color: Colors.grey,), onPressed: (){}),
-                            IconButton(icon: Icon(Icons.attachment, color: Colors.grey,), onPressed: (){}),
-                            IconButton(icon: Icon(Icons.location_on, color: Colors.grey,), onPressed: (){}),
-                            Expanded(
-                            child: Container(
-                              padding: EdgeInsets.only(right: 15),
-                              alignment: Alignment.centerRight,
-                              child: Container(
-                                alignment: Alignment.center,
-                                height: screenHeight/22,
-                                width: screenWidth/4.5,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.all(Radius.circular(15)),
-                                  border: Border.all(color: Colors.grey)
-                                ),
-                                child: Text("Topic", style: TextStyle(fontSize: 15),),
-                              ),
+            return WillPopScope(
+                onWillPop: () async {
+                  postTitleController.clear();
+                  postTextController.clear();
+                  return true;
+                },
+                child: Dialog(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(20))),
+                child: Container(
+                  width: screenWidth/1.1,
+                  height: screenHeight/1.8,
+                                child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                        padding: EdgeInsets.only(left: 18, right: 18, top: 15),
+                          color: Colors.transparent,
+                          child: TextField(
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "Title",
                             ),
-                          )
-                          ],
+                            controller: postTitleController,
+                            style: TextStyle(fontWeight: FontWeight.bold),
+                          ),
                         ),
                       ),
-                    ),
-                    Expanded(
-                      flex: 1,
-                      child: Container(
-                        margin: EdgeInsets.symmetric(horizontal: 13),
-                        alignment: Alignment.center,
-                        child: Text("Post"),
-                        decoration: BoxDecoration(
-                          border: Border(top: BorderSide(color: Colors.grey, width: 0.5))
+                      Expanded(
+                        flex: 4,
+                        child: SingleChildScrollView(
+                          padding: EdgeInsets.symmetric(horizontal: 18),
+                          scrollDirection: Axis.vertical,                       
+                          child: TextField(
+                            maxLines: null,
+                            keyboardType: TextInputType.multiline,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: "Post description"
+                            ),
+                            controller: postTextController,
+                          ),
                         ),
                       ),
-                    )
-                  ],
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          padding: EdgeInsets.only(left: 13, right: 13),
+                          color: Colors.transparent,
+                          child: Row(
+                            children: [
+                              IconButton(icon: Icon(Icons.image, color: Colors.grey,), onPressed: (){
+                                pickImage();
+                              }),
+                              IconButton(icon: Icon(Icons.attachment, color: Colors.grey,), onPressed: (){}),
+                              IconButton(icon: Icon(Icons.location_on, color: Colors.grey,), onPressed: (){}),
+                              Expanded(
+                              child: Container(
+                                padding: EdgeInsets.only(right: 15),
+                                alignment: Alignment.centerRight,
+                                child: Container(
+                                  alignment: Alignment.center,
+                                  height: screenHeight/22,
+                                  width: screenWidth/4.5,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.all(Radius.circular(15)),
+                                    border: Border.all(color: Colors.grey)
+                                  ),
+                                  child: Text("Topic", style: TextStyle(fontSize: 15),),
+                                ),
+                              ),
+                            )
+                            ],
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Container(
+                          margin: EdgeInsets.symmetric(horizontal: 13),
+                          alignment: Alignment.center,
+                          child: Text("Post"),
+                          decoration: BoxDecoration(
+                            border: Border(top: BorderSide(color: Colors.grey, width: 0.5))
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
             );
@@ -139,7 +216,7 @@ class _HomePageState extends State<HomePage> {
       },),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
-        leading: Icon(Icons.menu),
+        // leading: Icon(Icons.menu),
         elevation: 0,
         iconTheme: IconThemeData(
           color: Colors.black
@@ -173,15 +250,39 @@ class _HomePageState extends State<HomePage> {
           ),
           Padding(padding: EdgeInsets.only(top: 20)),
           Expanded(
-              child: ListView(
-                children: [
-                  PostTile(),
-                  PostTile(),
-                  PostTile()
+              child: FutureBuilder(
+                future: updatePost(),
+                builder: (BuildContext context, AsyncSnapshot<http.Response> snapshot){
 
-                
-              ],
-            ),
+                  if(snapshot.hasData){
+
+                    return ListView.builder(
+                  controller: checkPosScrollController,
+                  itemCount: timeLine.postList.length,
+                  itemBuilder: (BuildContext context, int index){
+                    return PostTile(
+                      timeLine.postList.elementAt(index).post_id,
+                      timeLine.postList.elementAt(index).profile_id,
+                      timeLine.postList.elementAt(index).post_description,
+                      timeLine.postList.elementAt(index).topic_id,
+                      timeLine.postList.elementAt(index).post_img,
+                      timeLine.postList.elementAt(index).creation_date,
+                      timeLine.postList.elementAt(index).post_likes,
+                      timeLine.postList.elementAt(index).post_dislikes,
+                      timeLine.postList.elementAt(index).post_comments,
+                      timeLine.postList.elementAt(index).post_title,
+                      );
+                  }
+            );
+
+                  }
+                  else return Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.amber),));
+
+                  
+
+                }
+                              
+              ),
           )
          
 

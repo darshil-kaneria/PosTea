@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:postea_frontend/pages/devpage.dart';
 import 'package:postea_frontend/pages/error.dart';
 import 'package:postea_frontend/pages/homepage.dart';
 import 'package:postea_frontend/pages/login.dart';
@@ -29,7 +30,8 @@ class Router {
           },
         );
       case '/home': return MaterialPageRoute(builder: (_) => HomePage());// do homepage
-      case '/error': return MaterialPageRoute(builder: (_) => ErrorPage());// do homepage
+      case '/devpage': return MaterialPageRoute(builder: (_) => DevPage());// do DevPage
+      case '/error': return MaterialPageRoute(builder: (_) => ErrorPage());// do errorPage
       case '/profile': // do profile
         return PageRouteBuilder(
           transitionDuration: Duration(milliseconds: 300),
