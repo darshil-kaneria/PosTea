@@ -12,7 +12,7 @@ process.on("message", message => {
             if (answer == "Account already exists") {
               process.send({"Error": "User already exists"});
             } else {
-            process.send({"userAdded": message.username});
+            process.send({"userAdded": message.newUser});
             }
             process.exit();
           }) 
