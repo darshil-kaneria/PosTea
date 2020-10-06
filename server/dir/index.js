@@ -67,3 +67,18 @@ document.getElementById("addProfile").onclick = () => {
     fetch("/addProfile", options);
     alert("Request to add profile sent successfully.");
 }
+
+document.getElementById("deletePost").onclick = () => {
+    var deletePostID = document.getElementById("deletePostID").value;
+    var deleteProfileID = document.getElementById("deleteProfileID").value;
+
+    options = {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({deletePostID: deletePostID, deleteProfileID: deleteProfileID})
+    };
+    fetch("/deletepost", options);
+    alert("Request to delete post sent successfully.");
+}
