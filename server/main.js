@@ -111,14 +111,14 @@ app.post('/updatebiodata', (req,res)=> {
   handleUpdate.on("message", message => res.send(message));
 });
 
-app.get('/deletepost', (req, res) => {
-  const handledelete = fork('/func/delete_post');
-  var data = {
-    postId: req.query.postId,
-    profileId: req.query.profileId
+app.post('/deletepost', (req, res) => {
+  const handledelete = fork('./func/delete_post.js');
+  // var data = {
+  //   postId: req.query.postId,
+  //   profileId: req.query.profileId
 
-  }
-  handledelete.send(data);
+  // }
+  handledelete.send(req.body);
   handledelete.on("message",message => res.send(message));
 
 });
