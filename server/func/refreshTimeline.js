@@ -7,7 +7,7 @@ process.on("message", message => {
             return console.error("error: " + err.message);
         }
 
-        await refreshTimeline(message.profileID, connection).then((answer) => {
+        await refreshTimeline(message.profileID, message.offset, connection).then((answer) => {
             connection.release();
             process.exit();
         });
@@ -17,8 +17,8 @@ process.on("message", message => {
     // process.exit()
 });
 
-refreshTimeline = async (profileID, connection) => {
-    var query = "SELECT post_description, topic_id, post_img, creation_date, post_likes, post_dislikes, post_comments FROM user_post WHERE profile_id = " + String(profileID) + " ORDER BY creation_date DESC LIMIT 100";
+refreshTimeline = async (profileID, offset, connection) => {
+    var query = "SELECT * FROM user_post WHERE profile_id = " + String(profileID) + " ORDER BY creation_date DESC LIMIT " + String(offset) + ", 2";
     return new Promise(async (resolve, reject) => {
         await connection.query(query, (err, result) => {
             if (err) {

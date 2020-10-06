@@ -132,7 +132,8 @@ app.post('/makePost', (req, res) => {
 app.get("/refreshTimeline", (req, res) => {
   const handleRefreshTimeline = fork('./func/refreshTimeline.js');
   data = {
-    profileID: req.query.profile_id
+    profileID: req.query.profile_id,
+    offset: req.query.post_offset
   }
   handleRefreshTimeline.send(data);
   handleRefreshTimeline.on("message", message => res.send(message));

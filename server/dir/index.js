@@ -15,6 +15,7 @@ document.getElementById("btn1").onclick = () => {
         body: JSON.stringify({ msg: post, topic: topic, postID: postID, profileID: profileID, topicID: topicID, likes: likes, dislikes: dislikes, comment: comment})
     };
     fetch("/makePost", options);
+    alert("Request to add post sent successfully.")
 };
 
 document.getElementById("btn2").onclick = () => {
@@ -33,6 +34,7 @@ document.getElementById("btn2").onclick = () => {
         body: JSON.stringify({ topicText: topicText, topicID: topicID, topicCreatorID: topicCreatorID, topicDescription: topicDescription})
     };
     fetch("/addTopicInfo", options);
+    alert("Request to add topic sent successfully.")
 };
 
 document.getElementById("newUserBtn").onclick = () => {
@@ -45,4 +47,5 @@ document.getElementById("newUserBtn").onclick = () => {
         body: JSON.stringify({newUser: newUser})
     };
     fetch("/adduser", options);
+    alert("Request to add user sent successfully.")
 };
