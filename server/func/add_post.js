@@ -15,9 +15,11 @@ process.on("message", message => {
             dislikes: message.dislikes,
             comment: message.comment
         }
-        await addPost(dict, connection);
-        connection.release();
-        process.exit();
+        await addPost(dict, connection).then((answer) => {
+            connection.release();
+            process.exit();
+        });
+        
     });
 });
 
@@ -31,38 +33,39 @@ const addPost = async (dict, connection) => {
     var topicContentFields = [[dict.topicID, dict.profileID]];
     var fields = [[dict.postID, dict.profileID, userPostMessage, dict.topicID, "none", curr_date, dict.likes, dict.dislikes, dict.comment]];
     
-    await connection.query(queryTopicExists, async (err, result) => {
-        if (err) {
-            console.log("error: " + err.message);
-            throw err;
-        }
-        result = JSON.stringify(result);
-        result = JSON.parse(result);
-        console.log(result);
-        if (result[0].topic_name == null) {
-            flag = 1;
-        } else {
-            await connection.query(queryString, [fields], (err, result) => {
-                if (err) {
-                    console.log("error: " + err.message);
-                    throw err;
-                }
-                console.log("Post added succesfully!!");
-                return result;
-            });
-            
-            await connection.query(addTopicContent, [topicContentFields], (err, result) => {
-                if (err) {
-                    console.log("error: " + err.message);
-                    throw err;
-                }
-                console.log("Post information added to topic_content " + topic + " succesfully!!");
-                return result;
-            });
-        }
-        return result;
-    });
-    
+    return new Promise(async (resolve, reject) => {
+        await connection.query(queryTopicExists, async (err, result) => {
+            if (err) {
+                console.log("error: " + err.message);
+                throw err;
+            }
+            result = JSON.stringify(result);
+            result = JSON.parse(result);
+            console.log(result);
+            if (result[0].topic_name == null) {
+                flag = 1;
+            } else {
+                await connection.query(queryString, [fields], (err, result) => {
+                    if (err) {
+                        console.log("error: " + err.message);
+                        throw err;
+                    }
+                    console.log("Post added succesfully!!");
+                    return result;
+                });
+                
+                await connection.query(addTopicContent, [topicContentFields], (err, result) => {
+                    if (err) {
+                        console.log("error: " + err.message);
+                        throw err;
+                    }
+                    console.log("Post information added to topic_content " + topic + " succesfully!!");
+                    return result;
+                });
+            }
+            return result;
+        });
+    })
 
 };
 
