@@ -157,18 +157,18 @@ app.get('/cleartable', (req, res) => {
 });
 
 
-/*
+
 app.get('/getpost', (req, res) => {
-  const getpost = fork('./func/get_post.js')
+  const getpost = fork('./func/get_post.js');
   var data = {
-    table: req.query.table
-
-
+    post_id: req.query.post_id
   };
+  getpost.send(data);
+  getpost.on("message", message => res.send(message));
   
   
 });
 
-*/
+
 
 
