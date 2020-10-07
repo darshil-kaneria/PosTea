@@ -16,8 +16,16 @@ process.on("message", message => {
           privacy = "No"
         }
         var profile_information = '{Profile ID: ' + answer[0].profile_id + ', Username: ' + answer[0].username + ', Private Account: ' + privacy + ', Name: ' + answer[0].name + ', Biodata: ' + answer[0].bio_data + '}';
-        profile_information = JSON.parse(JSON.stringify(profile_information));
-        process.send({ "message": profile_information });
+        // profile_information = JSON.parse(JSON.stringify(profile_information));
+        var profileInfoJson = {
+          profile_id: answer[0].profile_id,
+          username: answer[0].username,
+          privacy: privacy,
+          name: answer[0].name,
+          biodata: answer[0].bio_data
+        }
+
+        process.send({ "message": profileInfoJson });
       }
       process.exit();
 
