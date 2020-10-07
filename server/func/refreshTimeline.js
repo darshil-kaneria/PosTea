@@ -19,7 +19,7 @@ process.on("message", message => {
 
 refreshTimeline = async (profileID, offset, connection) => {
     var getNumPosts = "SELECT profile_id, COUNT(*) FROM user_post WHERE profile_id = " + String(profileID);
-    var query = "SELECT * FROM user_post WHERE profile_id = " + String(profileID) + " ORDER BY creation_date DESC LIMIT " + String(offset) + ", 2"; // change if condition below if you change limit
+    var query = "SELECT * FROM user_post WHERE profile_id = " + String(profileID) + " ORDER BY creation_date DESC LIMIT " + String(offset) + ", 3"; // change if condition below if you change limit
     return new Promise(async (resolve, reject) => {
         await connection.query(getNumPosts, async (err, result) => {
             if (err) {
@@ -29,7 +29,7 @@ refreshTimeline = async (profileID, offset, connection) => {
             result = JSON.stringify(result);
             // result = JSON.parse(result);
             var numOccurances = result.substring(28, result.indexOf("}"));
-            if (offset >= numOccurances - 1) { // change if you change limit
+            if (offset >= numOccurances - 2) { // change if you change limit
                 process.send({ "result": "You have reached the maximum number of posts for this profile id" });
             } else {
                 await connection.query(query, (err, result) => {
