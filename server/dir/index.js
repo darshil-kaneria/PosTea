@@ -71,6 +71,24 @@ document.getElementById("addProfile").onclick = () => {
     alert("Request to add profile sent successfully.");
 }
 
+document.getElementById("updateAddProfile").onclick = () => {
+    var original_username = document.getElementById("original_username").value;
+    var update_privateAcc = document.getElementById("update_privateAcc").value;
+    var update_name = document.getElementById("update_name").value;
+    var update_biodata = document.getElementById("update_biodata").value;
+    var update_profilePic = document.getElementById("update_profilePic").value;
+
+    options = {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({original_username: original_username, update_profilePic: update_profilePic, update_privateAcc: update_privateAcc, update_name: update_name, update_biodata: update_biodata})
+    };
+    fetch("/updateprofile", options);
+    alert("Request to update profile sent successfully.");
+}
+
 document.getElementById("deletePost").onclick = () => {
     var deletePostID = document.getElementById("deletePostID").value;
     var deleteProfileID = document.getElementById("deleteProfileID").value;

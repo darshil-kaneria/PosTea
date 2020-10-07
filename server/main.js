@@ -113,13 +113,13 @@ app.post('/updatebiodata', (req,res)=> {
 */
 app.post('/updateprofile', (req,res)=> {
   const handleUpdate = fork('./func/update_profile.js');
-  var data = {
-    username: req.query.account,
-    name: req.query.name,
-    biodata: req.query.biodata,
-    privacy: req.query.privacy
-  };
-  handleUpdate.send(data);
+  // var data = {
+  //   username: req.query.account,
+  //   name: req.query.name,
+  //   biodata: req.query.biodata,
+  //   privacy: req.query.privacy
+  // };
+  handleUpdate.send(req.body);
   handleUpdate.on("message", message => res.send(message));
 });
 
