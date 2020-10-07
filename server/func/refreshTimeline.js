@@ -37,6 +37,7 @@ refreshTimeline = async (profileID, offset, connection) => {
                         console.log("error: " + err.message);
                         throw err;
                     }
+                    
                     result = JSON.stringify(result);
                     result = JSON.parse(result);
                     // var list = [];
