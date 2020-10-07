@@ -70,7 +70,7 @@ app.get('/getprofile', (req, res)=> {
   handleGetProfile.send(data);
   handleGetProfile.on("message", message => res.send(message));
 });
-
+/*
 app.post('/updateusername', (req,res)=> {
   const handleUpdate = fork('./func/update_username.js');
   var data = {
@@ -110,7 +110,18 @@ app.post('/updatebiodata', (req,res)=> {
   handleUpdate.send(data);
   handleUpdate.on("message", message => res.send(message));
 });
-
+*/
+app.post('/updateprofile', (req,res)=> {
+  const handleUpdate = fork('./func/update_profile.js');
+  var data = {
+    username: req.query.account,
+    name: req.query.name,
+    biodata: req.query.biodata,
+    privacy: req.query.privacy
+  };
+  handleUpdate.send(data);
+  handleUpdate.on("message", message => res.send(message));
+});
 app.post('/deletepost', (req, res) => {
   const handledelete = fork('./func/delete_post.js');
   // var data = {
