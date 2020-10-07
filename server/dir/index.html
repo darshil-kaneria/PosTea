@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <h1>Postea App</h1>
+    <!-- <script type="text/javascript" src="index.js"></script> -->
+</head>
+
+<body>
+    <h2>Add a new User</h2>
+    <input id="newUser" placeholder="username"><br><br>
+    <button id="newUserBtn">Add User</button>
+    
+    <h2>Make a new Post</h2>
+    <!-- <input id="postID" placeholder="Post ID"> -->
+    <input id="profileID" placeholder="Profile ID">
+    <input id="topicID" placeholder="Topic ID">
+    <input id="likes" placeholder="Likes">
+    <input id="dislikes" placeholder="Dislikes"><br><br>
+    <input id="postTitle" placeholder="Post Title"><br><br>
+    <input id="text" placeholder="Enter your post"><br><br>
+    <input id="img" placeholder="Post image"><br><br>
+    <input id="topicText" placeholder="Enter topic to post to"><br><br>
+    <input id="postComments" placeholder="Comment"><br><br>
+    <button type="button" id="btn1">Make Post</button><br>
+
+    <h2>Delete Post</h2>
+    <input id="deletePostID" placeholder="Post ID of post"><br><br>
+    <input id="deleteProfileID" placeholder="Profile ID related to post"><br><br>
+    <button id="deletePost">Delete Post</button><br>
+
+    <h2>Create a new Topic</h2>
+    <input id="topic_id" placeholder="Enter Topic ID">
+    <input id="topic_creator_id" placeholder="Enter Topic Creator ID">
+    <input id="newTopicText" placeholder="Enter topic name"><br><br>
+    <input id="topic_description" placeholder="Enter topic description"><br><br>
+    <button id="btn2">Add Topic</button><br>
+
+    <h2>Add Profile</h2>
+    <input id="username" placeholder="Username"><br><br>
+    <input id="privateAcc" placeholder="is_private (1=Private)" type="number"><br><br> 
+    <input id="name" placeholder="Name" type="text"><br><br>
+    <input id="biodata" placeholder="Bio Data"><br><br>
+    <input id="profilePic" placeholder="Profile Picture"><br><br>
+    <button id="addProfile">Add Profile</button>
+
+    <h2>Update Profile</h2>
+    <input id="original_username" placeholder="Username"><br><br>
+    <input id="update_privateAcc" placeholder="is_private (1=Private)" type="number"><br><br> 
+    <input id="update_name" placeholder="New Display Name" type="text"><br><br>
+    <input id="update_biodata" placeholder="New Bio Data"><br><br>
+    <input id="update_profilePic" placeholder="New Profile Picture"><br><br>
+    <button id="updateAddProfile">Update Profile</button>
+
+    <h2>Engagements</h2>
+    <input id="engagement_post_id" type="number" placeholder="Enter Post ID">
+    <input id="engagement_profile_id" type="number" placeholder="Enter Profile ID"><br><br>
+    <button id="likeBtn">Like</button>
+    <button id="dislikeBtn">Dislike</button><br><br>
+    <input id="engagement_comment" placeholder="Comment"><br><br>
+    <button id="commentBtn">Add Comment</button>
+
+    <script src="index.js"></script>
+
+</body>
+<!-- <script type="text/javascript" src="index.js"></script> -->
+
+</html>
