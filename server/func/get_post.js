@@ -6,7 +6,6 @@ process.on("message", message => {
           if (err) {
             return console.error('error: ' + err.message);
           }
-          
           console.log('Database connection established');
           await getPost(message.post_id, connection);
           connection.release();
@@ -29,11 +28,9 @@ const getPost = async(postId, connection) => {
             } else {
                 console.log("Post retrieved");
                 console.log(result);
-                return result;
-                
+                resolve(result);
+                // return result;  
             }
-
-            
         });
     });
 }
