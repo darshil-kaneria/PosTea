@@ -58,12 +58,14 @@ document.getElementById("addProfile").onclick = () => {
     var privateAcc = document.getElementById("privateAcc").value;
     var name = document.getElementById("name").value;
     var biodata = document.getElementById("biodata").value;
+    var profilePic = document.getElementById("profilePic").value;
+
     options = {
         method: "POST",
         headers: {
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({username: username, privateAcc: privateAcc, name: name, biodata: biodata})
+        body: JSON.stringify({username: username, profilePic: profilePic, privateAcc: privateAcc, name: name, biodata: biodata})
     };
     fetch("/addProfile", options);
     alert("Request to add profile sent successfully.");
