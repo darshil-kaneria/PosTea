@@ -25,8 +25,7 @@ process.on("message", message => {
 });
 
 const addPost = async (dict, connection) => {
-    var id = -1;
-    id = Math.floor(Math.random() * 100000);
+    var id = Math.floor(Math.random() * 100000);
     console.log(id)
     var userPostMessage = dict.post;
     var topic = dict.topic

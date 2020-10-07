@@ -83,3 +83,46 @@ document.getElementById("deletePost").onclick = () => {
     fetch("/deletepost", options);
     alert("Request to delete post sent successfully.");
 }
+
+document.getElementById("likeBtn").onclick = () => {
+    var engagement_profile_id = document.getElementById("engagement_profile_id").value;
+    var engagement_post_id = document.getElementById("engagement_post_id").value;
+    options = {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({engagement_profile_id: engagement_profile_id, engagement_post_id: engagement_post_id, like_dislike: 1})
+    };
+    fetch("/addEngagement", options);
+    alert("Request to add Like sent successfully.");
+}
+
+document.getElementById("dislikeBtn").onclick = () => {
+    var engagement_profile_id = document.getElementById("engagement_profile_id").value;
+    var engagement_post_id = document.getElementById("engagement_post_id").value;
+    options = {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({engagement_profile_id: engagement_profile_id, engagement_post_id: engagement_post_id, like_dislike: 0})
+    };
+    fetch("/addEngagement", options);
+    alert("Request to add Dislike sent successfully.");
+}
+
+document.getElementById("commentBtn").onclick = () => {
+    var engagement_profile_id = document.getElementById("engagement_profile_id").value;
+    var engagement_post_id = document.getElementById("engagement_post_id").value;
+    var comment = document.getElementById("engagement_comment").value;
+    options = {
+        method: "POST",
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({engagement_profile_id: engagement_profile_id, engagement_post_id: engagement_post_id, comment: comment})
+    };
+    fetch("/addEngagement", options);
+    alert("Request to add Comment sent successfully.");
+}

@@ -147,7 +147,19 @@ app.get('/getcomments', (req, res) => {
   }
   handleComments.send(data);
   handleComments.on("message", message => res.send(message));
-})
+});
+
+// app.post('updateLikesDislikes', (req, res) => {
+//   const handleLikesDislikes = fork("./func/update_likes_dislikes.js");
+//   handleLikesDislikes.send(req.body);
+//   handleLikesDislikes.on("message", message => res.send(message));
+// });
+
+app.post('/addEngagement', (req, res) => {
+  const handleEngagements = fork('./func/add_engagement.js');
+  handleEngagements.send(req.body);
+  handleEngagements.on("message", message => res.send(message));
+});
 
 app.get("/refreshTimeline", (req, res) => {
   const handleRefreshTimeline = fork('./func/refreshTimeline.js');
@@ -158,7 +170,7 @@ app.get("/refreshTimeline", (req, res) => {
   handleRefreshTimeline.send(data);
   handleRefreshTimeline.on("message", message => res.send(message));
   
-})
+});
 
 
 

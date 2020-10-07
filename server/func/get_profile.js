@@ -18,6 +18,7 @@ process.on("message", message => {
           privacy = "No"
         }
         var profile_information = "Profile ID: "+answer[0].profile_id +", Username: "+ answer[0].username+ ", Private Account: "+privacy+", Name: "+answer[0].name+", Biodata: "+answer[0].bio_data;
+        JSON.parse(profile_information);
         process.send({"Profile Information": profile_information});
       }
       process.exit();
