@@ -65,7 +65,7 @@ app.post('/addprofile', (req, res) => {
 app.get('/getprofile', (req, res)=> {
   const handleGetProfile = fork('./func/get_profile.js');
   var data = {
-    username: req.query.account
+    username: req.query.username
   };
   handleGetProfile.send(data);
   handleGetProfile.on("message", message => res.send(message));
@@ -122,16 +122,11 @@ app.post('/updateprofile', (req,res)=> {
   handleUpdate.send(data);
   handleUpdate.on("message", message => res.send(message));
 });
+
 app.post('/deletepost', (req, res) => {
   const handledelete = fork('./func/delete_post.js');
-  // var data = {
-  //   postId: req.query.postId,
-  //   profileId: req.query.profileId
-
-  // }
   handledelete.send(req.body);
   handledelete.on("message",message => res.send(message));
-
 });
 
 app.post('/makePost', (req, res) => {
@@ -148,7 +143,6 @@ app.get('/getpost', (req, res) => {
   getpost.send(data);
   getpost.on("message", message => res.send(message));
   
-  
 });
 
 app.get('/getcomments', (req, res) => {
@@ -159,12 +153,6 @@ app.get('/getcomments', (req, res) => {
   handleComments.send(data);
   handleComments.on("message", message => res.send(message));
 });
-
-// app.post('updateLikesDislikes', (req, res) => {
-//   const handleLikesDislikes = fork("./func/update_likes_dislikes.js");
-//   handleLikesDislikes.send(req.body);
-//   handleLikesDislikes.on("message", message => res.send(message));
-// });
 
 app.post('/addEngagement', (req, res) => {
   const handleEngagements = fork('./func/add_engagement.js');
