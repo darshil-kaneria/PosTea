@@ -10,18 +10,28 @@ class ProcessTimeline{
   var offset = 0;
   var temp;
   int profile_id;
+  bool isEnd = false;
   Map<String, dynamic> posts;
 
   ProcessTimeline(this.profile_id);
 
   Future<http.Response> getPosts() async {
+    http.Response resp;
+    if(isEnd != true){
 
-    var url = "http://postea-server.herokuapp.com/refreshTimeline?profile_id="+profile_id.toString()+"&post_offset="+offset.toString();
-    http.Response resp = await http.get(url);
+      var url = "http://postea-server.herokuapp.com/refreshTimeline?profile_id="+profile_id.toString()+"&post_offset="+offset.toString();
+     resp = await http.get(url);
     posts = jsonDecode(resp.body);
+    if(posts['result'].length == 0){
+      isEnd=true;
+    }
     print("OFFSET IS: "+offset.toString());
+    if(isEnd == false)
     processPosts();
-    // print(resp.body);
+    
+
+    }
+    
     return resp;
   }
 
@@ -41,7 +51,7 @@ class ProcessTimeline{
         posts['result'][i]['post_comments'].toString(),
         posts['result'][i]['post_title'].toString()
       );
-      print(posts['result'][i]);
+      // print(posts['result'][i]);
       postList.add(newPost);
 
     }

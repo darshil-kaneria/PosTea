@@ -13,3 +13,4 @@ Color bgGradStart = Color(0xFFf6f6f6);
 Color bgGradEnd = Color(0xFFffe2e2);
 Color bg2 = Color(0xFFfaf3dd);
 Color bg3 = Color(0xFFd6e0f0);
+Color barrier = Color(0xFF200f21);

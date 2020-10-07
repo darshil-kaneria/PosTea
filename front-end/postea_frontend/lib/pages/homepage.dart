@@ -30,6 +30,7 @@ class _HomePageState extends State<HomePage> {
   var postTextController = new TextEditingController();
   var postTitleController = new TextEditingController();
   var checkPosScrollController = new ScrollController();
+  bool checkBoxVal = false;
  
   ProcessTimeline timeLine = new ProcessTimeline(1);
 
@@ -39,14 +40,23 @@ class _HomePageState extends State<HomePage> {
 
     if (checkPosScrollController.offset >= checkPosScrollController.position.maxScrollExtent &&
         !checkPosScrollController.position.outOfRange) {
+          if(!timeLine.isEnd)
       setState(() {
-      offset = offset+3;
-      updatePost();
+        offset=offset+3;
+      // updatePost();
             });
     }
     
  
  }
+ 
+  @override
+  // void dispose() {
+  //   // TODO: implement dispose
+  //   checkPosScrollController.dispose();
+  //   _scrollController.dispose();
+  //   super.dispose();
+  // }
 
   @override
   void initState() {
@@ -55,10 +65,10 @@ class _HomePageState extends State<HomePage> {
     //   timer.changeVal();
     //  });
     checkPosScrollController.addListener(_scrollListener);
-     setState(() {
-      offset = offset+3;
-      updatePost();
-            });
+    //  setState(() {
+      // offset = offset+3;
+      // updatePost();
+    //         });
     super.initState();
   }
 
@@ -107,8 +117,8 @@ class _HomePageState extends State<HomePage> {
       onTap: (value) {
         if(value == 2){
           setState(() {
-              offset = offset+2;
-              updatePost();
+              offset = offset+3;
+              // updatePost();
             });
         }
         else if(value == 1)
@@ -276,7 +286,8 @@ class _HomePageState extends State<HomePage> {
             );
 
                   }
-                  else return Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(Colors.amber),));
+                  else return Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(bgGradEnd),));
+                  // else return null;
 
                   
 
