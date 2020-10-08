@@ -30,26 +30,50 @@ refreshTimeline = async (profileID, offset, connection) => {
             // result = JSON.parse(result);
             var numOccurances = result.substring(28, result.indexOf("}"));
             if (offset >= numOccurances - 2) { // change if you change limit
-                process.send({ "result": "You have reached the maximum number of posts for this profile id" });
+                var limit = numOccurances - offset;
+                var newquery = "SELECT * FROM user_post WHERE profile_id = " + String(profileID) + " ORDER BY creation_date DESC LIMIT " + String(offset) + ", " + String(limit); // change if condition below if you change limit
+                await connection.query(newquery, (err, result) => {
+                    if (err) {
+                        console.log("error: " + err.message);
+                        throw err;
+                    }
+    
+                    result = JSON.stringify(result);
+                    result = JSON.parse(result);
+                    // var list = [];
+                    // for (i = 0; i < length(result); i++) {
+    
+                    // }
+                    var dict = {
+                        "result": result,
+                        "error": 1
+                    }
+                    process.send({ "result": dict});
+                    console.log(result);
+                    return result;
+                });
             } else {
                 await connection.query(query, (err, result) => {
                     if (err) {
                         console.log("error: " + err.message);
                         throw err;
                     }
-                    
+    
                     result = JSON.stringify(result);
                     result = JSON.parse(result);
                     // var list = [];
                     // for (i = 0; i < length(result); i++) {
-
+    
                     // }
-                    process.send({ "result": result });
+                    var dict = {
+                        "result": result,
+                        "error": 0
+                    }
+                    process.send({ "result": dict});
                     console.log(result);
                     return result;
                 });
             }
-
             return result;
         });
     });
