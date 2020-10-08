@@ -267,6 +267,7 @@ class _HomePageState extends State<HomePage> {
                   if(snapshot.hasData){
 
                     return ListView.builder(
+                      
                   controller: checkPosScrollController,
                   itemCount: timeLine.postList.length,
                   itemBuilder: (BuildContext context, int index){

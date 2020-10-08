@@ -22,11 +22,13 @@ class ProcessTimeline{
       var url = "http://postea-server.herokuapp.com/refreshTimeline?profile_id="+profile_id.toString()+"&post_offset="+offset.toString();
      resp = await http.get(url);
     posts = jsonDecode(resp.body);
-    if(posts['result'].length == 0){
+    print(posts['result'][0]);
+    if(posts['result'].length == 0 || posts['error'] == "1"){
+      // print("Reached end");
       isEnd=true;
     }
     print("OFFSET IS: "+offset.toString());
-    if(isEnd == false)
+    // if(isEnd == false)
     processPosts();
     
 
@@ -51,7 +53,7 @@ class ProcessTimeline{
         posts['result'][i]['post_comments'].toString(),
         posts['result'][i]['post_title'].toString()
       );
-      // print(posts['result'][i]);
+      print(posts['result'][i]['post_id']);
       postList.add(newPost);
 
     }
