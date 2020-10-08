@@ -11,6 +11,7 @@ class ProcessTimeline{
   var temp;
   int profile_id;
   bool isEnd = false;
+  bool postRetrieved = true;
   Map<String, dynamic> posts;
 
   ProcessTimeline(this.profile_id);
@@ -18,13 +19,17 @@ class ProcessTimeline{
   Future<http.Response> getPosts() async {
     http.Response resp;
     if(isEnd != true){
-
+      postRetrieved = false;
+      print("POST RETRIEVED IS: "+ postRetrieved.toString());
       var url = "http://postea-server.herokuapp.com/refreshTimeline?profile_id="+profile_id.toString()+"&post_offset="+offset.toString();
      resp = await http.get(url);
+     postRetrieved = true;
+     print("POST RETRIEVED IS: "+ postRetrieved.toString());
+
     posts = jsonDecode(resp.body);
-    print(posts['result'][0]);
-    if(posts['result'].length == 0 || posts['error'] == "1"){
-      // print("Reached end");
+    print(posts['error']);
+    if(posts['result'].length == 0 || posts['error'] == 1){
+      print("Reached end");
       isEnd=true;
     }
     print("OFFSET IS: "+offset.toString());

@@ -40,8 +40,10 @@ class _HomePageState extends State<HomePage> {
 
     if (checkPosScrollController.offset >= checkPosScrollController.position.maxScrollExtent &&
         !checkPosScrollController.position.outOfRange) {
-          if(!timeLine.isEnd)
+          print("ISPOST"+timeLine.postRetrieved.toString());
+          if(!timeLine.isEnd && timeLine.postRetrieved)
       setState(() {
+        print("SETSTATE CALLED");
         offset=offset+3;
       // updatePost();
             });
@@ -267,10 +269,18 @@ class _HomePageState extends State<HomePage> {
                   if(snapshot.hasData){
 
                     return ListView.builder(
-                      
+                  physics: BouncingScrollPhysics(),    
                   controller: checkPosScrollController,
                   itemCount: timeLine.postList.length,
                   itemBuilder: (BuildContext context, int index){
+
+                    if(timeLine.isEnd == true){
+                      if(index == timeLine.postList.length-1)
+                      return ListTile(
+                        leading: Icon(Icons.error_outline),
+                        title: Text("You have reached the end, my friend.", style: TextStyle(color: Colors.grey, fontSize: 15),),
+                      );
+                    }
                     return PostTile(
                       timeLine.postList.elementAt(index).post_id,
                       timeLine.postList.elementAt(index).profile_id,
