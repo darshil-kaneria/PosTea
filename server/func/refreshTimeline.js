@@ -48,8 +48,8 @@ refreshTimeline = async (profileID, offset, connection) => {
                         "result": result,
                         "error": 1
                     }
-                    process.send({ "result": dict});
-                    console.log(result);
+                    process.send(dict);
+                    console.log(dict);
                     return result;
                 });
             } else {
@@ -69,8 +69,8 @@ refreshTimeline = async (profileID, offset, connection) => {
                         "result": result,
                         "error": 0
                     }
-                    process.send({ "result": dict});
-                    console.log(result);
+                    process.send(dict);
+                    console.log(dict);
                     return result;
                 });
             }
