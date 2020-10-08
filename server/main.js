@@ -4,15 +4,30 @@
  * To allow for a larger request processing capacity, each function must be added in a seperate file and should be forked into a new child when needed.
  * Do not exceed more than 255 processes since that is how many processes heroku supplies with the free dyno that we are currently running.
  */
-
+const cluster = require('cluster');
 const express = require('express');
 const app = express();
 app.use(express.static("dir"));
 app.use(express.json({limit: '2mb'}));
 const PORT = process.env.PORT || 23556;
+const numCPUs = require('os').cpus().length;
 
-//Create a fork object - test concurrency only
-const fork = require("child_process").fork;
+
+if (cluster.isMaster) {
+  console.log(`Master ${process.pid} is running`);
+
+  // Fork workers.
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
+
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`worker ${worker.process.pid} died`);
+  });
+}
+else {
+
+  const fork = require("child_process").fork;
 app.get('/', (req, res)=>{
     
     console.log("request received on home");
@@ -30,9 +45,6 @@ app.get('/', (req, res)=>{
 app.post('/adduser', (req, res) => {
 
 const handlePosts = fork('./func/add_user.js');
-// var data = {
-//   username: req.query.account
-// };
 handlePosts.send(req.body);
 handlePosts.on("message", message => res.send(message));
 
@@ -40,10 +52,6 @@ handlePosts.on("message", message => res.send(message));
 
 app.post('/addtopicinfo', (req, res) => {
   const handtopic = fork('./func/add_topic.js');
-  // var data = {
-  //   topic_name: req.query.topic_name,
-  //   top_description: req.query.topic_description,
-  // }
   handtopic.send(req.body);
   handtopic.on("miessage", message => res.send(message));
 });
@@ -51,12 +59,6 @@ app.post('/addtopicinfo', (req, res) => {
 app.post('/addprofile', (req, res) => {
 
   const handleAddProfile = fork('./func/add_profile.js');
-  // var data = {
-  //   username: req.query.account,
-  //   is_private: req.query.is_private, 
-  //   name: req.query.name, 
-  //   bio_data: req.query.bio_data
-  // };
   handleAddProfile.send(req.body);
   handleAddProfile.on("message", message => res.send(message));
   
@@ -70,55 +72,9 @@ app.get('/getprofile', (req, res)=> {
   handleGetProfile.send(data);
   handleGetProfile.on("message", message => res.send(message));
 });
-/*
-app.post('/updateusername', (req,res)=> {
-  const handleUpdate = fork('./func/update_username.js');
-  var data = {
-    username: req.query.account,
-    updated: req.query.update
-  };
-  handleUpdate.send(data);
-  handleUpdate.on("message", message => res.send(message));
-});
 
-app.post('/updateprivacy', (req,res)=> {
-  const handleUpdate = fork('./func/update_privacy.js');
-  var data = {
-    username: req.query.account,
-    updated: req.query.update
-  };
-  handleUpdate.send(data);
-  handleUpdate.on("message", message => res.send(message));
-});
-
-app.post('/updatename', (req,res)=> {
-  const handleUpdate = fork('./func/update_name.js');
-  var data = {
-    username: req.query.account,
-    updated: req.query.update
-  };
-  handleUpdate.send(data);
-  handleUpdate.on("message", message => res.send(message));
-});
-
-app.post('/updatebiodata', (req,res)=> {
-  const handleUpdate = fork('./func/update_biodata.js');
-  var data = {
-    username: req.query.account,
-    updated: req.query.update
-  };
-  handleUpdate.send(data);
-  handleUpdate.on("message", message => res.send(message));
-});
-*/
 app.post('/updateprofile', (req,res)=> {
   const handleUpdate = fork('./func/update_profile.js');
-  // var data = {
-  //   username: req.query.account,
-  //   name: req.query.name,
-  //   biodata: req.query.biodata,
-  //   privacy: req.query.privacy
-  // };
   handleUpdate.send(req.body);
   handleUpdate.on("message", message => res.send(message));
 });
@@ -188,6 +144,15 @@ app.get('/cleartable', (req, res) => {
   clearTableChild.send(data);
   clearTableChild.on("message", message => res.send(message));
 });
+
+}
+
+
+  
+
+
+//Create a fork object - test concurrency only
+
 
 
 
