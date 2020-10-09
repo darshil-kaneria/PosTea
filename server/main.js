@@ -131,6 +131,7 @@ app.get("/refreshTimeline", (req, res) => {
   handleRefreshTimeline.send(data);
   handleRefreshTimeline.on("message", message => {
     res.send(message)});
+    handleRefreshTimeline.kill();
   
 });
 
