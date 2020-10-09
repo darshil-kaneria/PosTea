@@ -55,51 +55,67 @@ app.post('/addtopicinfo', (req, res) => {
   handtopic.send(req.body);
   handtopic.on("miessage", message => res.send(message));
 });
-
-app.post('/addprofile', (req, res) => {
-
-  const handleAddProfile = fork('./func/add_profile.js');
-  handleAddProfile.send(req.body);
-  handleAddProfile.on("message", message => res.send(message));
-  
-  });
-   
-app.get('/getprofile', (req, res)=> {
-  const handleGetProfile = fork('./func/get_profile.js');
-  var data = {
+// Profile methods
+app.route('/profile')
+  .get((req, res) => {
+    const handleGetProfile = fork('./func/get_profile.js');
+    var data = {
     username: req.query.username
-  };
-  handleGetProfile.send(data);
-  handleGetProfile.on("message", message => res.send(message));
-});
+    };
+    handleGetProfile.send(data);
+    handleGetProfile.on("message", message => res.send(message));
+  })
+  .post((req, res) => {
+    const handleAddProfile = fork('./func/add_profile.js');
+    handleAddProfile.send(req.body);
+    handleAddProfile.on("message", message => res.send(message));
+  })
+  .put((req, res) => {
+    const handleUpdate = fork('./func/update_profile.js');
+    handleUpdate.send(req.body);
+    handleUpdate.on("message", message => res.send(message));
+  });
+// Post methods
+app.route("/post")
+  .get((req, res) => {
+    const getpost = fork('./func/get_post.js');
+    var data = {
+      post_id: req.query.post_id
+    };
+    getpost.send(data);
+    getpost.on("message", message => res.send(message));
+  })
+  .post((req, res) => {
+    const handleUserPosts = fork('./func/add_post.js');
+    handleUserPosts.send(req.body);
+    res.send(req.body);
+  })
+  .delete((req, res) => {
+    const handledelete = fork('./func/delete_post.js');
+    handledelete.send(req.body);
+    handledelete.on("message",message => res.send(message));
+  })
+// app.post('/deletepost', (req, res) => {
+//   const handledelete = fork('./func/delete_post.js');
+//   handledelete.send(req.body);
+//   handledelete.on("message",message => res.send(message));
+// });
 
-app.post('/updateprofile', (req,res)=> {
-  const handleUpdate = fork('./func/update_profile.js');
-  handleUpdate.send(req.body);
-  handleUpdate.on("message", message => res.send(message));
-});
+// app.post('/makePost', (req, res) => {
+//   const handleUserPosts = fork('./func/add_post.js');
+//   handleUserPosts.send(req.body);
+//   res.send(req.body);
+// });
 
-app.post('/deletepost', (req, res) => {
-  const handledelete = fork('./func/delete_post.js');
-  handledelete.send(req.body);
-  handledelete.on("message",message => res.send(message));
-});
-
-app.post('/makePost', (req, res) => {
-  const handleUserPosts = fork('./func/add_post.js');
-  handleUserPosts.send(req.body);
-  res.send(req.body);
-});
-
-app.get('/getpost', (req, res) => {
-  const getpost = fork('./func/get_post.js');
-  var data = {
-    post_id: req.query.post_id
-  };
-  getpost.send(data);
-  getpost.on("message", message => res.send(message));
+// app.get('/getpost', (req, res) => {
+//   const getpost = fork('./func/get_post.js');
+//   var data = {
+//     post_id: req.query.post_id
+//   };
+//   getpost.send(data);
+//   getpost.on("message", message => res.send(message));
   
-});
+// });
 
 app.get('/getcomments', (req, res) => {
   const handleComments = fork("./func/get_comments.js");
