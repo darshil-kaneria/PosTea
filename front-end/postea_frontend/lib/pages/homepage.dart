@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 // import 'dart:html';
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -31,6 +32,8 @@ class _HomePageState extends State<HomePage> {
   var postTitleController = new TextEditingController();
   var checkPosScrollController = new ScrollController();
   bool checkBoxVal = false;
+  File imgToUpload;
+  String base64Image;
  
   ProcessTimeline timeLine = new ProcessTimeline(1);
 
@@ -76,8 +79,27 @@ class _HomePageState extends State<HomePage> {
 
   pickImage() async {
     // PickedFile img = await ImagePicker().getImage(source: ImageSource.gallery);
-    File img2 = await ImagePicker.pickImage(source: ImageSource.gallery);
-    print(img2);
+    imgToUpload = await ImagePicker.pickImage(source: ImageSource.gallery);
+    print(imgToUpload);
+  }
+
+  void makePost() async {
+
+    var reqBody = {
+      "postTitle": postTitleController.text,
+      "msg": postTextController.text,
+      "topic": "chess",
+      "img": base64Image,
+      "topicID": 21,
+      "profileID": 1,
+      "likes": 0,
+      "dislikes": 0,
+      "comment": 0
+    };
+    var reqBodyJson = jsonEncode(reqBody);
+    http.post("http://postea-server.herokuapp.com/post",
+    body: reqBodyJson
+    ).then((value) => print(value.body));
   }
 
   Future<http.Response> updatePost() async{
@@ -184,6 +206,11 @@ class _HomePageState extends State<HomePage> {
                             children: [
                               IconButton(icon: Icon(Icons.image, color: Colors.grey,), onPressed: (){
                                 pickImage();
+                                if (imgToUpload == null){
+                                  // final imgErrorSnackBar = SnackBar(content: Text('Image upload failed'));
+                                  // Scaffold.of(context).showSnackBar(imgErrorSnackBar);
+                                } 
+                                base64Image = base64Encode(imgToUpload.readAsBytesSync());
                               }),
                               IconButton(icon: Icon(Icons.attachment, color: Colors.grey,), onPressed: (){}),
                               IconButton(icon: Icon(Icons.location_on, color: Colors.grey,), onPressed: (){}),
@@ -209,12 +236,19 @@ class _HomePageState extends State<HomePage> {
                       ),
                       Expanded(
                         flex: 1,
-                        child: Container(
-                          margin: EdgeInsets.symmetric(horizontal: 13),
-                          alignment: Alignment.center,
-                          child: Text("Post"),
-                          decoration: BoxDecoration(
-                            border: Border(top: BorderSide(color: Colors.grey, width: 0.5))
+                        child: GestureDetector(
+                          onTap: () async {
+                            // Making a post request
+                            makePost();
+                            
+                          },
+                          child: Container(
+                            margin: EdgeInsets.symmetric(horizontal: 13),
+                            alignment: Alignment.center,
+                            child: Text("Post"),
+                            decoration: BoxDecoration(
+                              border: Border(top: BorderSide(color: Colors.grey, width: 0.5))
+                            ),
                           ),
                         ),
                       )
