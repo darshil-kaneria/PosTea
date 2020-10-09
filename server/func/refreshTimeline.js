@@ -8,7 +8,7 @@ process.on("message", message => {
             return console.error("error: " + err.message);
         }
 
-        await refreshTimeline(message.profileID, message.offset, connection).then((answer) => {
+        refreshTimeline(message.profileID, message.offset, connection).then((answer) => {
             connection.release();
             console.log("Exiting process: "+process.pid);
             process.exit();
@@ -59,8 +59,8 @@ refreshTimeline = async (profileID, offset, connection) => {
                     }
                     process.send(dict);
                     console.log("Query Complete");
-                    connection.release();
-                    return result;
+                    // connection.release();
+                    resolve(result);
                 });
             } else {
                 await connection.query({sql: query, timeout: 7000}, (err, result) => {
@@ -88,8 +88,8 @@ refreshTimeline = async (profileID, offset, connection) => {
                     }
                     process.send(dict);
                     console.log("Query complete");
-                    connection.release();
-                    return result;
+                    // connection.release();
+                    resolve(result);
                 });
             }
             return result;
