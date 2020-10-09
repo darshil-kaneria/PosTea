@@ -17,7 +17,7 @@ document.getElementById("btn1").onclick = () => {
         },
         body: JSON.stringify({ msg: post, topic: topic, postTitle: postTitle, profileID: profileID, img: img, topicID: topicID, likes: likes, dislikes: dislikes, comment: comment})
     };
-    fetch("/makePost", options);
+    fetch("/post", options);
     alert("Request to add post sent successfully.");
 };
 
