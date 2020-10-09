@@ -4,6 +4,7 @@ const db = require('./db_connection.js');
 process.on("message", message => {
     db.conn.getConnection(async (err, connection) => {
         if (err) {
+            // connection.release();
             return console.error("error: " + err.message);
         }
 
@@ -32,7 +33,14 @@ refreshTimeline = async (profileID, offset, connection) => {
             if (offset >= numOccurances - 2) { // change if you change limit
                 var limit = numOccurances - offset;
                 var newquery = "SELECT * FROM user_post WHERE profile_id = " + String(profileID) + " ORDER BY creation_date DESC LIMIT " + String(offset) + ", " + String(limit); // change if condition below if you change limit
-                await connection.query(newquery, (err, result) => {
+                await connection.query({sql: newquery, timeout: 7000}, (err, result) => {
+                    if (err && err.code === 'PROTOCOL_SEQUENCE_TIMEOUT') {
+                        var dict = {
+                            "error": 2
+                        }
+                        process.send(dict);
+                        throw new Error('Request timed out after 15 seconds');
+                      }
                     if (err) {
                         console.log("error: " + err.message);
                         throw err;
@@ -49,11 +57,18 @@ refreshTimeline = async (profileID, offset, connection) => {
                         "error": 1
                     }
                     process.send(dict);
-                    console.log(dict);
+                    console.log("Query Complete");
                     return result;
                 });
             } else {
-                await connection.query(query, (err, result) => {
+                await connection.query({sql: query, timeout: 7000}, (err, result) => {
+                    if (err && err.code === 'PROTOCOL_SEQUENCE_TIMEOUT') {
+                        var dict = {
+                            "error": 2
+                        }
+                        process.send(dict);
+                        throw new Error('Request timed out after 15 seconds');
+                      }
                     if (err) {
                         console.log("error: " + err.message);
                         throw err;
@@ -70,7 +85,7 @@ refreshTimeline = async (profileID, offset, connection) => {
                         "error": 0
                     }
                     process.send(dict);
-                    console.log(dict);
+                    console.log("Query complete");
                     return result;
                 });
             }
