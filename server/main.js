@@ -122,7 +122,7 @@ app.get("/refreshTimeline", (req, res) => {
   var to = setTimeout(function(){
     console.log('Killing process: '+handleRefreshTimeline.pid);
     handleRefreshTimeline.kill();
-  }, 7000);
+  }, 9000);
   data = {
     profileID: req.query.profile_id,
     offset: req.query.post_offset
