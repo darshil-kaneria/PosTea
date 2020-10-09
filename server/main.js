@@ -121,6 +121,7 @@ app.get("/refreshTimeline", (req, res) => {
   console.log("pid forked: "+handleRefreshTimeline.pid);
   var to = setTimeout(function(){
     console.log('Killing process: '+handleRefreshTimeline.pid);
+    res.send("Connection killed by server");
     handleRefreshTimeline.kill();
   }, 9000);
   data = {
