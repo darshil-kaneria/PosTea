@@ -117,15 +117,18 @@ app.post('/addEngagement', (req, res) => {
 });
 
 app.get("/refreshTimeline", (req, res) => {
-  console.log("blocked");
   const handleRefreshTimeline = fork('./func/refreshTimeline.js');
+  console.log("pid forked: "+handleRefreshTimeline.pid);
+  var to = setTimeout(function(){
+    console.log('Killing process: '+handleRefreshTimeline.pid);
+    handleRefreshTimeline.kill();
+  }, 8000);
   data = {
     profileID: req.query.profile_id,
     offset: req.query.post_offset
   }
   handleRefreshTimeline.send(data);
   handleRefreshTimeline.on("message", message => {
-    console.log("free");
     res.send(message)});
   
 });
@@ -147,6 +150,8 @@ app.get('/cleartable', (req, res) => {
   clearTableChild.send(data);
   clearTableChild.on("message", message => res.send(message));
 });
+
+
 
 }
 

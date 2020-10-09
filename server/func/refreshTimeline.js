@@ -10,6 +10,7 @@ process.on("message", message => {
 
         await refreshTimeline(message.profileID, message.offset, connection).then((answer) => {
             connection.release();
+            console.log("Exiting process: "+process.pid);
             process.exit();
         });
         // process.send({ "result": result });
@@ -58,6 +59,7 @@ refreshTimeline = async (profileID, offset, connection) => {
                     }
                     process.send(dict);
                     console.log("Query Complete");
+                    connection.release();
                     return result;
                 });
             } else {
@@ -86,6 +88,7 @@ refreshTimeline = async (profileID, offset, connection) => {
                     }
                     process.send(dict);
                     console.log("Query complete");
+                    connection.release();
                     return result;
                 });
             }
