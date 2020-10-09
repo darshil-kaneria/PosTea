@@ -32,6 +32,7 @@ class _HomePageState extends State<HomePage> {
   var postTitleController = new TextEditingController();
   var checkPosScrollController = new ScrollController();
   bool checkBoxVal = false;
+  bool checkEnd = false;
   File imgToUpload;
   String base64Image;
  
@@ -97,7 +98,9 @@ class _HomePageState extends State<HomePage> {
       "comment": 0
     };
     var reqBodyJson = jsonEncode(reqBody);
+    print("sending" + reqBodyJson);
     http.post("http://postea-server.herokuapp.com/post",
+    headers: {"Content-Type": "application/json"},
     body: reqBodyJson
     ).then((value) => print(value.body));
   }
@@ -204,8 +207,8 @@ class _HomePageState extends State<HomePage> {
                           color: Colors.transparent,
                           child: Row(
                             children: [
-                              IconButton(icon: Icon(Icons.image, color: Colors.grey,), onPressed: (){
-                                pickImage();
+                              IconButton(icon: Icon(Icons.image, color: Colors.grey,), onPressed: ()async{
+                                await pickImage();
                                 if (imgToUpload == null){
                                   // final imgErrorSnackBar = SnackBar(content: Text('Image upload failed'));
                                   // Scaffold.of(context).showSnackBar(imgErrorSnackBar);
@@ -309,11 +312,15 @@ class _HomePageState extends State<HomePage> {
                   itemBuilder: (BuildContext context, int index){
 
                     if(timeLine.isEnd == true){
-                      if(index == timeLine.postList.length-1)
+                      if(checkEnd)
                       return ListTile(
                         leading: Icon(Icons.error_outline),
                         title: Text("You have reached the end, my friend.", style: TextStyle(color: Colors.grey, fontSize: 15),),
                       );
+                      if(index == timeLine.postList.length-1){
+                        checkEnd = true;
+                      }
+                      
                     }
                     return PostTile(
                       timeLine.postList.elementAt(index).post_id,
