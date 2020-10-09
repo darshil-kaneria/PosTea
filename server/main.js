@@ -117,13 +117,16 @@ app.post('/addEngagement', (req, res) => {
 });
 
 app.get("/refreshTimeline", (req, res) => {
+  console.log("blocked");
   const handleRefreshTimeline = fork('./func/refreshTimeline.js');
   data = {
     profileID: req.query.profile_id,
     offset: req.query.post_offset
   }
   handleRefreshTimeline.send(data);
-  handleRefreshTimeline.on("message", message => res.send(message));
+  handleRefreshTimeline.on("message", message => {
+    console.log("free");
+    res.send(message)});
   
 });
 
