@@ -311,17 +311,17 @@ class _HomePageState extends State<HomePage> {
                   itemCount: timeLine.postList.length,
                   itemBuilder: (BuildContext context, int index){
 
-                    if(timeLine.isEnd == true){
-                      if(checkEnd)
-                      return ListTile(
-                        leading: Icon(Icons.error_outline),
-                        title: Text("You have reached the end, my friend.", style: TextStyle(color: Colors.grey, fontSize: 15),),
-                      );
-                      if(index == timeLine.postList.length-1){
-                        checkEnd = true;
-                      }
+                    // if(timeLine.isEnd == true){
+                    //   if(checkEnd)
+                    //   return ListTile(
+                    //     leading: Icon(Icons.error_outline),
+                    //     title: Text("You have reached the end, my friend.", style: TextStyle(color: Colors.grey, fontSize: 15),),
+                    //   );
+                    //   if(index == timeLine.postList.length-1){
+                    //     checkEnd = true;
+                    //   }
                       
-                    }
+                    // }
                     return PostTile(
                       timeLine.postList.elementAt(index).post_id,
                       timeLine.postList.elementAt(index).profile_id,
