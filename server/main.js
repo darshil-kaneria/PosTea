@@ -121,8 +121,8 @@ app.get('/getengagement', (req, res) => {
   var data = {
     post_id: req.query.post_id
   }
-  handleComments.send(data);
-  handleComments.on("message", message => res.send(message));
+  handleEngagements.send(data);
+  handleEngagements.on("message", message => res.send(message));
 });
 
 
