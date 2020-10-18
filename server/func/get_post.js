@@ -21,7 +21,7 @@ const getPost = async(postId, connection) => {
        connection.query(query,[postId],function(err, result)  {
             if (err) {
                 console.log("error:" + err.message);
-                throw err;
+                reject(err);
             }
             if (result.length == 0) {
                 console.log("Post does not exist");

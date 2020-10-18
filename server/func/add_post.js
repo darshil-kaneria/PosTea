@@ -40,7 +40,7 @@ const addPost = async (dict, connection) => {
         await connection.query(queryTopicExists, async (err, result) => {
             if (err) {
                 console.log("error: " + err.message);
-                throw err;
+                reject(result);
             }
             result = JSON.stringify(result);
             result = JSON.parse(result);

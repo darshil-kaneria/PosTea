@@ -40,7 +40,7 @@ function getProfile(user, connection) {
     connection.query(selectQuery, [user], function (err, result) {
       if (err) {
         console.log(err);
-        throw err;
+        reject(result);
       }
       try {
         if (result.length == 0) {
@@ -50,7 +50,7 @@ function getProfile(user, connection) {
         }
       }
       catch (error) {
-        throw err;
+        reject(result);
       }
       return;
     });

@@ -30,7 +30,7 @@ function deletePost(postId, profileId, connection) {
             if (err) {
                 console.log("hi");
                 console.log(err);
-                throw err;
+                reject(result);
             }
             try {
                 if (result.length == 0) {
