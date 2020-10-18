@@ -145,6 +145,26 @@ app.get('/getengagement', (req, res) => {
   handleComments.on("message", message => res.send(message));
 });
 
+
+app.get('/getfollowers', (req, res) => {
+  const handleFollowers = fork("./func/get_followers.js");
+  var data = {
+    post_id: req.query.user_id
+  }
+  handleFollowers.send(data);
+  handleFollowers.on("message", message => res.send(message));
+});
+
+
+app.get('/getfollowing', (req, res) => {
+  const handleFollowing = fork("./func/get_following.js");
+  var data = {
+    post_id: req.query.user_id
+  }
+  handleFollowing.send(data);
+  handleFollowing.on("message", message => res.send(message));
+});
+
 app.post('/addEngagement', (req, res) => {
   const handleEngagements = fork('./func/add_engagement.js');
   handleEngagements.send(req.body);
