@@ -1,12 +1,10 @@
 import 'dart:convert';
-
+import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import './expandedPostTile.dart';
-import 'package:postea_frontend/customWidgets/expandedPostTile.dart';
 
-class PostTile extends StatefulWidget {
+class ExpandedPostTile extends StatefulWidget {
   var post_id;
   var profile_id;
   var post_description;
@@ -18,7 +16,7 @@ class PostTile extends StatefulWidget {
   var post_comments;
   var post_title;
 
-  PostTile(
+  ExpandedPostTile(
       this.post_id,
       this.profile_id,
       this.post_description,
@@ -31,7 +29,7 @@ class PostTile extends StatefulWidget {
       this.post_title);
 
   @override
-  _PostTileState createState() => _PostTileState(
+  _ExpandedPostTileState createState() => _ExpandedPostTileState(
       this.post_id,
       this.profile_id,
       this.post_description,
@@ -44,7 +42,7 @@ class PostTile extends StatefulWidget {
       this.post_title);
 }
 
-class _PostTileState extends State<PostTile> {
+class _ExpandedPostTileState extends State<ExpandedPostTile> {
   var post_id;
   var profile_id;
   var post_description;
@@ -61,7 +59,7 @@ class _PostTileState extends State<PostTile> {
   Color like_color = Colors.black;
   Color dislike_color = Colors.black;
 
-  _PostTileState(
+  _ExpandedPostTileState(
       this.post_id,
       this.profile_id,
       this.post_description,
@@ -83,24 +81,27 @@ class _PostTileState extends State<PostTile> {
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
-          ListTile(
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage("https://picsum.photos/200"),
-              backgroundColor: Colors.deepPurpleAccent[50],
-            ),
-            title: Text(
-              post_id.toString(),
-              style: TextStyle(fontSize: 20),
-            ),
-            subtitle: Row(
-              children: [
-                Icon(
-                  Icons.location_on,
-                  size: 15,
-                  color: Colors.grey,
-                ),
-                Text("with Darshil Kaneria")
-              ],
+          Container(
+            margin: EdgeInsets.only(top: 20),
+            child: ListTile(
+              leading: CircleAvatar(
+                backgroundImage: NetworkImage("https://picsum.photos/200"),
+                backgroundColor: Colors.deepPurpleAccent[50],
+              ),
+              title: Text(
+                post_id.toString(),
+                style: TextStyle(fontSize: 20),
+              ),
+              subtitle: Row(
+                children: [
+                  Icon(
+                    Icons.location_on,
+                    size: 15,
+                    color: Colors.grey,
+                  ),
+                  Text("with Darshil Kaneria")
+                ],
+              ),
             ),
           ),
           Container(
@@ -111,32 +112,14 @@ class _PostTileState extends State<PostTile> {
               top: BorderSide(width: 0.5, color: Colors.grey),
             )),
             child: ListTile(
-                onTap: () => {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => Hero(
-                                  tag: 'postAnimation',
-                                  child: ExpandedPostTile(
-                                      post_id,
-                                      profile_id,
-                                      post_description,
-                                      topic_id,
-                                      post_img,
-                                      creation_date,
-                                      post_likes,
-                                      post_dislikes,
-                                      post_comments,
-                                      post_title))))
-                    },
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 0, horizontal: 0),
                 title: Text(post_title,
                     style:
-                        TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
                 subtitle: AutoSizeText(
                   post_description,
-                  style: TextStyle(fontSize: 15, color: Colors.black),
+                  style: TextStyle(fontSize: 16, color: Colors.black),
                 )),
           ),
           Row(
@@ -223,7 +206,7 @@ class _PostTileState extends State<PostTile> {
                 ),
               )
             ],
-          )
+          ),
         ],
       ),
     );
