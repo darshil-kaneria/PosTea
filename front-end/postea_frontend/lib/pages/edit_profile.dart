@@ -50,16 +50,20 @@ class _EditProfileState extends State<EditProfile> {
         body: SingleChildScrollView(
           scrollDirection: Axis.vertical,
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(10.0),
                       child: Container(
-                      height: screenWidth / 4,
-                      width: screenWidth / 4,
+                      height: screenWidth / 3,
+                      width: screenWidth / 3,
                       decoration: ShapeDecoration(
                           shape: CircleBorder(
                               side: BorderSide(width: 1, color: Colors.blueGrey))),
@@ -82,27 +86,27 @@ class _EditProfileState extends State<EditProfile> {
                           }),
                   ),
                     ),
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: ButtonTheme(
-                        shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(100),
-                              side: BorderSide(color: Colors.redAccent)),
-                        child: RaisedButton(
-                          elevation: 1,
-                          color: loginButton,
-                          highlightColor: Colors.red[700],
-                          onPressed: () {
+                  // Expanded(
+                  //   child: Padding(
+                  //     padding: const EdgeInsets.all(15.0),
+                  //     child: ButtonTheme(
+                  //       shape: RoundedRectangleBorder(
+                  //             borderRadius: BorderRadius.circular(100),
+                  //             side: BorderSide(color: Colors.redAccent)),
+                  //       child: RaisedButton(
+                  //         elevation: 1,
+                  //         color: loginButton,
+                  //         highlightColor: Colors.red[700],
+                  //         onPressed: () {
 
-                        },
-                        child: Text("Edit profile image", style: TextStyle(
-                                  fontFamily: "Helvetica",
-                                  color: Colors.white,
-                                  fontSize: 16),),),
-                      ),
-                    ),
-                  )
+                  //       },
+                  //       child: Text("Edit profile image", style: TextStyle(
+                  //                 fontFamily: "Helvetica",
+                  //                 color: Colors.white,
+                  //                 fontSize: 16),),),
+                  //     ),
+                  //   ),
+                  // )
                   ]),
               ),
               Padding(
