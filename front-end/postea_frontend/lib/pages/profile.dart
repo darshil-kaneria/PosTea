@@ -8,6 +8,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:postea_frontend/pages/edit_profile.dart';
 
 class Profile extends StatefulWidget {
   @override
@@ -41,12 +42,7 @@ class _ProfileState extends State<Profile> {
     });
 
     http.Response resp = await http.post(
-        "http://postea-server.herokuapp.com/updateprofile?account=dkaneria&name=" +
-            name +
-            "&biodata=" +
-            bio_data +
-            "&privacy=" +
-            isPrivate.toString(),
+        "http://postea-server.herokuapp.com/proile",
         headers: {'Content-Type': 'application/json'},
         body: sendAnswer);
     print(resp.body);
@@ -58,7 +54,7 @@ class _ProfileState extends State<Profile> {
 
   getProfile() async {
     http.Response resp = await http
-        .get("http://postea-server.herokuapp.com/getprofile?username=dkaneria");
+        .get("http://postea-server.herokuapp.com/profile?username=dkaneria");
     profile = jsonDecode(resp.body);
     setState(() {
       _nameController.text = profile["message"]["name"];
@@ -91,6 +87,8 @@ class _ProfileState extends State<Profile> {
     return Scaffold(
       backgroundColor: bgColor,
       extendBodyBehindAppBar: true,
+      resizeToAvoidBottomPadding: false,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -109,133 +107,46 @@ class _ProfileState extends State<Profile> {
               color: Colors.black,
             ),
             onPressed: () {
-              showDialog(
-                context: context,
-                barrierDismissible: false,
-                barrierColor: barrier,
-                builder: (context) {
-                  return StatefulBuilder(
-                    builder: (context, setState) {
-                      return Dialog(
-                        shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(20))),
-                        child: Container(
-                          height: screenHeight / 1.8,
-                          width: screenWidth / 1.2,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(20)),
-                          ),
-                          child: Column(
-                            children: [
-                              Expanded(
-                                flex: 1,
-                                child: Container(
-                                  margin: EdgeInsets.only(
-                                      top: 20, bottom: 5, right: 15, left: 15),
-                                  child: TextField(
-                                    controller: _nameController,
-                                    decoration: InputDecoration(
-                                      hintText: "Name",
-                                      hintStyle: TextStyle(color: Colors.grey),
-                                      filled: false,
-                                      fillColor: Colors.purple[50],
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10.0)),
-                                        borderSide: BorderSide(
-                                            color: Colors.deepPurple[900]),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.all(
-                                            Radius.circular(10.0)),
-                                        borderSide:
-                                            BorderSide(color: Colors.red[900]),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              SingleChildScrollView(
-                                padding: EdgeInsets.symmetric(horizontal: 15),
-                                child: TextField(
-                                  keyboardType: TextInputType.multiline,
-                                  minLines: 10,
-                                  maxLines: 10,
-                                  controller: _biodataController,
-                                  decoration: InputDecoration(
-                                    hintText: "About",
-                                    hintStyle: TextStyle(color: Colors.grey),
-                                    filled: false,
-                                    fillColor: Colors.purple[50],
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
-                                      borderSide: BorderSide(
-                                          color: Colors.deepPurple[900]),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10.0)),
-                                      borderSide:
-                                          BorderSide(color: Colors.red[900]),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              ListTile(
-                                title: Text("Private account"),
-                                trailing: Switch(
-                                  value: isPrivate,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      isPrivate = value;
-                                      print(isPrivate);
-                                    });
-                                  },
-                                  activeColor: Colors.red[900],
-                                  activeTrackColor: bg3,
-                                ),
-                              ),
-                              Container(
-                                margin: EdgeInsets.only(
-                                    bottom: 10, left: 15, right: 15),
-                                child: ButtonTheme(
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(100),
-                                        side: BorderSide(
-                                            color: Colors.redAccent)),
-                                    minWidth: screenWidth / 4,
-                                    child: RaisedButton(
-                                      onPressed: () async {
-                                        bio_data = _biodataController.text;
-                                        name = _nameController.text;
-
-                                        print("name: " + name);
-                                        print("biodata: " + bio_data);
-                                        print(
-                                            "privacy: " + isPrivate.toString());
-
-                                        updateProfile();
-                                      },
-                                      elevation: 1,
-                                      color: loginButton,
-                                      highlightColor: Colors.red[700],
-                                      child: Text(
-                                        "Submit",
-                                        style: TextStyle(color: Colors.white),
-                                      ),
-                                    )),
-                              )
-                            ],
-                          ),
-                        ),
-                      );
+                Navigator.push(
+                  context,
+                  PageRouteBuilder(
+                    transitionDuration: Duration(milliseconds: 300),
+                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                      return FadeTransition(opacity: animation, child: SlideTransition(position: Tween<Offset>(begin: Offset(0,-1), end: Offset(0,0)).animate(CurvedAnimation(parent: animation, curve: Curves.decelerate)), child: child,));
                     },
+                    pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secAnimation) {
+                      return EditProfile(nameText: name, biodata: bio_data, privacy: isPrivate,);
+                    },
+                  )
                   );
-                },
-              );
+              // child: ButtonTheme(
+              //                         shape: RoundedRectangleBorder(
+              //                             borderRadius:
+              //                                 BorderRadius.circular(100),
+              //                             side: BorderSide(
+              //                                 color: Colors.redAccent)),
+              //                         minWidth: screenWidth / 4,
+              //                         child: RaisedButton(
+              //                           onPressed: () async {
+              //                             bio_data = _biodataController.text;
+              //                             name = _nameController.text;
+
+              //                             print("name: " + name);
+              //                             print("biodata: " + bio_data);
+              //                             print(
+              //                                 "privacy: " + isPrivate.toString());
+
+              //                             updateProfile();
+              //                           },
+              //                           elevation: 1,
+              //                           color: loginButton,
+              //                           highlightColor: Colors.red[700],
+              //                           child: Text(
+              //                             "Submit",
+              //                             style: TextStyle(color: Colors.white),
+              //                           ),
+              //                         )),
+
             },
           )
         ],
@@ -269,10 +180,28 @@ class _ProfileState extends State<Profile> {
                                   shape: CircleBorder(
                                       side: BorderSide(
                                           width: 1, color: Colors.blueGrey))),
-                              child: CircleAvatar(
-                                backgroundImage:
-                                    NetworkImage("https://picsum.photos/200"),
-                                maxRadius: screenWidth / 8,
+                              child: FutureBuilder(
+                                future: FirebaseStorageService.getImage(context, "tom_and_jerry.jpeg"),
+                                builder: (context, AsyncSnapshot<dynamic> snapshot){
+
+                                  if(snapshot.hasData){
+
+                                    return CircleAvatar(
+                                    backgroundImage: NetworkImage(snapshot.data),
+                                    maxRadius: screenWidth / 8,
+                                );
+                                  }
+                                  else{
+                                    return CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      backgroundColor: bgColor,
+                                      valueColor: AlwaysStoppedAnimation(loginButtonEnd),
+                                    );
+                                    
+                                  }
+                                  
+                                }
+                                
                               ),
                             ),
                             Column(
@@ -577,17 +506,9 @@ class _ProfileState extends State<Profile> {
   }
 }
 
-Future<Widget> displayImage(BuildContext context, String imageName) async {
-  Image image;
-  await FirebaseStorageService.getImage(context, imageName).then((value) {
-    image = Image.network(value.toString());
-  });
-  return image;
-}
-
 class FirebaseStorageService extends ChangeNotifier {
   FirebaseStorageService();
   static Future<dynamic> getImage(BuildContext context, String image) async {
-    return await FirebaseStorage.instance.ref().child(image).getDownloadURL();
+    return await FirebaseStorage.instance.ref().child("profile").child(image).getDownloadURL();
   }
 }
