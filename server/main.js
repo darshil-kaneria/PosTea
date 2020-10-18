@@ -117,8 +117,27 @@ app.route("/post")
   
 // });
 
+app.get('/getusername', (req, res) => {
+  const handleUsername = fork("./func/profileid_to_username.js");
+  var data = {
+    profile_id: req.query.profile_id
+  }
+  handleUsername.send(data);
+  handleUsername.on("message", message => res.send(message));
+});
+
 app.get('/getcomments', (req, res) => {
   const handleComments = fork("./func/get_comments.js");
+  var data = {
+    post_id: req.query.post_id
+  }
+  handleComments.send(data);
+  handleComments.on("message", message => res.send(message));
+});
+
+
+app.get('/getengagement', (req, res) => {
+  const handleEngagements = fork("./func/get_engagement_post.js");
   var data = {
     post_id: req.query.post_id
   }
