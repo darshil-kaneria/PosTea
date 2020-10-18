@@ -29,6 +29,8 @@ const addPost = async (dict, connection) => {
     console.log(id)
     var userPostMessage = dict.post;
     var topic = dict.topic
+    console.log(topic);
+    console.log(dict.topicID);
     var queryTopicExists = "SELECT topic_id, topic_name, COUNT(*) FROM topic_info WHERE topic_name='" + dict.topic + "'";
     var queryString = "INSERT INTO user_post (post_id, profile_id, post_description, topic_id, post_img, creation_date, post_likes, post_dislikes, post_comments, post_title) VALUES ?";
     var addTopicContent = "INSERT INTO topic_content (topic_id, post_id) VALUES ?";
@@ -59,7 +61,7 @@ const addPost = async (dict, connection) => {
                         
                     }
                     console.log("Post added succesfully!!");
-                    return result;
+                    resolve(result);
                 });
 
                 await connection.query(addTopicContent, [topicContentFields], (err, result) => {
@@ -68,10 +70,10 @@ const addPost = async (dict, connection) => {
                         throw err;
                     }
                     console.log("Post information added to topic_content " + topic + " succesfully!!");
-                    return result;
+                    resolve(result);
                 });
             }
-            return result;
+            resolve(result);
         });
     })
 
