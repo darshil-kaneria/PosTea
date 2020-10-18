@@ -38,6 +38,13 @@ class _EditProfileState extends State<EditProfile> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
+          leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Colors.black,
+          onPressed: () {
+            Navigator.pop(context);
+          },
+        ),
         ),
         extendBodyBehindAppBar: false,
         body: SingleChildScrollView(
@@ -48,30 +55,54 @@ class _EditProfileState extends State<EditProfile> {
                 padding: const EdgeInsets.all(10.0),
                 child: Row(
                   children: [
-                    Container(
-                    height: screenWidth / 4,
-                    width: screenWidth / 4,
-                    decoration: ShapeDecoration(
-                        shape: CircleBorder(
-                            side: BorderSide(width: 1, color: Colors.blueGrey))),
-                    child: FutureBuilder(
-                        future: FirebaseStorageService.getImage(
-                            context, "tom_and_jerry.jpeg"),
-                        builder: (context, AsyncSnapshot<dynamic> snapshot) {
-                          if (snapshot.hasData) {
-                            return CircleAvatar(
-                              backgroundImage: NetworkImage(snapshot.data),
-                              maxRadius: screenWidth / 8,
-                            );
-                          } else {
-                            return CircularProgressIndicator(
-                              strokeWidth: 2,
-                              backgroundColor: bgColor,
-                              valueColor: AlwaysStoppedAnimation(loginButtonEnd),
-                            );
-                          }
-                        }),
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Container(
+                      height: screenWidth / 4,
+                      width: screenWidth / 4,
+                      decoration: ShapeDecoration(
+                          shape: CircleBorder(
+                              side: BorderSide(width: 1, color: Colors.blueGrey))),
+                      child: FutureBuilder(
+                          future: FirebaseStorageService.getImage(
+                              context, "tom_and_jerry.jpeg"),
+                          builder: (context, AsyncSnapshot<dynamic> snapshot) {
+                            if (snapshot.hasData) {
+                              return CircleAvatar(
+                                backgroundImage: NetworkImage(snapshot.data),
+                                maxRadius: screenWidth / 8,
+                              );
+                            } else {
+                              return CircularProgressIndicator(
+                                strokeWidth: 2,
+                                backgroundColor: bgColor,
+                                valueColor: AlwaysStoppedAnimation(loginButtonEnd),
+                              );
+                            }
+                          }),
                   ),
+                    ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.all(15.0),
+                      child: ButtonTheme(
+                        shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100),
+                              side: BorderSide(color: Colors.redAccent)),
+                        child: RaisedButton(
+                          elevation: 1,
+                          color: loginButton,
+                          highlightColor: Colors.red[700],
+                          onPressed: () {
+
+                        },
+                        child: Text("Edit profile image", style: TextStyle(
+                                  fontFamily: "Helvetica",
+                                  color: Colors.white,
+                                  fontSize: 16),),),
+                      ),
+                    ),
+                  )
                   ]),
               ),
               Padding(
@@ -88,7 +119,7 @@ class _EditProfileState extends State<EditProfile> {
                         labelStyle: TextStyle(color: Colors.brown[200]),
                         enabledBorder: OutlineInputBorder(
                             borderSide: BorderSide(
-                              color: Colors.grey,
+                              color: Colors.transparent,
                             ),
                             borderRadius: BorderRadius.all(Radius.circular(20))),
                         focusedBorder: OutlineInputBorder(
@@ -112,12 +143,12 @@ class _EditProfileState extends State<EditProfile> {
                         labelStyle: TextStyle(color: Colors.brown[200],fontWeight: FontWeight.bold),
                         enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(20)),
-                            borderSide: BorderSide(color: Colors.brown[200])),
+                            borderSide: BorderSide(color: Colors.transparent)),
                         focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(20)),
                             borderSide:
                                 BorderSide(color: Colors.deepOrange[700])),
-                        hintText: "Tell others something about yourself :)"),
+                        hintText: "Tell everyone something about yourself :)"),
                   ),
                 ),
               ),
@@ -140,6 +171,26 @@ class _EditProfileState extends State<EditProfile> {
 
                   ),
                 )
+              ),
+              Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: ButtonTheme(
+                  shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(100),
+                                side: BorderSide(color: Colors.redAccent)),
+                          child: RaisedButton(
+                            elevation: 1,
+                            color: loginButton,
+                            highlightColor: Colors.red[700],
+                            onPressed: () {
+
+                          },
+                          child: Text("Save", style: TextStyle(
+                                    fontFamily: "Helvetica",
+                                    color: Colors.white,
+                                    fontSize: 16),),),
+
+                ),
               )
             ],
           ),

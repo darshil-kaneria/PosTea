@@ -23,12 +23,15 @@ class _ProfileState extends State<Profile> {
 
   var _nameController = TextEditingController();
   var _biodataController = TextEditingController();
+  int _value;
+  PageController controller = PageController(initialPage: 0);
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     // displayImage();
+    _value=0;
     getProfile();
   }
 
@@ -81,6 +84,7 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
+    
 
     // displayImage();
 
@@ -119,47 +123,23 @@ class _ProfileState extends State<Profile> {
                     },
                   )
                   );
-              // child: ButtonTheme(
-              //                         shape: RoundedRectangleBorder(
-              //                             borderRadius:
-              //                                 BorderRadius.circular(100),
-              //                             side: BorderSide(
-              //                                 color: Colors.redAccent)),
-              //                         minWidth: screenWidth / 4,
-              //                         child: RaisedButton(
-              //                           onPressed: () async {
-              //                             bio_data = _biodataController.text;
-              //                             name = _nameController.text;
-
-              //                             print("name: " + name);
-              //                             print("biodata: " + bio_data);
-              //                             print(
-              //                                 "privacy: " + isPrivate.toString());
-
-              //                             updateProfile();
-              //                           },
-              //                           elevation: 1,
-              //                           color: loginButton,
-              //                           highlightColor: Colors.red[700],
-              //                           child: Text(
-              //                             "Submit",
-              //                             style: TextStyle(color: Colors.white),
-              //                           ),
-              //                         )),
 
             },
           )
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: EdgeInsets.all(0),
-          child: Column(
+        child: PageView(
+          scrollDirection: Axis.horizontal,
+          // physics: NeverScrollableScrollPhysics(),
+          controller: controller,
+          children: [
+            Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 Container(
-                  height: screenHeight / 4,
+                  // height: screenHeight / 4,
                   width: screenWidth,
                   color: Colors.transparent,
                   // padding: EdgeInsets.only(top: screenHeight / 20),
@@ -263,24 +243,9 @@ class _ProfileState extends State<Profile> {
                         ),
                       ),
                       // Profile circle
-
-                      // Center(
-                      //   child: Container(
-                      //     child: Container(),
-                      //     height: screenHeight / 7,
-                      //     width: screenHeight / 7,
-                      //     alignment: Alignment.center,
-                      //     decoration: BoxDecoration(
-                      //         color: Colors.grey,
-                      //         borderRadius: BorderRadius.circular(100)),
-                      //   ),
-                      // ),
                       SizedBox(
                         height: screenHeight / 25,
                       ),
-                      // Profile Name
-
-                      // SizedBox(height: screenHeight / 25),
                       // Follow & Following Buttons
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -373,125 +338,105 @@ class _ProfileState extends State<Profile> {
                     ],
                   ),
                 ),
-                Container(
-                  height: screenHeight / 1.6,
-                  width: screenWidth,
-                  color: Colors.transparent,
-                  child: Column(
-                    children: <Widget>[
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          ButtonTheme(
-                            child: FlatButton(
-                              onPressed: () {},
-                              child: Text(
-                                "About",
-                                style: TextStyle(fontFamily: "Open Sans"),
+                Expanded(
+                  child: Container(
+                    // height: screenHeight / 1.6,
+                    width: screenWidth,
+                    color: Colors.transparent,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: <Widget>[
+                        Hero(
+                          tag: 'dmenu',
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 12),
+                            child: Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                color: Colors.red[50],
+                                border: Border.all(color: Colors.black12)),
+                              child: DropdownButton(
+                                isExpanded: true,
+                                underline: SizedBox(),
+                                icon: null,
+                                value: _value,
+                                items: [
+                                  DropdownMenuItem(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                                      child: Container(
+                                        child: Text("About"),
+                                      ),
+                                    ),
+                                    value: 0,
+                                  ),
+                                  DropdownMenuItem(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                                      child: Container(
+                                        child: Text("Posts"),
+                                      ),
+                                    ),
+                                    value: 1,
+                                  ),
+                                  DropdownMenuItem(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                                      child: Container(
+                                        child: Text("Topics"),
+                                      ),
+                                    ),
+                                    value: 2,
+                                  ),
+                                  
+
+                                ], 
+                              onChanged: (num value) {
+                              setState(() {
+                              _value = value;
+                              });
+                              controller.animateToPage(
+                                _value,
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.decelerate
+                              );
+                                print(controller.page);
+                              }
                               ),
                             ),
                           ),
-                          ButtonTheme(
-                            child: FlatButton(
-                              onPressed: () {},
-                              child: Text("Posts"),
+                        ),
+                        Expanded(
+                          flex: 4,
+                          child: Container(
+                            // height: screenHeight / 1.8,
+                            color: Colors.transparent,
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: <Widget>[
+                                  Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    margin: EdgeInsets.only(top: 10, left: 12, right: 12),
+                                    elevation: 1,
+                                    clipBehavior: Clip.antiAlias,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Container(
+                                        child: Text(bio_data),
+                                      ),
+                                    )
+                                  )
+                                ],
+                              ),
                             ),
                           ),
-                          ButtonTheme(
-                            child: FlatButton(
-                              onPressed: () {},
-                              child: Text("Topic"),
-                            ),
-                          )
-                        ],
-                      ), // Row for tab buttons About - Posts - Topic
-                      Container(
-                        height: screenHeight / 1.8,
-                        color: Colors.transparent,
-                        child: PageView(
-                          scrollDirection: Axis.horizontal,
-                          children: <Widget>[
-                            Container(
-                                alignment: Alignment.center,
-                                width: screenWidth,
-                                child: Card(
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(20),
-                                  ),
-                                  margin: EdgeInsets.only(left: 12, right: 12),
-                                  clipBehavior: Clip.antiAlias,
-                                  elevation: 0,
-                                  color: Colors.transparent,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.start,
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        color: Colors.transparent,
-                                        height: screenHeight / 2,
-                                        child: ListView(
-                                          padding: EdgeInsets.all(0),
-                                          scrollDirection: Axis.vertical,
-                                          children: [
-                                            ListTile(
-                                              title: Text(
-                                                "Who?",
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 25),
-                                              ),
-                                              subtitle: Text(
-                                                bio_data,
-                                                style: TextStyle(
-                                                    color: Colors.black,
-                                                    fontSize: 17),
-                                              ),
-                                            ),
-                                            Padding(
-                                                padding: EdgeInsets.all(10)),
-                                            ListTile(
-                                                title: Text("Where?",
-                                                    style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        fontSize: 25)),
-                                                subtitle: Row(
-                                                  children: [
-                                                    Icon(
-                                                      Icons.location_on,
-                                                      size: 18,
-                                                      color: Colors.blueGrey,
-                                                    ),
-                                                    Text(
-                                                      "Stockholm, Sweden",
-                                                      style: TextStyle(
-                                                          color: Colors.black,
-                                                          fontSize: 17),
-                                                    )
-                                                  ],
-                                                )),
-                                          ],
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                )),
-                            Container(
-                              alignment: Alignment.center,
-                              width: screenWidth,
-                              child: Text("Posts"),
-                            ),
-                            Container(
-                              alignment: Alignment.center,
-                              width: screenWidth,
-                              child: Text("Topics"),
-                            )
-                          ],
-                        ),
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
                 // Container(
@@ -500,6 +445,158 @@ class _ProfileState extends State<Profile> {
                 //   color: Colors.yellowAccent,
                 // ),
               ]),
+              // Posts page
+            Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  Hero(
+                    tag: 'dmenu',
+                    child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 12),
+                            child: Container(
+                              alignment: Alignment.center,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10.0),
+                                color: Colors.red[50],
+                                border: Border.all(color: Colors.black12)),
+                              child: DropdownButton(
+                                isExpanded: true,
+                                underline: SizedBox(),
+                                icon: null,
+                                value: _value,
+                                items: [
+                                  DropdownMenuItem(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                                      child: Container(
+                                        child: Text("About"),
+                                      ),
+                                    ),
+                                    value: 0,
+                                  ),
+                                  DropdownMenuItem(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                                      child: Container(
+                                        child: Text("Posts"),
+                                      ),
+                                    ),
+                                    value: 1,
+                                  ),
+                                  DropdownMenuItem(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                                      child: Container(
+                                        child: Text("Topics"),
+                                      ),
+                                    ),
+                                    value: 2,
+                                  ),
+                                  
+
+                                ], 
+                              onChanged: (num value) {
+                              setState(() {
+                              _value = value;
+                              controller.animateToPage(
+                                _value,
+                                duration: Duration(milliseconds: 300),
+                                curve: Curves.decelerate
+                                );
+                              print(value);
+                              });
+                              // print(value);
+                              
+                              }
+                              ),
+                            ),
+                          ),
+                  ),
+                        Expanded(
+                          child: Container(
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.vertical,
+                              child: Column(
+                                children: [
+                                  Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    margin: EdgeInsets.only(top: 10, left: 12, right: 12),
+                                    elevation: 1,
+                                    clipBehavior: Clip.antiAlias,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Container(
+                                        child: Text(bio_data),
+                                      ),
+                                    )
+                                  ),
+                                  Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    margin: EdgeInsets.only(top: 10, left: 12, right: 12),
+                                    elevation: 1,
+                                    clipBehavior: Clip.antiAlias,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Container(
+                                        child: Text(bio_data),
+                                      ),
+                                    )
+                                  ),
+                                  Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    margin: EdgeInsets.only(top: 10, left: 12, right: 12),
+                                    elevation: 1,
+                                    clipBehavior: Clip.antiAlias,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Container(
+                                        child: Text(bio_data),
+                                      ),
+                                    )
+                                  ),
+                                  Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    margin: EdgeInsets.only(top: 10, left: 12, right: 12),
+                                    elevation: 1,
+                                    clipBehavior: Clip.antiAlias,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Container(
+                                        child: Text(bio_data),
+                                      ),
+                                    )
+                                  ),
+                                  Card(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    margin: EdgeInsets.only(top: 10, left: 12, right: 12),
+                                    elevation: 1,
+                                    clipBehavior: Clip.antiAlias,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20.0),
+                                      child: Container(
+                                        child: Text(bio_data),
+                                      ),
+                                    )
+                                  )
+                                ],
+                              ),
+                            ),
+                          ),
+                        )
+                ],
+              )
+              ]
         ),
       ),
     );
