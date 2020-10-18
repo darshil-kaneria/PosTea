@@ -23,20 +23,26 @@ process.on("message", message => {
 
 const addTopicInfo = async function(data, connection) {
     //var topic_id = top_id;
+    console.log("data");
     var top_id = Math.random()
     var addtopicinfoq = "INSERT INTO topic_info (topic_id, topic_creator_id, topic_name, topic_description, topic_img, creation_date) VALUES ?";
     var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
     var vals = [[data.topicID, data.topic_creator_id, data.topicText, data.topic_description, "", date]];
-    await connection.query(addtopicinfoq,[vals], function(err, result) {
+    return new Promise(function(resolve, reject) {
+      connection.query(addtopicinfoq,[vals], function(err, result) {
         if (err) {
             console.log(err);
-            throw err;
+
+            reject(result);
+            //throw err;
         } else {
-          console.log("topic info added sucessfully")
-          return result;  
+          //console.log("topic info added sucessfully");
+          resolve(result);
+          //return result;  
         }
 
-    });
+      });
+    })
 
 
 }

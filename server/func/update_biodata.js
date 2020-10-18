@@ -27,6 +27,7 @@ process.on("message", message => {
       connection.query(selectQuery,[user],  function (err, result) {
         if (err) {
           console.log(err);
+          reject("An error occurred");
           throw err;}
         try {
           if (result.length == 0) {
@@ -42,6 +43,7 @@ process.on("message", message => {
           }
         }
         catch (error){
+          reject("An error occured");
           throw err;
         }
         return;

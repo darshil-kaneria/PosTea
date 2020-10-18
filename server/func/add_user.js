@@ -30,7 +30,7 @@ process.on("message", message => {
       connection.query(selectQuery,[user],  function (err, result) {
         if (err) {
           console.log(err);
-          throw err;}
+          reject(result);}
         try {
           if (result.length == 1) {
             resolve("Account already exists");

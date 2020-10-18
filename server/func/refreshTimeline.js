@@ -1,4 +1,4 @@
-const { query } = require('express');
+//const { query } = require('express');
 const db = require('./db_connection.js');
 
 process.on("message", message => {
