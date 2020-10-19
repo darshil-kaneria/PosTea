@@ -11,7 +11,7 @@ process.on("message", message => {
       if (answer == "Account already exists") {
         process.send({"Error": "User information already exists"});
       } else {
-      process.send({"Profile user information added": "Successfully"});
+      process.send(answer);
       }
       process.exit();
   });
@@ -43,7 +43,7 @@ process.on("message", message => {
                 throw err;
                 }
               } 
-                resolve("Added");
+                resolve(profile_id);
               });
           }
         }
