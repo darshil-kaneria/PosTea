@@ -35,6 +35,12 @@ class _ProfileState extends State<Profile> {
     getProfile();
   }
 
+  @override
+  void dispose(){
+    controller.dispose();
+    super.dispose();
+  }
+
   updateProfile() async {
     var sendAnswer = JsonEncoder().convert({
       "original_username": "dkaneria",
@@ -131,7 +137,7 @@ class _ProfileState extends State<Profile> {
       body: SafeArea(
         child: PageView(
           scrollDirection: Axis.horizontal,
-          // physics: NeverScrollableScrollPhysics(),
+          physics: NeverScrollableScrollPhysics(),
           controller: controller,
           children: [
             Column(
@@ -347,16 +353,25 @@ class _ProfileState extends State<Profile> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: <Widget>[
-                        Hero(
-                          tag: 'dmenu',
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 12),
-                            child: Container(
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.0),
-                                color: Colors.red[50],
-                                border: Border.all(color: Colors.black12)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 12),
+                          child: Container(
+                            alignment: Alignment.center,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              color: Colors.red[50],
+                              border: Border.all(color: Colors.black12)),
+                            child: Theme(
+                              data: Theme.of(context).copyWith(
+                                canvasColor: Colors.red[100],
+                                buttonTheme: ButtonTheme.of(context).copyWith(
+                                  shape: RoundedRectangleBorder(
+                                    side: BorderSide(width: 1.0, style: BorderStyle.solid),
+                                    borderRadius: BorderRadius.circular(50.0)
+                                    ),
+                                    alignedDropdown:true
+                                  )
+                                ),
                               child: DropdownButton(
                                 isExpanded: true,
                                 underline: SizedBox(),
@@ -399,7 +414,7 @@ class _ProfileState extends State<Profile> {
                               });
                               controller.animateToPage(
                                 _value,
-                                duration: Duration(milliseconds: 300),
+                                duration: Duration(milliseconds: 150),
                                 curve: Curves.decelerate
                               );
                                 print(controller.page);
@@ -460,55 +475,64 @@ class _ProfileState extends State<Profile> {
                                 borderRadius: BorderRadius.circular(10.0),
                                 color: Colors.red[50],
                                 border: Border.all(color: Colors.black12)),
-                              child: DropdownButton(
-                                isExpanded: true,
-                                underline: SizedBox(),
-                                icon: null,
-                                value: _value,
-                                items: [
-                                  DropdownMenuItem(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                      child: Container(
-                                        child: Text("About"),
-                                      ),
-                                    ),
-                                    value: 0,
+                              child: Theme(
+                                data: Theme.of(context).copyWith(
+                                  canvasColor: Colors.red[100],
+                                  buttonTheme: ButtonTheme.of(context).copyWith(
+                                    alignedDropdown:true
+                                  )
                                   ),
-                                  DropdownMenuItem(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                      child: Container(
-                                        child: Text("Posts"),
+                                child: DropdownButton(
+                                  isDense: false,
+                                  isExpanded: true,
+                                  underline: SizedBox(),
+                                  icon: null,
+                                  value: _value,
+                                  items: [
+                                    DropdownMenuItem(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                                        child: Container(
+                                          child: Text("About"),
+                                        ),
                                       ),
+                                      value: 0,
                                     ),
-                                    value: 1,
-                                  ),
-                                  DropdownMenuItem(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                      child: Container(
-                                        child: Text("Topics"),
+                                    DropdownMenuItem(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                                        child: Container(
+                                          child: Text("Posts"),
+                                        ),
                                       ),
+                                      value: 1,
                                     ),
-                                    value: 2,
-                                  ),
-                                  
+                                    DropdownMenuItem(
+                                      child: Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                                        child: Container(
+                                          child: Text("Topics"),
+                                        ),
+                                      ),
+                                      value: 2,
+                                    ),
+                                    
 
-                                ], 
-                              onChanged: (num value) {
-                              setState(() {
-                              _value = value;
-                              controller.animateToPage(
-                                _value,
-                                duration: Duration(milliseconds: 300),
-                                curve: Curves.decelerate
-                                );
-                              print(value);
-                              });
-                              // print(value);
-                              
-                              }
+                                  ], 
+                                onChanged: (num value) {
+                                setState(() {
+                                _value = value;
+                                controller.animateToPage(
+                                  _value,
+                                  duration: Duration(milliseconds: 150),
+                                  curve: Curves.decelerate
+                                  );
+                                print(value);
+                                });
+                                // print(value);
+                                
+                                }
+                                ),
                               ),
                             ),
                           ),

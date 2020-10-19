@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:http/http.dart';
+import 'dart:convert';
 //import 'package:postea_frontend/data_models/error_codes.json';
 
 class ProcessSignUp {
@@ -115,7 +117,19 @@ class ProcessSignUp {
             .child(username)
             .set(email);
 
-        print("FINISHED");
+        var reqBody = JsonEncoder().convert({
+          "newUser": username
+        });
+        Response response = await post(
+          "http://postea-server.herokuapp.com/adduser",
+          headers: {'Content-Type': 'application/json'},
+          body: reqBody
+          );
+
+        if(response.statusCode == 200){
+          print("FINISHED");
+        }
+        
         return [errCode, errMsg];
         // Navigator.push(
         //     context, MaterialPageRoute(builder: (context) => LoggedIn()));

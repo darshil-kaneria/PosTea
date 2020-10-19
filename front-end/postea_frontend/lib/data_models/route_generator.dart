@@ -4,6 +4,7 @@ import 'package:postea_frontend/pages/devpage.dart';
 import 'package:postea_frontend/pages/error.dart';
 import 'package:postea_frontend/pages/homepage.dart';
 import 'package:postea_frontend/pages/login.dart';
+import 'package:postea_frontend/pages/onboarding.dart';
 import 'package:postea_frontend/pages/profile.dart';
 import 'package:postea_frontend/pages/signup.dart';
 import 'package:postea_frontend/pages/loggedIn.dart';

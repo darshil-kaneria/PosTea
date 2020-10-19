@@ -19,6 +19,10 @@ import 'package:postea_frontend/data_models/process_timeline.dart';
 import 'login.dart';
 
 class HomePage extends StatefulWidget {
+
+  final int profileID=1;
+
+  // HomePage({@required this.profileID});
   @override
   _HomePageState createState() => _HomePageState();
 }

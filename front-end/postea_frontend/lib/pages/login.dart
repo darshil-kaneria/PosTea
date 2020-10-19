@@ -1,8 +1,13 @@
+// import 'dart:html';
+import 'dart:convert';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 import 'package:postea_frontend/data_models/process_login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:postea_frontend/pages/homepage.dart';
+import 'package:postea_frontend/pages/onboarding.dart';
 import '../colors.dart';
 import 'loggedIn.dart';
 
@@ -30,7 +35,7 @@ class _LoginState extends State<Login> {
   //   }
   // }
 
-  logInUser(String email, String password) async {
+  logInUser(String email, String password, String username) async {
     print(email);
     print(password);
     try {
@@ -39,8 +44,13 @@ class _LoginState extends State<Login> {
           .user;
 
       print("hello from logInUser()");
-
-      if (user != null) {
+      Response response = await get("http://postea-server.herokuapp.com/profile?username="+username);
+      var respBody = jsonDecode(response.body);
+      if(respBody.containsKey("Error")){
+        Navigator.push(context, MaterialPageRoute(builder: (context) => Onboarding(username: username)));
+        print("Error occurred");
+      }
+      else if (user != null) {
         print("hello from logInUser() success");
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => HomePage()));
@@ -206,7 +216,7 @@ class _LoginState extends State<Login> {
                                 final databaseReference = FirebaseDatabase
                                     .instance
                                     .reference()
-                                    .child("users");
+                                    .child("users"); 
 
                                 print("hello");
 
@@ -221,10 +231,10 @@ class _LoginState extends State<Login> {
                                   if (_email == null) {
                                     // do error checking for invalid credentials
                                   }
-                                  logInUser(_email, password);
+                                  logInUser(_email, password, username);
                                 });
                               } else {
-                                logInUser(_email, password);
+                                logInUser(_email, password, username);
                               }
 
                               // var ret = ProcessLogin(
