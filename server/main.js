@@ -98,6 +98,21 @@ app.route("/post")
     handledelete.on("message",message => res.send(message));
   });
 
+  app.route("/engagement")
+    .get((req,res) => {
+      const handleEngagements = fork("./func/get_engagement_post.js");
+    var data = {
+    post_id: req.query.post_id
+    }
+    handleEngagements.send(data);
+    handleEngagements.on("message", message => res.send(message));
+  })
+  .post((req, res) => {
+    const handleEngagements = fork('./func/add_engagement.js');
+    handleEngagements.send(req.body);
+    handleEngagements.on("message", message => res.send(message));
+  });
+
 app.get('/getusername', (req, res) => {
   const handleUsername = fork("./func/profileid_to_username.js");
   var data = {
@@ -116,14 +131,14 @@ app.get('/getcomments', (req, res) => {
   handleComments.on("message", message => res.send(message));
 });
 
-app.get('/getengagement', (req, res) => {
-  const handleEngagements = fork("./func/get_engagement_post.js");
-  var data = {
-    post_id: req.query.post_id
-  }
-  handleEngagements.send(data);
-  handleEngagements.on("message", message => res.send(message));
-});
+// app.get('/getengagement', (req, res) => {
+//   const handleEngagements = fork("./func/get_engagement_post.js");
+//   var data = {
+//     post_id: req.query.post_id
+//   }
+//   handleEngagements.send(data);
+//   handleEngagements.on("message", message => res.send(message));
+// });
 
 
 app.get('/getfollowers', (req, res) => {
@@ -156,11 +171,11 @@ app.get('/getfollowing', (req, res) => {
   handleFollowing.on("message", message => res.send(message));
 });
 
-app.post('/addEngagement', (req, res) => {
-  const handleEngagements = fork('./func/add_engagement.js');
-  handleEngagements.send(req.body);
-  handleEngagements.on("message", message => res.send(message));
-});
+// app.post('/addEngagement', (req, res) => {
+//   const handleEngagements = fork('./func/add_engagement.js');
+//   handleEngagements.send(req.body);
+//   handleEngagements.on("message", message => res.send(message));
+// });
 
 app.get("/refreshTimeline", (req, res) => {
   const handleRefreshTimeline = fork('./func/refreshTimeline.js');
