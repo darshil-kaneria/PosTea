@@ -16,7 +16,7 @@ process.on("message", message => {
 });
 
 const getTopicFollowers = async(topic_id, connection) => {
-    var query = "SELECT * FROM topic_followers WHERE topic_follower.topic_id = ?";
+    var query = "SELECT * FROM topic_follower WHERE topic_follower.topic_id = ?";
     return new Promise(function(resolve, reject) {
        connection.query(query,[topic_id],function(err, result)  {
             if (err) {
