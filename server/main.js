@@ -166,6 +166,14 @@ app.get('/getfollowing', (req, res) => {
   handleFollowing.on("message", message => res.send(message));
 });
 
+app.get('/gettopic', (req, res)=> {
+  const handleTopics = fork("./func/get_topic.js");
+  var data = {
+    topic_id: req.query.topic_id
+  }
+  handleTopics.send(data);
+  handleTopics.on("message", message => res.send(message));
+}); 
 app.post('/addEngagement', (req, res) => {
   const handleEngagements = fork('./func/add_engagement.js');
   handleEngagements.send(req.body);
