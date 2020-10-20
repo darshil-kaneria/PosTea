@@ -77,6 +77,16 @@ app.route('/profile')
     handleUpdate.on("message", message => res.send(message));
   });
 
+app.get('/selectposts', (req, res) => {
+  const select = fork('./func/select_posts.js');
+  var data = {topicID: req.query.topic_id};
+  select.send(data);
+  select.on("message", message => res.send(message));
+
+
+
+});
+
 // Post methods
 app.route("/post")
   .get((req, res) => {
