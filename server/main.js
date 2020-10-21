@@ -181,13 +181,6 @@ app.get('/getfollowing', (req, res) => {
   handleFollowing.on("message", message => res.send(message));
 });
 
-<<<<<<< HEAD
-// app.post('/addEngagement', (req, res) => {
-//   const handleEngagements = fork('./func/add_engagement.js');
-//   handleEngagements.send(req.body);
-//   handleEngagements.on("message", message => res.send(message));
-// });
-=======
 app.get('/gettopic', (req, res)=> {
   const handleTopics = fork("./func/get_topic.js");
   var data = {
@@ -239,7 +232,6 @@ app.post('/addEngagement', (req, res) => {
   handleEngagements.send(req.body);
   handleEngagements.on("message", message => res.send(message));
 });
->>>>>>> 1c75ba0bbda71d81f12bd46f0dfe00ff18f1c461
 
 app.get("/refreshTimeline", (req, res) => {
   const handleRefreshTimeline = fork('./func/refreshTimeline.js');
