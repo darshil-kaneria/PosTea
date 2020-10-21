@@ -184,7 +184,25 @@ app.get('/gettopicfollowers', (req, res)=> {
   handleTopics.on("message", message => res.send(message));
 }); 
 
-app.get('/addTopicFollowers', (req, res) => {
+app.get('/gettopicsfollowedbyuser', (req, res)=> {
+  const handleTopics = fork("./func/get_userFollowedTopics.js");
+  var data = {
+    user_id: req.query.user_id
+  }
+  handleTopics.send(data);
+  handleTopics.on("message", message => res.send(message));
+}); 
+
+app.get('/convertidtotopicname', (req, res)=> {
+  const handleTopics = fork("./func/get_topicfromid");
+  var data = {
+    topic_id: req.query.topic_id
+  }
+  handleTopics.send(data);
+  handleTopics.on("message", message => res.send(message));
+});
+
+app.post('/addTopicFollowers', (req, res) => {
   const handleTopicsFollowers = fork("./func/add_topicfollowers.js");
   var data = {
     topic_id: req.query.topic_id,
