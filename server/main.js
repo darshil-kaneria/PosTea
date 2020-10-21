@@ -184,7 +184,6 @@ app.get('/gettopicfollowers', (req, res)=> {
   handleTopics.on("message", message => res.send(message));
 }); 
 
-<<<<<<< HEAD
 app.get('/gettopicsfollowedbyuser', (req, res)=> {
   const handleTopics = fork("./func/get_userFollowedTopics.js");
   var data = {
@@ -204,9 +203,6 @@ app.get('/convertidtotopicname', (req, res)=> {
 });
 
 app.post('/addTopicFollowers', (req, res) => {
-=======
-app.get('/addTopicFollowers', (req, res) => {
->>>>>>> e07fe204dbcfb9f1e721a510520a140b276b9a70
   const handleTopicsFollowers = fork("./func/add_topicfollowers.js");
   var data = {
     topic_id: req.query.topic_id,
