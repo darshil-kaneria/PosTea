@@ -6,32 +6,32 @@ process.on("message", message => {
             return console.error('error: ' + err.message);
           }
           console.log('Database connection established');
-          var data = {
-            profile_id: req.query.profile_id,
-            follower_id: req.query.follower_id
-          }
-          //  addFollower(message.profile_id,message.follower_id, connection).then((answer) => {
-         addFollower(data, connection).then((answer) => {
+        //   var data = {
+        //     topic_id: req.query.topic_id,
+        //     follower_id: req.query.follower_id
+        //   }
+        addTopicFollower(message.topic_id,message.follower_id, connection).then((answer) => {
+        // addTopicFollower(data, connection).then((answer) => {
             connection.release();
             if (answer == "Relationship already exists") {
-                process.send({"Error": "User-User relationship already exists"});
+                process.send({"Error": "User-Topic relationship already exists"});
             } else {
-                process.send({"Success": "Follower relationship created"});
+                process.send({"Success": "Topic Follower relationship created"});
                 }
             process.exit();
           });
         });
         
 });
- //function addFollower(profile_id, follower_id, connection) {
- function addFollower(data, connection) {
-    var profile_id = data.profile_id;
-    var follower_id = data.follower_id;
-    var selectQuery = "SELECT * FROM user_follower WHERE profile_id = '"+profile_id+"' AND follower_id = '"+follower_id+"'";
-    var addFollowerQuery = "INSERT INTO user_follower (row_id, profile_id, follower_id) VALUES ?";
+ function addTopicFollower(topic_id, follower_id, connection) {
+ //function addTopicFollower(data, connection) {
+    // var topic_id = data.topic_id;
+    // var follower_id = data.follower_id;
+    var selectQuery = "SELECT * FROM topic_follower WHERE topic_id = '"+topic_id+"' AND follower_id = '"+follower_id+"'";
+    var addFollowerQuery = "INSERT INTO topic_follower (row_id, topic_id, follower_id) VALUES ?";
     var row_id = Math.floor(Math.random() * 100000);
-    var values1 = [[profile_id, follower_id]];
-    var values2 = [[row_id, profile_id, follower_id]]
+    var values1 = [[topic_id, follower_id]];
+    var values2 = [[row_id, topic_id, follower_id]]
     return new Promise(function(resolve, reject) {
       connection.query(selectQuery,[values1],  function (err, result) {
         if (err) {
