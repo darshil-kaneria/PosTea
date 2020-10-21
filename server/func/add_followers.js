@@ -14,7 +14,7 @@ process.on("message", message => {
          addFollower(data, connection).then((answer) => {
             connection.release();
             if (answer == "Relationship already exists") {
-                process.send({"Error": "User-User relationship alreadt exists"});
+                process.send({"Error": "User-User relationship already exists"});
             } else {
                 process.send({"Success": "Follower relationship created"});
                 }

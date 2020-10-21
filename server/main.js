@@ -77,6 +77,16 @@ app.route('/profile')
     handleUpdate.on("message", message => res.send(message));
   });
 
+app.get('/selectposts', (req, res) => {
+  const select = fork('./func/select_posts.js');
+  var data = {topicID: req.query.topic_id};
+  select.send(data);
+  select.on("message", message => res.send(message));
+
+
+
+});
+
 // Post methods
 app.route("/post")
   .get((req, res) => {
@@ -171,11 +181,65 @@ app.get('/getfollowing', (req, res) => {
   handleFollowing.on("message", message => res.send(message));
 });
 
+<<<<<<< HEAD
 // app.post('/addEngagement', (req, res) => {
 //   const handleEngagements = fork('./func/add_engagement.js');
 //   handleEngagements.send(req.body);
 //   handleEngagements.on("message", message => res.send(message));
 // });
+=======
+app.get('/gettopic', (req, res)=> {
+  const handleTopics = fork("./func/get_topic.js");
+  var data = {
+    topic_id: req.query.topic_id
+  }
+  handleTopics.send(data);
+  handleTopics.on("message", message => res.send(message));
+}); 
+
+app.get('/gettopicfollowers', (req, res)=> {
+  const handleTopics = fork("./func/get_topicfollowers.js");
+  var data = {
+    topic_id: req.query.topic_id
+  }
+  handleTopics.send(data);
+  handleTopics.on("message", message => res.send(message));
+}); 
+
+app.get('/gettopicsfollowedbyuser', (req, res)=> {
+  const handleTopics = fork("./func/get_userFollowedTopics.js");
+  var data = {
+    user_id: req.query.user_id
+  }
+  handleTopics.send(data);
+  handleTopics.on("message", message => res.send(message));
+}); 
+
+app.get('/convertidtotopicname', (req, res)=> {
+  const handleTopics = fork("./func/get_topicfromid");
+  var data = {
+    topic_id: req.query.topic_id
+  }
+  handleTopics.send(data);
+  handleTopics.on("message", message => res.send(message));
+});
+
+app.post('/addTopicFollowers', (req, res) => {
+  const handleTopicsFollowers = fork("./func/add_topicfollowers.js");
+  var data = {
+    topic_id: req.query.topic_id,
+    follower_id: req.query.follower_id
+  }
+  handleTopicsFollowers.send(data)
+  // handleTopicsFollowers.send(req.body);
+  handleTopicsFollowers.on("message", message => res.send(message));
+});
+app.post('/addEngagement', (req, res) => {
+  const handleEngagements = fork('./func/add_engagement.js');
+  handleEngagements.send(req.body);
+  handleEngagements.on("message", message => res.send(message));
+});
+>>>>>>> 1c75ba0bbda71d81f12bd46f0dfe00ff18f1c461
 
 app.get("/refreshTimeline", (req, res) => {
   const handleRefreshTimeline = fork('./func/refreshTimeline.js');
