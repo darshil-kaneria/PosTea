@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:postea_frontend/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -19,7 +21,13 @@ class _OnboardingState extends State<Onboarding> {
 
   var nameController = TextEditingController();
   var bioController = TextEditingController();
+  File imgToUpload;
 
+  pickImage() async {
+    // PickedFile img = await ImagePicker().getImage(source: ImageSource.gallery);
+    imgToUpload = await ImagePicker.pickImage(source: ImageSource.gallery);
+    print(imgToUpload);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -151,31 +159,37 @@ class _OnboardingState extends State<Onboarding> {
 
                           Expanded(
                             flex: 2,
-                            child: Container(
-                            height: screenWidth / 3,
-                            width: screenWidth / 3,
-                            decoration: ShapeDecoration(
-                                  shape: CircleBorder(
-                                      side: BorderSide(width: 1, color: Colors.blueGrey))),
-                            child: FutureBuilder(
-                                  future: FirebaseStorageService.getImage(
-                                      context, "default-big.png"),
-                                  builder: (context, AsyncSnapshot<dynamic> snapshot) {
-                                    if (snapshot.hasData) {
-                                      return CircleAvatar(
-                                        backgroundColor: Colors.white,
-                                        child: ClipOval(child: Image.network(snapshot.data)),
-                                        maxRadius: screenWidth / 8,
-                                      );
-                                    } else {
-                                      return CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        backgroundColor: bgColor,
-                                        valueColor: AlwaysStoppedAnimation(loginButtonEnd),
-                                      );
-                                    }
-                                  }),
+                            child: GestureDetector(
+                              onTap: () async {
+                                await pickImage();
+                                print(imgToUpload);
+                              },
+                              child: Container(
+                              height: screenWidth / 3,
+                              width: screenWidth / 3,
+                              decoration: ShapeDecoration(
+                                    shape: CircleBorder(
+                                        side: BorderSide(width: 1, color: Colors.blueGrey))),
+                              child: FutureBuilder(
+                                    future: FirebaseStorageService.getImage(
+                                        context, "default-big.png"),
+                                    builder: (context, AsyncSnapshot<dynamic> snapshot) {
+                                      if (snapshot.hasData) {
+                                        return CircleAvatar(
+                                          backgroundColor: Colors.white,
+                                          child: ClipOval(child: Image.network(snapshot.data)),
+                                          maxRadius: screenWidth / 8,
+                                        );
+                                      } else {
+                                        return CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          backgroundColor: bgColor,
+                                          valueColor: AlwaysStoppedAnimation(loginButtonEnd),
+                                        );
+                                      }
+                                    }),
                   ),
+                            ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(30.0),
