@@ -29,6 +29,7 @@ process.on("message", message => {
       connection.query(selectQuery,[user],  function (err, result) {
         if (err) {
           console.log(err);
+          reject(err.message);
           throw err;}
         try {
           if (result.length == 1) {
@@ -40,6 +41,7 @@ process.on("message", message => {
                     addProfile(user, is_private, name, bio_data, connection);
                 } else {
                 console.log(err);
+                reject(err.message);
                 throw err;
                 }
               } 
@@ -48,6 +50,7 @@ process.on("message", message => {
           }
         }
         catch (error){
+          reject(error.message);
           throw err;
         }
         return;
