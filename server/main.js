@@ -108,6 +108,21 @@ app.route("/post")
     handledelete.on("message",message => res.send(message));
   });
 
+  app.route("/engagement")
+    .get((req,res) => {
+      const handleEngagements = fork("./func/get_engagement_post.js");
+    var data = {
+    post_id: req.query.post_id
+    }
+    handleEngagements.send(data);
+    handleEngagements.on("message", message => res.send(message));
+  })
+  .post((req, res) => {
+    const handleEngagements = fork('./func/add_engagement.js');
+    handleEngagements.send(req.body);
+    handleEngagements.on("message", message => res.send(message));
+  });
+
 app.get('/getusername', (req, res) => {
   const handleUsername = fork("./func/profileid_to_username.js");
   var data = {
@@ -126,14 +141,14 @@ app.get('/getcomments', (req, res) => {
   handleComments.on("message", message => res.send(message));
 });
 
-app.get('/getengagement', (req, res) => {
-  const handleEngagements = fork("./func/get_engagement_post.js");
-  var data = {
-    post_id: req.query.post_id
-  }
-  handleEngagements.send(data);
-  handleEngagements.on("message", message => res.send(message));
-});
+// app.get('/getengagement', (req, res) => {
+//   const handleEngagements = fork("./func/get_engagement_post.js");
+//   var data = {
+//     post_id: req.query.post_id
+//   }
+//   handleEngagements.send(data);
+//   handleEngagements.on("message", message => res.send(message));
+// });
 
 
 app.get('/getfollowers', (req, res) => {
@@ -166,6 +181,52 @@ app.get('/getfollowing', (req, res) => {
   handleFollowing.on("message", message => res.send(message));
 });
 
+app.get('/gettopic', (req, res)=> {
+  const handleTopics = fork("./func/get_topic.js");
+  var data = {
+    topic_id: req.query.topic_id
+  }
+  handleTopics.send(data);
+  handleTopics.on("message", message => res.send(message));
+}); 
+
+app.get('/gettopicfollowers', (req, res)=> {
+  const handleTopics = fork("./func/get_topicfollowers.js");
+  var data = {
+    topic_id: req.query.topic_id
+  }
+  handleTopics.send(data);
+  handleTopics.on("message", message => res.send(message));
+}); 
+
+app.get('/gettopicsfollowedbyuser', (req, res)=> {
+  const handleTopics = fork("./func/get_userFollowedTopics.js");
+  var data = {
+    user_id: req.query.user_id
+  }
+  handleTopics.send(data);
+  handleTopics.on("message", message => res.send(message));
+}); 
+
+app.get('/convertidtotopicname', (req, res)=> {
+  const handleTopics = fork("./func/get_topicfromid");
+  var data = {
+    topic_id: req.query.topic_id
+  }
+  handleTopics.send(data);
+  handleTopics.on("message", message => res.send(message));
+});
+
+app.post('/addTopicFollowers', (req, res) => {
+  const handleTopicsFollowers = fork("./func/add_topicfollowers.js");
+  var data = {
+    topic_id: req.query.topic_id,
+    follower_id: req.query.follower_id
+  }
+  handleTopicsFollowers.send(data)
+  // handleTopicsFollowers.send(req.body);
+  handleTopicsFollowers.on("message", message => res.send(message));
+});
 app.post('/addEngagement', (req, res) => {
   const handleEngagements = fork('./func/add_engagement.js');
   handleEngagements.send(req.body);
