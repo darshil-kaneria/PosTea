@@ -31,9 +31,9 @@ const addTopicInfo = async function(data, connection) {
     return new Promise(function(resolve, reject) {
       connection.query(addtopicinfoq,[vals], function(err, result) {
         if (err) {
-            console.log(err);
+            //console.log(err);
 
-            reject(result);
+            reject(err.message);
             //throw err;
         } else {
           //console.log("topic info added sucessfully");

@@ -8,7 +8,7 @@ process.on("message", message => {
           console.log('Database connection established');
           await getPosts(message.topicID, connection);
           connection.release();
-          process.send({"posts retrieved": "success"});
+          //process.send({"posts retrieved": "success"});
           process.exit();
           
         });
@@ -17,12 +17,13 @@ process.on("message", message => {
 function getPosts(topic_id, connection) {
     console.log(topic_id);
     console.log("print");
-    var selectquery = "SELECT * FROM user_post WHERE topic_id = ?";
+    var selectquery = "SELECT * FROM user_post WHERE topic_id = '" +topic_id +"'ORDER BY date DESC LIMIT 10'";
+    console.log(selectquery);
     return new Promise(function (resolve, reject) {
-        connection.query(selectquery, [topic_id], function(err, result) {
+        connection.query(selectquery, function(err, result) {
             if (err) {
-                console.log(err);
-                reject(result);
+                //console.log(err);
+                reject(err.message);
             } else {
                 if (result.length == 0) {
                     resolve("Posts for topic does not exist");
