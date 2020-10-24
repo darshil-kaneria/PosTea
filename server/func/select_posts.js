@@ -17,7 +17,7 @@ process.on("message", message => {
 function getPosts(topic_id, connection) {
     console.log(topic_id);
     console.log("print");
-    var selectquery = "SELECT * FROM user_post WHERE topic_id = '" +topic_id +"'ORDER BY date DESC LIMIT 10'";
+    var selectquery = "SELECT * FROM user_post WHERE topic_id = " +topic_id + " ORDER BY creation_date DESC LIMIT 10";
     console.log(selectquery);
     return new Promise(function (resolve, reject) {
         connection.query(selectquery, function(err, result) {

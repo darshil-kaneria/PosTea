@@ -28,9 +28,9 @@ function deletePost(postId, profileId, connection) {
     return new Promise(async function(resolve, reject) {
         await connection.query(selectfromPost,[p_id, prof],  async function (err, result) {
             if (err) {
-                console.log("hi");
-                console.log(err);
-                reject(result);
+                //console.log("hi");
+                //console.log(err);
+                reject(err.message);
             }
             try {
                 if (result.length == 0) {
