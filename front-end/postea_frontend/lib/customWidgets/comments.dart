@@ -2,14 +2,25 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class Comments extends StatefulWidget {
+  var personName;
+  var comment;
+
+  Comments(this.comment, this.personName);
+
   @override
-  _CommentsState createState() => _CommentsState();
+  _CommentsState createState() => _CommentsState(this.comment, this.personName);
 }
 
 class _CommentsState extends State<Comments> {
+  var comment;
+  var personName;
+  var screenWidth;
+
+  _CommentsState(this.comment, this.personName);
+
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -32,21 +43,18 @@ class _CommentsState extends State<Comments> {
                   Padding(
                     padding: const EdgeInsets.only(bottom: 2),
                     child: Text(
-                      "Vidit Shah",
+                      this.personName,
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                   ),
                   Text(
-                    "This is beautiful!",
+                    this.comment,
+                    // "{\"post retrieved\": \"success\"}",
                     style: TextStyle(fontSize: 15),
                   ),
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 180),
-                child: Icon(CupertinoIcons.heart_solid),
-              )
             ],
           ),
         ],

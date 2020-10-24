@@ -60,6 +60,16 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
   Color like_color = Colors.black;
   Color dislike_color = Colors.black;
 
+  engagementInfo() async {
+    http.Response resp;
+    var url = "http://postea-server.herokuapp.com/engagement?post_id=74242";
+    resp = await http.get(url);
+
+    print("response");
+    print(resp.body);
+    return resp.body;
+  }
+
   _ExpandedPostTileState(
       this.post_id,
       this.profile_id,
@@ -74,6 +84,10 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
 
   @override
   Widget build(BuildContext context) {
+    var response = engagementInfo();
+
+    double screenWidth = MediaQuery.of(context).size.width;
+
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
@@ -125,73 +139,89 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
           ),
           Row(
             children: [
-              IconButton(
-                icon: Icon(
-                  Icons.thumb_up,
-                  color: like_color,
-                ),
-                iconSize: 20,
-                onPressed: () {
-                  like_or_dislike = "1";
-                  setState(() {
-                    if (dislike_color == Colors.deepOrange[200]) {
-                      dislike_color = Colors.black;
-                    }
-                    if (like_color == Colors.deepOrange[200]) {
-                      like_color = Colors.black;
-                    } else
-                      like_color = Colors.deepOrange[200];
-                  });
-                  print(post_id);
-                  print(profile_id);
-                  print(like_or_dislike);
-                  print(comment);
-                  var data = {
-                    "engagement_post_id": post_id,
-                    "engagement_profile_id": profile_id,
-                    "like_dislike": like_or_dislike,
-                    "comment": comment
-                  };
-                  var sendAnswer = JsonEncoder().convert(data);
-                  print(sendAnswer);
-                  Future<http.Response> resp = http.post(
-                      'http://postea-server.herokuapp.com/addEngagement',
-                      headers: {'Content-Type': 'application/json'},
-                      body: sendAnswer);
-                },
+              Column(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.thumb_up,
+                      color: like_color,
+                    ),
+                    iconSize: 20,
+                    onPressed: () {
+                      like_or_dislike = "1";
+                      setState(() {
+                        if (dislike_color == Colors.deepOrange[200]) {
+                          dislike_color = Colors.black;
+                        }
+                        if (like_color == Colors.deepOrange[200]) {
+                          like_color = Colors.black;
+                        } else
+                          like_color = Colors.deepOrange[200];
+                      });
+                      print(post_id);
+                      print(profile_id);
+                      print(like_or_dislike);
+                      print(comment);
+                      var data = {
+                        "engagement_post_id": post_id,
+                        "engagement_profile_id": profile_id,
+                        "like_dislike": like_or_dislike,
+                        "comment": comment
+                      };
+                      var sendAnswer = JsonEncoder().convert(data);
+                      print(sendAnswer);
+                      Future<http.Response> resp = http.post(
+                          'http://postea-server.herokuapp.com/engagement',
+                          headers: {'Content-Type': 'application/json'},
+                          body: sendAnswer);
+                    },
+                  ),
+                  Text("15k",
+                      style:
+                          TextStyle(fontWeight: FontWeight.bold, fontSize: 15))
+                ],
               ),
-              IconButton(
-                icon: Icon(
-                  Icons.thumb_down,
-                  color: dislike_color,
-                ),
-                iconSize: 20,
-                onPressed: () {
-                  setState(() {
-                    like_or_dislike = "0";
-                    if (like_color == Colors.deepOrange[200]) {
-                      like_color = Colors.black;
-                    }
-                    if (dislike_color == Colors.deepOrange[200]) {
-                      dislike_color = Colors.black;
-                    } else
-                      dislike_color = Colors.deepOrange[200];
-                  });
+              Column(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.thumb_down,
+                      color: dislike_color,
+                    ),
+                    iconSize: 20,
+                    onPressed: () {
+                      setState(() {
+                        like_or_dislike = "0";
+                        if (like_color == Colors.deepOrange[200]) {
+                          like_color = Colors.black;
+                        }
+                        if (dislike_color == Colors.deepOrange[200]) {
+                          dislike_color = Colors.black;
+                        } else
+                          dislike_color = Colors.deepOrange[200];
+                      });
 
-                  var data = {
-                    "engagement_post_id": post_id,
-                    "engagement_profile_id": profile_id,
-                    "like_dislike": like_or_dislike,
-                    "comment": comment
-                  };
-                  var sendAnswer = JsonEncoder().convert(data);
-                  Future<http.Response> resp = http.post(
-                      'http://postea-server.herokuapp.com/addEngagement',
-                      headers: {'Content-Type': 'application/json'},
-                      body: sendAnswer);
-                },
+                      var data = {
+                        "engagement_post_id": post_id,
+                        "engagement_profile_id": profile_id,
+                        "like_dislike": like_or_dislike,
+                        "comment": comment
+                      };
+                      var sendAnswer = JsonEncoder().convert(data);
+                      Future<http.Response> resp = http.post(
+                          'http://postea-server.herokuapp.com/engagement',
+                          headers: {'Content-Type': 'application/json'},
+                          body: sendAnswer);
+                    },
+                  ),
+                  Text(
+                    "100",
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  )
+                ],
               ),
               IconButton(
+                alignment: Alignment.topCenter,
                 icon: Icon(Icons.comment),
                 iconSize: 20,
                 onPressed: () {},
@@ -208,7 +238,65 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
               )
             ],
           ),
-          Comments(),
+          Card(
+            margin: EdgeInsets.only(top: 15),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  child: Comments("Today is a lovely day!", "Vidit Shah"),
+                ),
+                Divider(
+                  color: Colors.grey,
+                  indent: 20,
+                  endIndent: 20,
+                ),
+                Container(
+                  child: Comments("I am grateful for everything that I have!",
+                      "Darshil Kaneria"),
+                  width: screenWidth,
+                ),
+                Divider(
+                  color: Colors.grey,
+                  indent: 20,
+                  endIndent: 20,
+                ),
+                Container(
+                  child: Comments(
+                      "This is a very beautiful day! I am loving it...",
+                      "Bharat Iyer"),
+                  width: screenWidth,
+                ),
+                Divider(
+                  color: Colors.grey,
+                  indent: 20,
+                  endIndent: 20,
+                ),
+                Container(
+                  child: Comments(
+                      "You have given me the best gift of my life!\nThank you very much",
+                      "Vaibbavi SK"),
+                ),
+                Divider(
+                  color: Colors.grey,
+                  indent: 20,
+                  endIndent: 20,
+                ),
+                Container(
+                  child: Comments(
+                      "Wishing you a very happy birthday!\nMay you succeed in all your endeavors!\nRock this day and the days to come!!",
+                      "Pooja Bhasker"),
+                ),
+                Divider(
+                  color: Colors.grey,
+                  indent: 20,
+                  endIndent: 20,
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
