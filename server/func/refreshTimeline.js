@@ -26,7 +26,7 @@ refreshTimeline = async (profileID, offset, connection) => {
         await connection.query(getNumPosts, async (err, result) => {
             if (err) {
                 console.log(err);
-                throw err;
+                reject(err.message);
             }
             result = JSON.stringify(result);
             // result = JSON.parse(result);
@@ -40,11 +40,11 @@ refreshTimeline = async (profileID, offset, connection) => {
                             "error": 2
                         }
                         process.send(dict);
-                        throw new Error('Request timed out after 15 seconds');
+                        reject('Request timed out after 15 seconds');
                       }
                     if (err) {
                         console.log("error: " + err.message);
-                        throw err;
+                        reject(err.message);
                     }
     
                     result = JSON.stringify(result);
@@ -73,7 +73,7 @@ refreshTimeline = async (profileID, offset, connection) => {
                       }
                     if (err) {
                         console.log("error: " + err.message);
-                        throw err;
+                        reject(err.message);
                     }
     
                     result = JSON.stringify(result);

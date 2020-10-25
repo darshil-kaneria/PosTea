@@ -22,7 +22,7 @@ const getFollowing = async(user_id, connection) => {
        connection.query(query,[profile_id],function(err, result)  {
             if (err) {
                 console.log("error:" + err.message);
-                throw err;
+                reject(err.message);
             }
             if (result.length == 0) {
                 console.log("User following record does not exist");

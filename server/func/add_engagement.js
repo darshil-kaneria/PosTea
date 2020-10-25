@@ -24,7 +24,7 @@ const addEngagement = async (dict, connection) => {
     await connection.query(existsQuery, async (err, result) => {
       if (err) {
         console.log(err);
-        throw err;
+        reject(err.message);
       }
       result = JSON.stringify(result);
       var isNull = result.substring(12, 16);
@@ -35,7 +35,7 @@ const addEngagement = async (dict, connection) => {
           await connection.query(checkNull, async (err, result) => {
             if (err) {
               console.log(err);
-              throw err;
+              reject(err.message);
             }
             result = JSON.stringify(result);
             result = JSON.parse(result);
@@ -45,10 +45,10 @@ const addEngagement = async (dict, connection) => {
             await connection.query(updateQuery, (err, result) => {
               if (err) {
                 console.log(err);
-                throw err;
+                reject(err.message);
               }
               console.log("Successfully updated like_or_dislike field of engagement table!")
-              return result;
+              resolve(result);
             })
           });
         } else { // User has commented on the post
@@ -56,7 +56,7 @@ const addEngagement = async (dict, connection) => {
           await connection.query(checkNull, async (err, result) => {
             if (err) {
               console.log(err);
-              throw err;
+              reject(err.message);
             }
             result = JSON.stringify(result);
             result = JSON.parse(result);
@@ -65,10 +65,10 @@ const addEngagement = async (dict, connection) => {
             await connection.query(updateQuery2, (err, result) => {
               if (err) {
                 console.log(err);
-                throw err;
+                reject(err.message);
               }
               console.log("Successfully updated comment field of engagement table!")
-              return result;
+              resolve(result);
             })
           })
         }
@@ -84,12 +84,12 @@ const addEngagement = async (dict, connection) => {
         await connection.query(addEngagementQuery, [vals], (err, result) => {
           if (err) {
             console.log(err);
-            throw errl;
+            reject(err.message);
           }
           console.log("Engagement Recorded Successfully!");
         });
       }
-      return result;
+      resolve(result);
     });
   });
 

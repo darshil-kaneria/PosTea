@@ -37,14 +37,14 @@ process.on("message", message => {
           } else {
             connection.query(addProfileQuery, [values], function (err, result) {
               if (err) {
-                throw err;
+                reject(err.message);
               } 
                 resolve("Added")
               });
           }
         }
         catch (error){
-          throw err;
+          reject(err.message);
         }
         return;
       });

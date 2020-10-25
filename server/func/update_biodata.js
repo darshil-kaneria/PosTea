@@ -28,7 +28,8 @@ process.on("message", message => {
         if (err) {
           console.log(err);
           reject("An error occurred");
-          throw err;}
+          reject(err.message);
+        }
         try {
           if (result.length == 0) {
             resolve("Account does not exist");
@@ -36,15 +37,14 @@ process.on("message", message => {
             connection.query(updateQuery, function (err, result) {
               if (err) {
                 console.log(err);
-                throw err;
+                reject(err.message);
               } 
                 resolve("Added");
               });
           }
         }
         catch (error){
-          reject("An error occured");
-          throw err;
+          reject(err.message);
         }
         return;
       });

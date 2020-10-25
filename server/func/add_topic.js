@@ -33,7 +33,7 @@ const addTopicInfo = async function(data, connection) {
         if (err) {
             console.log(err);
 
-            reject(result);
+            reject(err.message);
             //throw err;
         } else {
           //console.log("topic info added sucessfully");

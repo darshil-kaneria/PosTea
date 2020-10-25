@@ -11,7 +11,7 @@ process.on("message", message => {
       if (answer == "Account already exists") {
         process.send({"Error": "User information already exists"});
       } else {
-      process.send(answer);
+        process.send(answer);
       }
       process.exit();
   });
@@ -29,7 +29,8 @@ process.on("message", message => {
       connection.query(selectQuery,[user],  function (err, result) {
         if (err) {
           console.log(err);
-          throw err;}
+          reject(err.message);
+        }
         try {
           if (result.length == 1) {
             resolve("Account already exists");
@@ -40,15 +41,15 @@ process.on("message", message => {
                     addProfile(user, is_private, name, bio_data, connection);
                 } else {
                 console.log(err);
-                throw err;
-                }
+                reject(err.message);
+              }
               } 
                 resolve(profile_id);
               });
           }
         }
         catch (error){
-          throw err;
+          reject(err.message);
         }
         return;
       });
