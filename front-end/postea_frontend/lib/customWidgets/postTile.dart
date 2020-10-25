@@ -171,7 +171,7 @@ class _PostTileState extends State<PostTile> {
                   var sendAnswer = JsonEncoder().convert(data);
                   print(sendAnswer);
                   Future<http.Response> resp = http.post(
-                      'http://postea-server.herokuapp.com/addEngagement',
+                      'http://postea-server.herokuapp.com/engagement',
                       headers: {'Content-Type': 'application/json'},
                       body: sendAnswer);
                 },
@@ -202,7 +202,7 @@ class _PostTileState extends State<PostTile> {
                   };
                   var sendAnswer = JsonEncoder().convert(data);
                   Future<http.Response> resp = http.post(
-                      'http://postea-server.herokuapp.com/addEngagement',
+                      'http://postea-server.herokuapp.com/engagement',
                       headers: {'Content-Type': 'application/json'},
                       body: sendAnswer);
                 },
