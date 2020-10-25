@@ -46,6 +46,16 @@ class _HomePageState extends State<HomePage> {
   
   _scrollListener() {
 
+    if (checkPosScrollController.offset <= checkPosScrollController.position.minScrollExtent &&
+        !checkPosScrollController.position.outOfRange){
+          
+          setState(() {
+            print("Timeline refreshed");
+            timeLine.clearTimeline();
+            offset = 0;
+          });
+        }
+
     if (checkPosScrollController.offset >= checkPosScrollController.position.maxScrollExtent &&
         !checkPosScrollController.position.outOfRange) {
           print("ISPOST"+timeLine.postRetrieved.toString());

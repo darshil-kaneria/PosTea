@@ -72,4 +72,8 @@ class ProcessTimeline{
 
   }
 
+  clearTimeline(){
+    postList.clear();
+  }
+
 }

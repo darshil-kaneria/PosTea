@@ -22,11 +22,15 @@ class _OnboardingState extends State<Onboarding> {
   var nameController = TextEditingController();
   var bioController = TextEditingController();
   File imgToUpload;
+  
 
   pickImage() async {
     // PickedFile img = await ImagePicker().getImage(source: ImageSource.gallery);
     imgToUpload = await ImagePicker.pickImage(source: ImageSource.gallery);
     print(imgToUpload);
+    setState(() {
+      
+    });
   }
 
   @override
@@ -35,6 +39,7 @@ class _OnboardingState extends State<Onboarding> {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
     var profileID;
+    // Future<Image> defaultImg = FirebaseStorageService.getImage(context, "default-big.png");
 
     return SafeArea(
           child: Scaffold(
@@ -75,13 +80,14 @@ class _OnboardingState extends State<Onboarding> {
                             padding: EdgeInsets.fromLTRB(30, 0, 30, 0),
                             child: TextField(
                               controller: nameController,
+                              style: TextStyle(color: Colors.white),
                               decoration: InputDecoration(
                                 contentPadding: EdgeInsets.only(left: 30),
                                 hintText: "Name",
                                 hintStyle: TextStyle(color: Colors.white38),
                                 hoverColor: Colors.black,
                                 enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.black),
+                                    borderSide: BorderSide(color: Colors.white),
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(50))),
                                 focusedBorder: OutlineInputBorder(
@@ -120,6 +126,7 @@ class _OnboardingState extends State<Onboarding> {
                               minLines: 10,
                               maxLines: 15,
                               controller: bioController,
+                              style: TextStyle(color: Colors.white),
                               decoration: InputDecoration(
                                 
                                 contentPadding: EdgeInsets.only(left: 30, top: 20),
@@ -127,7 +134,7 @@ class _OnboardingState extends State<Onboarding> {
                                 hintStyle: TextStyle(color: Colors.white38),
                                 hoverColor: Colors.black,
                                 enabledBorder: OutlineInputBorder(
-                                    borderSide: BorderSide(color: Colors.black),
+                                    borderSide: BorderSide(color: Colors.white),
                                     borderRadius:
                                         BorderRadius.all(Radius.circular(10))),
                                 focusedBorder: OutlineInputBorder(
@@ -177,7 +184,9 @@ class _OnboardingState extends State<Onboarding> {
                                       if (snapshot.hasData) {
                                         return CircleAvatar(
                                           backgroundColor: Colors.white,
-                                          child: ClipOval(child: Image.network(snapshot.data)),
+                                          child: ClipOval(
+                                            child: (imgToUpload != null) ? Image.file(imgToUpload): Image.network(snapshot.data)
+                                            ),
                                           maxRadius: screenWidth / 8,
                                         );
                                       } else {
