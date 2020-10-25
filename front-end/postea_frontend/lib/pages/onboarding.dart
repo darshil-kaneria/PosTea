@@ -8,6 +8,7 @@ import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:postea_frontend/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:postea_frontend/pages/homepage.dart';
 
 class Onboarding extends StatefulWidget {
 
@@ -225,17 +226,10 @@ class _OnboardingState extends State<Onboarding> {
                                     headers: {'Content-Type': 'application/json'},
                                     body:  reqBody
                                   );
-                                  print(response.statusCode);
-                                  print(response.body);
-                                  if(response.statusCode == 200){
-                                    if(response.body == "Account already exists"){
-                                      print("ALREADY EXISTS");
-                                    }
-                                    else{
-                                      profileID = response.body;
-                                      print(profileID);
-                                    }
-                                  }
+                                  // print(response.statusCode);
+                                  
+                                  profileID = jsonDecode(response.body);
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage(profileID: profileID['profile_id'])));
 
                                 },
                                 elevation: 1,

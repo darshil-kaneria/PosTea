@@ -12,7 +12,7 @@ import 'package:postea_frontend/pages/loggedIn.dart';
 class Router {
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
-    //final args = settings.arguments;
+    final HomePage args = settings.arguments;
 
     switch(settings.name){
       case '/login': // do login
@@ -30,7 +30,7 @@ class Router {
             return FadeTransition(opacity: animation, child: SlideTransition(position: Tween<Offset>(begin: Offset(1,0), end: Offset(0,0)).animate(CurvedAnimation(parent: animation, curve: Curves.decelerate)), child: child,));
           },
         );
-      case '/home': return MaterialPageRoute(builder: (_) => HomePage());// do homepage
+      case '/home': return MaterialPageRoute(builder: (_) => HomePage(profileID: 1,));// do homepage
       case '/devpage': return MaterialPageRoute(builder: (_) => DevPage());// do DevPage
       case '/error': return MaterialPageRoute(builder: (_) => ErrorPage());// do errorPage
       case '/profile': // do profile

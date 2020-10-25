@@ -52,8 +52,9 @@ class _LoginState extends State<Login> {
       }
       else if (user != null) {
         print("hello from logInUser() success");
+        // print(respBody['message']['profile_id']);
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomePage()));
+            context, MaterialPageRoute(builder: (context) => HomePage(profileID: respBody['message']['profile_id'],)));
         // this.loginSucces = true;
       } else {
         print("hello from logInUser() err");

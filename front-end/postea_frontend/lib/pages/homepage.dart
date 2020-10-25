@@ -20,9 +20,9 @@ import 'login.dart';
 
 class HomePage extends StatefulWidget {
 
-  final int profileID=1;
+  int profileID;
 
-  // HomePage({@required this.profileID});
+  HomePage({@required this.profileID});
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -39,8 +39,7 @@ class _HomePageState extends State<HomePage> {
   bool checkEnd = false;
   File imgToUpload;
   String base64Image;
- 
-  ProcessTimeline timeLine = new ProcessTimeline(1);
+  ProcessTimeline timeLine;
 
   var offset = 0;
   
@@ -80,6 +79,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    timeLine = new ProcessTimeline(widget.profileID);
     // Timer.periodic(Duration(seconds: 1), (timer) {
     //   var timer = Provider.of<TimerCount>(context, listen: false);
     //   timer.changeVal();

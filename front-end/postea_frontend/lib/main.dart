@@ -30,6 +30,7 @@ void checkUserLoggedIn() {
     User user = FirebaseAuth.instance.currentUser;
 
     if (user != null) {
+      print("USERNAME IS "+user.email);
       setState(() {
         firstScreen = '/home';
       });
