@@ -67,7 +67,7 @@ document.getElementById("addProfile").onclick = () => {
         },
         body: JSON.stringify({username: username, profilePic: profilePic, privateAcc: privateAcc, name: name, biodata: biodata})
     };
-    fetch("/addProfile", options);
+    fetch("/profile", options);
     alert("Request to add profile sent successfully.");
 }
 
@@ -85,7 +85,7 @@ document.getElementById("updateAddProfile").onclick = () => {
         },
         body: JSON.stringify({original_username: original_username, update_profilePic: update_profilePic, update_privateAcc: update_privateAcc, update_name: update_name, update_biodata: update_biodata})
     };
-    fetch("/updateprofile", options);
+    fetch("/profile", options);
     alert("Request to update profile sent successfully.");
 }
 
@@ -94,13 +94,13 @@ document.getElementById("deletePost").onclick = () => {
     var deleteProfileID = document.getElementById("deleteProfileID").value;
 
     options = {
-        method: "POST",
+        method: "DELETE",
         headers: {
             'Content-Type': 'application/json'
         },
         body: JSON.stringify({deletePostID: deletePostID, deleteProfileID: deleteProfileID})
     };
-    fetch("/deletepost", options);
+    fetch("/post", options);
     alert("Request to delete post sent successfully.");
 }
 
@@ -114,7 +114,7 @@ document.getElementById("likeBtn").onclick = () => {
         },
         body: JSON.stringify({engagement_profile_id: engagement_profile_id, engagement_post_id: engagement_post_id, like_dislike: 1})
     };
-    fetch("/addEngagement", options);
+    fetch("/engagement", options);
     alert("Request to add Like sent successfully.");
 }
 
