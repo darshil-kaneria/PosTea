@@ -36,15 +36,15 @@ process.on("message", message => {
             resolve("Account already exists");
           } else {
             connection.query(addProfileQuery, [values], function (err, result) {
-              if (err) {
-                if (err.code === 'ER_DUP_ENTRY') {
-                    addProfile(user, is_private, name, bio_data, connection);
-                } else {
-                console.log(err);
-                reject(err.message);
-              }
-              } 
-                resolve(profile_id);
+              // if (err) {
+              //   if (err.code != 'ER_DUP_ENTRY') {
+              //       addProfile(user, is_private, name, bio_data, connection);
+              //   } else {
+              //   console.log(err);
+              //   reject(err.message);
+              // }
+              // } 
+                resolve({"profile_id": profile_id});
               });
           }
         }
