@@ -216,7 +216,8 @@ class _OnboardingState extends State<Onboarding> {
                                     headers: {'Content-Type': 'application/json'},
                                     body:  reqBody
                                   );
-
+                                  print(response.statusCode);
+                                  print(response.body);
                                   if(response.statusCode == 200){
                                     if(response.body == "Account already exists"){
                                       print("ALREADY EXISTS");
