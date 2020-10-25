@@ -33,7 +33,4 @@ function getPosts(topic_id, connection) {
             }
         })
     });
-
-
-
 }

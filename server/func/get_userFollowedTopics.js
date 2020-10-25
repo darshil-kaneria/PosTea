@@ -21,7 +21,7 @@ const getTopicsFollowed = async(user_id, connection) => {
        connection.query(query,[user_id],function(err, result)  {
             if (err) {
                 console.log("error:" + err.message);
-                throw err;
+                reject(err.message);
             }
             if (result.length == 0) {
                 console.log("User does not follow topics");

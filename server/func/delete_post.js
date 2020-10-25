@@ -28,9 +28,8 @@ function deletePost(postId, profileId, connection) {
     return new Promise(async function(resolve, reject) {
         await connection.query(selectfromPost,[p_id, prof],  async function (err, result) {
             if (err) {
-                console.log("hi");
                 console.log(err);
-                reject(result);
+                reject(err.message);
             }
             try {
                 if (result.length == 0) {
@@ -38,29 +37,25 @@ function deletePost(postId, profileId, connection) {
                 } else {
                     await connection.query(deletefromPost, [p_id], function(err, result) {
                         if (err) {
-                            console.log("hi2");
                             console.log(err);
-                            throw err;
+                            reject(err.message);
                         }
-                        return result;
+                        resolve(result);
                     }
                     );
                     await connection.query(deletefromtopic, [p_id], function(err, result) {
                         if (err) {
-                            console.log("hi3");
                             console.log(err);
-                            throw err;
+                            reject(err.message);
                         } else {
                             resolve("Post deleted");
                         }
                         
                     }
-                    );
-                    
+                    );   
                 }
-
             } catch (error) {
-                throw err;
+                reject(err.message);
             }
             return;
 

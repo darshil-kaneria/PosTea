@@ -22,7 +22,8 @@ const clearTable = async function(tableName, connection){
     var resp = await connection.query(clearTableQuery, function (err, result) {
         if (err) {
           console.log(err);
-          throw err;}
+          throw err;
+        }
         return "success";
       });
 

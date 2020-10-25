@@ -36,7 +36,8 @@ process.on("message", message => {
       connection.query(selectQuery,[values1],  function (err, result) {
         if (err) {
           console.log(err);
-          throw err;}
+          reject(err.message);
+        }
         try {
           if (result.length == 1) {
             resolve("Relationship already exists");
@@ -47,7 +48,7 @@ process.on("message", message => {
                     addFollower(data, connection)
                 } else {
                 console.log(err);
-                throw err;
+                reject(err.message);
                 }
               } 
                 resolve("Added");
@@ -55,7 +56,7 @@ process.on("message", message => {
           }
         }
         catch (error){
-          throw err;
+          reject(err.message);
         }
         return;
       });
