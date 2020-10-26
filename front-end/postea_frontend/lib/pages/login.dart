@@ -10,6 +10,7 @@ import 'package:postea_frontend/pages/homepage.dart';
 import 'package:postea_frontend/pages/onboarding.dart';
 import '../colors.dart';
 import 'loggedIn.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
   final bool loginSuccess = false;
@@ -21,6 +22,7 @@ class _LoginState extends State<Login> {
   var _usernameController = TextEditingController();
   var _passwordController = TextEditingController();
   var _forgotPasswordController = TextEditingController();
+  
   PageController _pageController = PageController(
     initialPage: 0,
     keepPage: true,
@@ -53,6 +55,9 @@ class _LoginState extends State<Login> {
       else if (user != null) {
         print("hello from logInUser() success");
         // print(respBody['message']['profile_id']);
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setInt('profileID', respBody['message']['profile_id']);
+        prefs.setString('username', username);
         Navigator.push(
             context, MaterialPageRoute(builder: (context) => HomePage(profileID: respBody['message']['profile_id'],)));
         // this.loginSucces = true;

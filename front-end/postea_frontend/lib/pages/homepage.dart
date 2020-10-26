@@ -79,6 +79,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
+    print("The profile ID is: "+widget.profileID.toString());
     timeLine = new ProcessTimeline(widget.profileID);
     // Timer.periodic(Duration(seconds: 1), (timer) {
     //   var timer = Provider.of<TimerCount>(context, listen: false);
@@ -106,7 +107,7 @@ class _HomePageState extends State<HomePage> {
       "topic": "chess",
       "img": base64Image,
       "topicID": 21,
-      "profileID": 1,
+      "profileID": widget.profileID,
       "likes": 0,
       "dislikes": 0,
       "comment": 0

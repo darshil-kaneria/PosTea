@@ -8,12 +8,23 @@ import 'package:postea_frontend/pages/onboarding.dart';
 import 'package:postea_frontend/pages/profile.dart';
 import 'package:postea_frontend/pages/signup.dart';
 import 'package:postea_frontend/pages/loggedIn.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Router {
 
+  static SharedPreferences pref;
+  static int profileId;
+
+  // static Future<int> getPref() async {
+  //   pref = await SharedPreferences.getInstance();
+  //   profileId = pref.getInt('profileID') ?? 0;
+  //   print("Logged in to: "+profileId.toString());
+  //   return profileId;
+  // }
+
   static Route<dynamic> generateRoute(RouteSettings settings) {
     final HomePage args = settings.arguments;
-
+  
     switch(settings.name){
       case '/login': // do login
         return MaterialPageRoute(
@@ -30,7 +41,11 @@ class Router {
             return FadeTransition(opacity: animation, child: SlideTransition(position: Tween<Offset>(begin: Offset(1,0), end: Offset(0,0)).animate(CurvedAnimation(parent: animation, curve: Curves.decelerate)), child: child,));
           },
         );
-      case '/home': return MaterialPageRoute(builder: (_) => HomePage(profileID: 1,));// do homepage
+      case '/home': 
+        // SharedPreferences.getInstance().then((SharedPreferences sp) {
+        //   profileId = sp.getInt('profileID');
+        // });
+      return MaterialPageRoute(builder: (_) => HomePage(profileID: args.profileID));// do homepage
       case '/devpage': return MaterialPageRoute(builder: (_) => DevPage());// do DevPage
       case '/error': return MaterialPageRoute(builder: (_) => ErrorPage());// do errorPage
       case '/profile': // do profile

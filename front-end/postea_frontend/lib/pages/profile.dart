@@ -9,6 +9,7 @@ import 'dart:convert';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:postea_frontend/pages/edit_profile.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatefulWidget {
   @override
@@ -20,11 +21,14 @@ class _ProfileState extends State<Profile> {
   var bio_data = "";
   bool isPrivate = false;
   Map<String, dynamic> profile;
+  SharedPreferences prefs;
+  String username;
 
   var _nameController = TextEditingController();
   var _biodataController = TextEditingController();
   int _value;
   PageController controller = PageController(initialPage: 0);
+  
 
   @override
   void initState() {
@@ -43,7 +47,7 @@ class _ProfileState extends State<Profile> {
 
   updateProfile() async {
     var sendAnswer = JsonEncoder().convert({
-      "original_username": "dkaneria",
+      "original_username": username,
       "update_privateAcc": isPrivate.toString(),
       "update_name": name,
       "update_biodata": bio_data,
@@ -51,7 +55,7 @@ class _ProfileState extends State<Profile> {
     });
 
     http.Response resp = await http.post(
-        "http://postea-server.herokuapp.com/proile",
+        "http://postea-server.herokuapp.com/profile",
         headers: {'Content-Type': 'application/json'},
         body: sendAnswer);
     print(resp.body);
@@ -62,8 +66,11 @@ class _ProfileState extends State<Profile> {
   }
 
   getProfile() async {
+    prefs = await SharedPreferences.getInstance();
+    username = prefs.getString('username') ?? "";
+    print(username);
     http.Response resp = await http
-        .get("http://postea-server.herokuapp.com/profile?username=dkaneria");
+        .get("http://postea-server.herokuapp.com/profile?username="+username.toString());
     profile = jsonDecode(resp.body);
     setState(() {
       _nameController.text = profile["message"]["name"];
@@ -125,7 +132,7 @@ class _ProfileState extends State<Profile> {
                       return FadeTransition(opacity: animation, child: SlideTransition(position: Tween<Offset>(begin: Offset(0,-1), end: Offset(0,0)).animate(CurvedAnimation(parent: animation, curve: Curves.decelerate)), child: child,));
                     },
                     pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secAnimation) {
-                      return EditProfile(nameText: name, biodata: bio_data, privacy: isPrivate,);
+                      return EditProfile(nameText: name, biodata: bio_data, privacy: isPrivate, username: username,);
                     },
                   )
                   );

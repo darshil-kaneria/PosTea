@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:custom_switch/custom_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/colors.dart';
@@ -7,8 +9,9 @@ class EditProfile extends StatefulWidget {
   var nameText;
   var biodata;
   bool privacy;
+  var username;
 
-  EditProfile({@required this.nameText, this.biodata, this.privacy});
+  EditProfile({@required this.nameText, this.biodata, this.privacy, this.username});
 
   @override
   _EditProfileState createState() => _EditProfileState();
@@ -24,6 +27,26 @@ class _EditProfileState extends State<EditProfile> {
     nameController.text = widget.nameText;
   biodataController.text = widget.biodata;
     super.initState();
+  }
+
+  updateProfile() async {
+    var sendAnswer = JsonEncoder().convert({
+      "original_username": widget.username,
+      "update_privateAcc": widget.privacy.toString(),
+      "update_name": nameController.text,
+      "update_biodata": biodataController.text,
+      "update_profilePic": "random"
+    });
+
+    http.Response resp = await http.put(
+        "http://postea-server.herokuapp.com/profile",
+        headers: {'Content-Type': 'application/json'},
+        body: sendAnswer);
+    print(resp.body);
+    if (resp.statusCode == 200)
+      print("success");
+    else
+      print("Some error");
   }
 
   @override
@@ -187,7 +210,8 @@ class _EditProfileState extends State<EditProfile> {
                             color: loginButton,
                             highlightColor: Colors.red[700],
                             onPressed: () {
-
+                              updateProfile();
+                              Navigator.pop(context);
                           },
                           child: Text("Save", style: TextStyle(
                                     fontFamily: "Helvetica",
