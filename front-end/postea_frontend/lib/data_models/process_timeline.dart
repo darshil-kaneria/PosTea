@@ -7,6 +7,7 @@ import 'post.dart';
 class ProcessTimeline{
 
   List<Post> postList = [];
+  var firstPostTime = null;
   var offset = 0;
   var temp;
   int profile_id;
@@ -17,13 +18,17 @@ class ProcessTimeline{
   ProcessTimeline(this.profile_id);
 
   Future<http.Response> getPosts() async {
+  
     http.Response resp;
     if(isEnd != true){
       postRetrieved = false;
       print("POST RETRIEVED IS: "+ postRetrieved.toString());
-      var url = "http://postea-server.herokuapp.com/refreshTimeline?profile_id="+profile_id.toString()+"&post_offset="+offset.toString();
-     resp = await http.get(url);
-     postRetrieved = true;
+       if(firstPostTime == null){
+         print("IS NULL");
+         var url = "http://postea-server.herokuapp.com/refreshTimeline?profile_id="+profile_id.toString()+"&post_offset="+offset.toString();
+        resp = await http.get(url);
+        
+        postRetrieved = true;
      print("POST RETRIEVED IS: "+ postRetrieved.toString());
 
     posts = jsonDecode(resp.body);
@@ -33,8 +38,37 @@ class ProcessTimeline{
       isEnd=true;
     }
     print("OFFSET IS: "+offset.toString());
-    if(isEnd == false)
-    processPosts();
+    if(isEnd == false){
+      firstPostTime = posts['result'][0]['creation_date'].toString();
+      var dateString = DateTime.parse(firstPostTime).toString();
+      print(dateString.substring(0,dateString.length-5));
+      firstPostTime = dateString.substring(0,dateString.length-5);
+      
+      processPosts();
+
+    } 
+    }
+    else{
+      print("IS NOT NULL");
+      var url = "http://postea-server.herokuapp.com/refreshTimeline?profile_id="+profile_id.toString()+"&post_offset="+offset.toString()+"&post_time='"+firstPostTime+"'";
+        resp = await http.get(url);
+        
+        postRetrieved = true;
+     print("POST RETRIEVED IS: "+ postRetrieved.toString());
+
+    posts = jsonDecode(resp.body);
+    print(posts['error']);
+    if(posts['result'].length == 0 || posts['error'] == 1){
+      print("Reached end");
+      isEnd=true;
+    }
+    print("OFFSET IS: "+offset.toString());
+    if(isEnd == false){
+      processPosts();
+    } 
+    }
+      
+     
     
 
     }
@@ -76,6 +110,7 @@ class ProcessTimeline{
     postList.clear();
     this.offset = 0;
     this.isEnd = false;
+    firstPostTime = null;
     print("DONE");
   }
 

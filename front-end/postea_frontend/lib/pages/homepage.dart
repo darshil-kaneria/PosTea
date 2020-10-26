@@ -17,6 +17,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:postea_frontend/customWidgets/topic_pill.dart';
 import 'package:http/http.dart' as http;
 import 'package:postea_frontend/data_models/process_timeline.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'login.dart';
 
 class HomePage extends StatefulWidget {
@@ -145,9 +146,15 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               title: Text("Logout"),
               onTap: () async {
-                await FirebaseAuth.instance.signOut();
+                SharedPreferences pref = await SharedPreferences.getInstance();
+                pref.clear().then( (value) async {
+                  if(value == true){
+                    await FirebaseAuth.instance.signOut();
                 Navigator.push(
                     context, MaterialPageRoute(builder: (context) => Login()));
+                  }
+                });
+                
               },
             )
           ],
