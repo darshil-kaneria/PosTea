@@ -28,7 +28,12 @@ function deletePost(postId, profileId, connection) {
     return new Promise(async function(resolve, reject) {
         await connection.query(selectfromPost,[p_id, prof],  async function (err, result) {
             if (err) {
+<<<<<<< HEAD
+                //console.log("hi");
+                //console.log(err);
+=======
                 console.log(err);
+>>>>>>> 1589baa182577b7f9b590696829d293b3c700248
                 reject(err.message);
             }
             try {

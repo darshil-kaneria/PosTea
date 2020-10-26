@@ -7,8 +7,8 @@ process.on("message", message => {
           }
           console.log('Database connection established');
           var data = {
-            profile_id: req.query.profile_id,
-            follower_id: req.query.follower_id
+            profile_id: message.profile_id,
+            follower_id: message.follower_id
           }
           //  addFollower(message.profile_id,message.follower_id, connection).then((answer) => {
          addFollower(data, connection).then((answer) => {
@@ -19,7 +19,13 @@ process.on("message", message => {
                 process.send({"Success": "Follower relationship created"});
                 }
             process.exit();
-          });
+          }).catch(function(result) {
+            process.send(result);
+            connection.release();
+            process.exit();
+
+
+          }); ;
         });
         
 });
@@ -43,14 +49,19 @@ process.on("message", message => {
             resolve("Relationship already exists");
             } else {
                 connection.query(addFollowerQuery, [values2], function (err, result) {
-              if (err) {
+              
+                if (err) {
+                  reject(err.message);
+                /*
                 if (err.code === 'ER_DUP_ENTRY') {
                     addFollower(data, connection)
                 } else {
                 console.log(err);
                 reject(err.message);
               }
+              */
               } 
+
                 resolve("Added");
               });
           }

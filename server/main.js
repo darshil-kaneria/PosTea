@@ -50,6 +50,14 @@ handlePosts.on("message", message => res.send(message));
 
 });
 
+app.post('/addcommeng', (req, res) => {
+  const handtopic = fork('./func/add_topic.js');
+  handtopic.send(req.body);
+  handtopic.on("message", message => res.send(message));
+
+
+});
+
 app.post('/addtopicinfo', (req, res) => {
   const handtopic = fork('./func/add_topic.js');
   handtopic.send(req.body);

@@ -57,6 +57,10 @@ const addPost = async (dict, connection) => {
                         } else {
                             console.log("error: " + err.message);
                             reject(err.message);
+
+
+
+                            
                         }
                         
                     }

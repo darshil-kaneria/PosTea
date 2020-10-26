@@ -7,10 +7,18 @@ process.on("message", message => {
             return console.error('error: ' + err.message);
           }
           console.log('Database connection established');
+          
           await getFollowers(message.user_id, connection).then(function(answer) {
+            process.send(answer);
             connection.release();
             process.exit();
-      });     
+          }).catch(function(result) {
+              process.send(result);
+              connection.release();
+              process.exit();
+
+
+          });     
     });
 });
 
@@ -20,14 +28,16 @@ const getFollowers = async(user_id, connection) => {
     return new Promise(function(resolve, reject) {
        connection.query(query,[follower_id],function(err, result)  {
             if (err) {
-                console.log("error:" + err.message);
+                console.log("error exists");
+                //console.log("error:" + err.message);
                 reject(err.message);
             }
             if (result.length == 0) {
-                console.log("User followers record does not exist");
+                reject("does not exist");
+                //resolve(result);
             } else {
                 console.log("Followers retrieved");
-                console.log(result);
+                //console.log(result);
                 resolve(result);
                 // return result;  
             }
