@@ -9,7 +9,14 @@ process.on("message", message => {
           await getPosts(message.topicID, connection);
           connection.release();
           //process.send({"posts retrieved": "success"});
-          process.exit();
+          getEngagement(message.topic_id, connection).then((value)=> {
+                process.send(value, );
+                connection.release();
+            //process.send(resul);
+                process.exit();
+        
+        }) 
+          
           
         });
 });
@@ -23,6 +30,7 @@ function getPosts(topic_id, connection) {
         connection.query(selectquery, function(err, result) {
             if (err) {
                 //console.log(err);
+
                 reject(err.message);
             } else {
                 if (result.length == 0) {

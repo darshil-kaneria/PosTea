@@ -7,22 +7,30 @@ process.on("message", message => {
             return console.error('error: ' + err.message);
           }
           console.log('Database connection established');
-          await getEngagement(message.post_id, connection);
-          connection.release();
-          process.send({"post retrieved": "success"});
-          process.exit();
+          getEngagement(message.post_id, connection).then((value)=> {
+              process.send(value, );
+              connection.release();
+          //process.send(resul);
+                process.exit();
+          
+          }) 
+
+          
+
           
         });
 });
 
 const getEngagement = async(postId, connection) => {
-    var query = "SELECT * FROM engagement WHERE engagement.post_id = ?";
+    var query = "SELECT * FROM engagement WHERE post_id = ?";
+    console.log(postId);
     return new Promise(function(resolve, reject) {
        connection.query(query,[postId],function(err, result)  {
             if (err) {
                 console.log("error:" + err.message);
                 reject(err.message);
             }
+            //console.log(result)
             if (result.length == 0) {
                 console.log("Post does not exist");
             } else {

@@ -7,10 +7,18 @@ process.on("message", message => {
             return console.error('error: ' + err.message);
           }
           console.log('Database connection established');
-          await getFollowing(message.user_id, connection);
-          connection.release();
-          process.send({"Following retrieved": "success"});
-          process.exit();
+          getFollowing(message.user_id, connection).then((value)=> {
+            process.send(value, );
+            connection.release();
+        //process.send(resul);
+              process.exit();
+        
+            }).catch(function(result) {
+                process.send(result);
+                connection.release();
+                process.exit();
+
+            });
           
         });
 });
@@ -25,7 +33,7 @@ const getFollowing = async(user_id, connection) => {
                 reject(err.message);
             }
             if (result.length == 0) {
-                console.log("User following record does not exist");
+                reject("User following record does not exist");
             } else {
                 console.log("Following retrieved");
                 console.log(result);
