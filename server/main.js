@@ -243,7 +243,8 @@ app.get("/refreshTimeline", (req, res) => {
   }, 9000);
   data = {
     profileID: req.query.profile_id,
-    offset: req.query.post_offset
+    offset: req.query.post_offset,
+    time: req.query.post_time
   }
   handleRefreshTimeline.send(data);
   handleRefreshTimeline.on("message", message => {

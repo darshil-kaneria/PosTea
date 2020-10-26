@@ -8,7 +8,7 @@ process.on("message", message => {
             return console.error("error: " + err.message);
         }
 
-        refreshTimeline(message.profileID, message.offset, connection).then((answer) => {
+        refreshTimeline(message.profileID, message.offset, message.time, connection).then((answer) => {
             connection.release();
             console.log("Exiting process: "+process.pid);
             process.exit();
@@ -19,14 +19,10 @@ process.on("message", message => {
     // process.exit()
 });
 
-refreshTimeline = async (profileID, offset, connection) => {
+refreshTimeline = async (profileID, offset, time, connection) => {
 
-    /** QUERY 1 - to select the dynamic offset
-        select count(*)
-        from user_post
-        where profile_id in (1,2) and creation_date > '2020-10-06 20:27:29'
-        order by creation_date desc   
-     */
+    //QUERY 1 - to select the dynamic offset
+    var getOffset = "SELECT COUNT(*) FROM user_post WHERE profile_id in (1,2) AND creation_date > '?' ORDER BY creation_date DESC";   
 
     var getNumPosts = "SELECT profile_id, COUNT(*) FROM user_post WHERE profile_id = " + String(profileID);
     var query = "SELECT * FROM user_post WHERE profile_id = " + String(profileID) + " ORDER BY creation_date DESC LIMIT " + String(offset) + ", 3"; // change if condition below if you change limit
@@ -71,6 +67,16 @@ refreshTimeline = async (profileID, offset, connection) => {
                     resolve(result);
                 });
             } else {
+                await connection.query({sql: getOffset, timeout: 7000}, time, (err, result) => {
+                    if (err) {
+                        reject(err.message)
+                    }
+                    // result = JSON.stringify(result);
+                    // result = JSON.parse(result);
+                    console.log("result is .....");
+                    console.log(result);
+                    resolve(result);
+                });
                 await connection.query({sql: query, timeout: 7000}, (err, result) => {
                     if (err && err.code === 'PROTOCOL_SEQUENCE_TIMEOUT') {
                         var dict = {
