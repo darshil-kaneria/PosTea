@@ -21,7 +21,7 @@ const convert_id_to_username = async(profileId, connection) => {
        connection.query(query,[profileId],function(err, result)  {
             if (err) {
                 console.log("error:" + err.message);
-                throw err;
+                reject(err.message);
             }
             if (result.length == 0) {
                 console.log("Profile does not exist");

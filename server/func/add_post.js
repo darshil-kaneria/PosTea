@@ -42,7 +42,7 @@ const addPost = async (dict, connection) => {
         await connection.query(queryTopicExists, async (err, result) => {
             if (err) {
                 console.log("error: " + err.message);
-                reject(result);
+                reject(err.message);
             }
             result = JSON.stringify(result);
             result = JSON.parse(result);
@@ -56,7 +56,7 @@ const addPost = async (dict, connection) => {
                             addPost(dict, connection);
                         } else {
                             console.log("error: " + err.message);
-                            throw err;
+                            reject(err.message);
                         }
                         
                     }
@@ -67,7 +67,7 @@ const addPost = async (dict, connection) => {
                 await connection.query(addTopicContent, [topicContentFields], (err, result) => {
                     if (err) {
                         console.log("error: " + err.message);
-                        throw err;
+                        reject(err.message);
                     }
                     console.log("Post information added to topic_content " + topic + " succesfully!!");
                     resolve(result);

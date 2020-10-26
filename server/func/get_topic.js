@@ -25,6 +25,7 @@ const getTopic = async(topic_id, connection) => {
             }
             if (result.length == 0) {
                 console.log("Topic does not exist");
+                reject("Topic does not exist");
             } else {
                 console.log("Topic retrieved");
                 console.log(result);

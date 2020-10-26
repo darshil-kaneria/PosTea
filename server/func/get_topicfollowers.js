@@ -21,7 +21,7 @@ const getTopicFollowers = async(topic_id, connection) => {
        connection.query(query,[topic_id],function(err, result)  {
             if (err) {
                 console.log("error:" + err.message);
-                throw err;
+                reject(err.message);
             }
             if (result.length == 0) {
                 console.log("Topic followers record does not exist");

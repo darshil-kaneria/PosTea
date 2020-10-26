@@ -20,13 +20,21 @@ process.on("message", message => {
 });
 
 refreshTimeline = async (profileID, offset, connection) => {
+
+    /** QUERY 1 - to select the dynamic offset
+        select count(*)
+        from user_post
+        where profile_id in (1,2) and creation_date > '2020-10-06 20:27:29'
+        order by creation_date desc   
+     */
+
     var getNumPosts = "SELECT profile_id, COUNT(*) FROM user_post WHERE profile_id = " + String(profileID);
     var query = "SELECT * FROM user_post WHERE profile_id = " + String(profileID) + " ORDER BY creation_date DESC LIMIT " + String(offset) + ", 3"; // change if condition below if you change limit
     return new Promise(async (resolve, reject) => {
         await connection.query(getNumPosts, async (err, result) => {
             if (err) {
                 console.log(err);
-                throw err;
+                reject(err.message);
             }
             result = JSON.stringify(result);
             // result = JSON.parse(result);
@@ -40,11 +48,11 @@ refreshTimeline = async (profileID, offset, connection) => {
                             "error": 2
                         }
                         process.send(dict);
-                        throw new Error('Request timed out after 15 seconds');
+                        reject('Request timed out after 15 seconds');
                       }
                     if (err) {
                         console.log("error: " + err.message);
-                        throw err;
+                        reject(err.message);
                     }
     
                     result = JSON.stringify(result);
@@ -73,7 +81,7 @@ refreshTimeline = async (profileID, offset, connection) => {
                       }
                     if (err) {
                         console.log("error: " + err.message);
-                        throw err;
+                        reject(err.message);
                     }
     
                     result = JSON.stringify(result);

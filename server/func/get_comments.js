@@ -20,12 +20,12 @@ process.on("message", message => {
       await connection.query(selectQuery, function (err, result) {
         if (err) {
           console.log(err);
-          throw err;
+          reject(err.message);
         }
         result = JSON.stringify(result);
         result = JSON.parse(result);
         process.send({"message": result});
-        return result;
+        resolve(result);
       });
     })
   };
