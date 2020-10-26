@@ -47,9 +47,9 @@ class _HomePageState extends State<HomePage> {
             checkPosScrollController.position.minScrollExtent &&
         !checkPosScrollController.position.outOfRange) {
       setState(() {
-        print("Timeline refreshed");
-        timeLine.clearTimeline();
         offset = 0;
+        print("Timeline refreshed");
+        timeLine.clearTimeline();       
       });
     }
 

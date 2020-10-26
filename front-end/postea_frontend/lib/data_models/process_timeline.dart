@@ -33,7 +33,7 @@ class ProcessTimeline{
       isEnd=true;
     }
     print("OFFSET IS: "+offset.toString());
-    // if(isEnd == false)
+    if(isEnd == false)
     processPosts();
     
 
@@ -74,6 +74,9 @@ class ProcessTimeline{
 
   clearTimeline(){
     postList.clear();
+    this.offset = 0;
+    this.isEnd = false;
+    print("DONE");
   }
 
 }
