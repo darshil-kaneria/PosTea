@@ -28,7 +28,7 @@ process.on("message", message => {
     return new Promise(function(resolve, reject) {
       connection.query(selectQuery,[user],  function (err, result) {
         if (err) {
-          console.log(err);
+          //console.log(err);
           reject(err.message);
         }
         try {

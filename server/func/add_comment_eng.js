@@ -6,14 +6,49 @@ process.on("message", message => {
             return console.error('error: ' + err.message);
           }
           console.log('Database connection established');
-          add_comm_eng(message.postID, message.like, message.engag_id, connection);
+          var data = {
+            post_id: message.postID,
+            likes: message.likes,
+            engagement_id: message.engagement_id,
+          }
+          add_comm_eng(data, connection).then((answer) => {
+            connection.release();
+            if (answer == "engagement does not exist") {
+                process.send({"Error": "engagement does not exist"});
+            } else if (answer == "post does not exist") {
+                process.send({"Error": "post does not exist"});
+
+            
+            } else if (answer == "comment addded") {
+                console.log("sucsess");
+                process.send({"Success": "comment engagement added"});
+            }
+            process.exit();
+          }).catch(function(result) {
+            process.send(result);
+            connection.release();
+            process.exit();
+
+
+          }); ;
+
+
+          
            // console.log(answer.length);
+
             
         });
         
 });
 
-const add_comm_eng = async ( postID, likes, engagement_id, connection) => {
+const add_comm_eng = async ( data, connection) => {
+    postID = data.post_id;
+    var likes = data.likes;
+    var engagement_id = data.engagement_id;
+    //console.log(postID);
+
+    
+
     var id = Math.floor(Math.random() * 100000);
     var addquery = "INSERT INTO comm_engagement (comm_id, post_id, comm_like, engagement_id) VALUES ?";
     var selectquery = "SELECT * FROM engagement WHERE engagement_id = ?" ;
@@ -24,6 +59,7 @@ const add_comm_eng = async ( postID, likes, engagement_id, connection) => {
             if (err) {
                 reject (err.message);
             } else {
+                //console.log("executed");
                 if (result.length == 0) {
                     resolve("engagement does not exist");
                 } else {
