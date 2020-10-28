@@ -8,12 +8,18 @@ process.on("message", message => {
           }
           console.log('Database connection established');
           getEngagement(message.post_id, connection).then((value)=> {
-              process.send(value, );
+              process.send(value);
               connection.release();
           //process.send(resul);
                 process.exit();
           
-          }) 
+          }) .catch(function(result) {
+            process.send(result);
+            connection.release();
+            process.exit();
+
+
+          });
 
           
 
