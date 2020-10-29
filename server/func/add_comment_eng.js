@@ -19,9 +19,9 @@ process.on("message", message => {
                 process.send({"Error": "post does not exist"});
 
             
-            } else if (answer == "comment addded") {
-                console.log("sucsess");
-                process.send({"Success": "comment engagement added"});
+            } else {
+                //console.log("sucsess");
+                process.send(answer);
             }
             process.exit();
           }).catch(function(result) {
@@ -74,7 +74,7 @@ const add_comm_eng = async ( data, connection) => {
                                     if (err) {
                                         reject(err.message);
                                     } else {
-                                        resolve("comment added");
+                                        resolve(result);
                                     }
                                 });
 
