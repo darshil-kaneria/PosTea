@@ -38,7 +38,7 @@ const getEngagement = async(postId, connection) => {
             }
             //console.log(result)
             if (result.length == 0) {
-                console.log("Post does not exist");
+                reject("Post does not exist");
             } else {
                 console.log("Post retrieved");
                 console.log(result);
