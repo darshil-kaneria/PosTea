@@ -229,7 +229,7 @@ class _PostTileState extends State<PostTile> {
                   padding: EdgeInsets.only(right: 15),
                   alignment: Alignment.centerRight,
                   child: Text(
-                    "3 hours ago",
+                    creation_date,
                     style: TextStyle(color: Colors.grey),
                   ),
                 ),

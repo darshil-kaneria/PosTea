@@ -89,7 +89,7 @@ class ProcessTimeline{
         posts['result'][i]['post_description'].toString(),
         posts['result'][i]['topic_id'].toString(),
         posts['result'][i]['post_img'].toString(),
-        posts['result'][i]['creation_date'].toString(),
+        posts['timeDiff'][i].toString(),
         posts['result'][i]['post_likes'].toString(),
         posts['result'][i]['post_dislikes'].toString(),
         posts['result'][i]['post_comments'].toString(),
