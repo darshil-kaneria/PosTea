@@ -12,6 +12,8 @@ import 'package:postea_frontend/customWidgets/postTile.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 //import 'package:postea_frontend/customWidgets/customAppBar.dart';
 import 'package:postea_frontend/data_models/timer.dart';
+import 'package:postea_frontend/main.dart';
+import 'package:postea_frontend/pages/profile.dart';
 import 'package:provider/provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:postea_frontend/customWidgets/topic_pill.dart';
@@ -332,7 +334,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(
               icon: Icon(Icons.account_circle),
               onPressed: () {
-                Navigator.of(context).pushNamed('/profile');
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => Profile(profileId: widget.profileID, isOwner: true,)));
               }),
         ],
       ),

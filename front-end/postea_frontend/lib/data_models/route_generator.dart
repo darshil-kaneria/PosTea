@@ -23,8 +23,9 @@ class Router {
   // }
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
-    final HomePage args = settings.arguments;
-  
+    HomePage args = settings.arguments;
+    // Profile pargs = settings.arguments;
+    // print(pargs);
     switch(settings.name){
       case '/login': // do login
         return MaterialPageRoute(

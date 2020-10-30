@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:postea_frontend/pages/profile.dart';
 import './comments.dart';
 import 'package:http/http.dart' as http;
 
@@ -102,9 +103,14 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
               Container(
                 margin: EdgeInsets.only(top: 20),
                 child: ListTile(
-                  leading: CircleAvatar(
-                    backgroundImage: NetworkImage("https://picsum.photos/200"),
-                    backgroundColor: Colors.deepPurpleAccent[50],
+                  leading: GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(new MaterialPageRoute(builder: (context) => Profile(profileId: int.parse(widget.profile_id), isOwner: false,)));
+                    },
+                    child: CircleAvatar(
+                      backgroundImage: NetworkImage("https://picsum.photos/200"),
+                      backgroundColor: Colors.deepPurpleAccent[50],
+                    ),
                   ),
                   title: Text(
                     post_id.toString(),
