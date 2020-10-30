@@ -4,14 +4,18 @@ import 'package:custom_switch/custom_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/colors.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:file/file.dart';
+import 'package:image_picker/image_picker.dart';
 
 class EditProfile extends StatefulWidget {
   var nameText;
   var biodata;
   bool privacy;
   var username;
+  File profilePic;
 
-  EditProfile({@required this.nameText, this.biodata, this.privacy, this.username});
+  EditProfile(
+      {@required this.nameText, this.biodata, this.privacy, this.username});
 
   @override
   _EditProfileState createState() => _EditProfileState();
@@ -20,13 +24,34 @@ class EditProfile extends StatefulWidget {
 class _EditProfileState extends State<EditProfile> {
   var nameController = TextEditingController();
   var biodataController = TextEditingController();
-  
+  File profilePic;
+  var _image;
+
   @override
   void initState() {
     // TODO: implement initState
     nameController.text = widget.nameText;
-  biodataController.text = widget.biodata;
+    biodataController.text = widget.biodata;
     super.initState();
+  }
+
+  chooseProfilePic() async {
+    // PickedFile img = await ImagePicker().getImage(source: ImageSource.gallery);
+    print("about to choose image");
+    ImagePicker.pickImage(source: ImageSource.gallery).then((value) {
+      print("In dot then");
+      print(value);
+      profilePic = value;
+    });
+    print("chosen image is " + profilePic.toString());
+    print(profilePic);
+  }
+
+  Future uploadProfilePic(File file) async {
+    StorageReference storageReference =
+        FirebaseStorage.instance.ref().child("profile").child("testUpload2");
+    await storageReference.putFile(file).onComplete;
+    print("Uploaded image to Firebase from edit profile");
   }
 
   updateProfile() async {
@@ -51,7 +76,6 @@ class _EditProfileState extends State<EditProfile> {
 
   @override
   Widget build(BuildContext context) {
-    
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
 
@@ -62,12 +86,12 @@ class _EditProfileState extends State<EditProfile> {
           backgroundColor: Colors.transparent,
           elevation: 0,
           leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          color: Colors.black,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
+            icon: Icon(Icons.arrow_back),
+            color: Colors.black,
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
         ),
         extendBodyBehindAppBar: false,
         body: SingleChildScrollView(
@@ -79,65 +103,88 @@ class _EditProfileState extends State<EditProfile> {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(10.0),
-                      child: Container(
-                      height: screenWidth / 3,
-                      width: screenWidth / 3,
-                      decoration: ShapeDecoration(
-                          shape: CircleBorder(
-                              side: BorderSide(width: 1, color: Colors.blueGrey))),
-                      child: FutureBuilder(
-                          future: FirebaseStorageService.getImage(
-                              context, "tom_and_jerry.jpeg"),
-                          builder: (context, AsyncSnapshot<dynamic> snapshot) {
-                            if (snapshot.hasData) {
-                              return CircleAvatar(
-                                backgroundImage: NetworkImage(snapshot.data),
-                                maxRadius: screenWidth / 8,
-                              );
-                            } else {
-                              return CircularProgressIndicator(
-                                strokeWidth: 2,
-                                backgroundColor: bgColor,
-                                valueColor: AlwaysStoppedAnimation(loginButtonEnd),
-                              );
-                            }
-                          }),
-                  ),
-                    ),
-                  // Expanded(
-                  //   child: Padding(
-                  //     padding: const EdgeInsets.all(15.0),
-                  //     child: ButtonTheme(
-                  //       shape: RoundedRectangleBorder(
-                  //             borderRadius: BorderRadius.circular(100),
-                  //             side: BorderSide(color: Colors.redAccent)),
-                  //       child: RaisedButton(
-                  //         elevation: 1,
-                  //         color: loginButton,
-                  //         highlightColor: Colors.red[700],
-                  //         onPressed: () {
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: new GestureDetector(
+                          onTap: () async {
+                            // profilePic = await ImagePicker.pickImage(
+                            //     source: ImageSource.gallery);
+                            await chooseProfilePic().then((val) {
+                              setState(() {
+                                _image = profilePic;
+                              });
+                            });
 
-                  //       },
-                  //       child: Text("Edit profile image", style: TextStyle(
-                  //                 fontFamily: "Helvetica",
-                  //                 color: Colors.white,
-                  //                 fontSize: 16),),),
-                  //     ),
-                  //   ),
-                  // )
-                  ]),
+                            print("I have chosen the image " +
+                                profilePic.toString());
+                          },
+                          child: Container(
+                            height: screenWidth / 3,
+                            width: screenWidth / 3,
+                            decoration: ShapeDecoration(
+                                shape: CircleBorder(
+                                    side: BorderSide(
+                                        width: 1, color: Colors.blueGrey))),
+                            child: profilePic != null
+                                ? Image.file(
+                                    profilePic,
+                                    height: 300,
+                                    width: 300,
+                                  )
+                                : FutureBuilder(
+                                    future: FirebaseStorageService.getImage(
+                                        context, "tom_and_jerry.jpeg"),
+                                    builder: (context,
+                                        AsyncSnapshot<dynamic> snapshot) {
+                                      if (snapshot.hasData) {
+                                        return CircleAvatar(
+                                          backgroundImage:
+                                              NetworkImage(snapshot.data),
+                                          maxRadius: screenWidth / 8,
+                                        );
+                                      } else {
+                                        return CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          backgroundColor: bgColor,
+                                          valueColor: AlwaysStoppedAnimation(
+                                              loginButtonEnd),
+                                        );
+                                      }
+                                    }),
+                          ),
+                        ),
+                      ),
+                      // Expanded(
+                      //   child: Padding(
+                      //     padding: const EdgeInsets.all(15.0),
+                      //     child: ButtonTheme(
+                      //       shape: RoundedRectangleBorder(
+                      //             borderRadius: BorderRadius.circular(100),
+                      //             side: BorderSide(color: Colors.redAccent)),
+                      //       child: RaisedButton(
+                      //         elevation: 1,
+                      //         color: loginButton,
+                      //         highlightColor: Colors.red[700],
+                      //         onPressed: () {
+
+                      //       },
+                      //       child: Text("Edit profile image", style: TextStyle(
+                      //                 fontFamily: "Helvetica",
+                      //                 color: Colors.white,
+                      //                 fontSize: 16),),),
+                      //     ),
+                      //   ),
+                      // )
+                    ]),
               ),
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Card(
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)
-                  ),
+                      borderRadius: BorderRadius.circular(20)),
                   child: TextField(
                     controller: nameController,
                     decoration: InputDecoration(
@@ -148,10 +195,13 @@ class _EditProfileState extends State<EditProfile> {
                             borderSide: BorderSide(
                               color: Colors.transparent,
                             ),
-                            borderRadius: BorderRadius.all(Radius.circular(20))),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(20))),
                         focusedBorder: OutlineInputBorder(
-                            borderSide: BorderSide(color: Colors.deepOrange[700]),
-                            borderRadius: BorderRadius.all(Radius.circular(20))),
+                            borderSide:
+                                BorderSide(color: Colors.deepOrange[700]),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(20))),
                         hintText: "What should we call you?"),
                   ),
                 ),
@@ -160,14 +210,17 @@ class _EditProfileState extends State<EditProfile> {
                 padding: const EdgeInsets.all(10.0),
                 child: Card(
                   elevation: 1,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20)),
                   child: TextField(
                     controller: biodataController,
                     minLines: 5,
                     maxLines: 10,
                     decoration: InputDecoration(
                         // labelText: "About",
-                        labelStyle: TextStyle(color: Colors.brown[200],fontWeight: FontWeight.bold),
+                        labelStyle: TextStyle(
+                            color: Colors.brown[200],
+                            fontWeight: FontWeight.bold),
                         enabledBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.all(Radius.circular(20)),
                             borderSide: BorderSide(color: Colors.transparent)),
@@ -180,44 +233,48 @@ class _EditProfileState extends State<EditProfile> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: Card(
-                  color: Colors.white,
-                  elevation: 1,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                  child: ListTile(
-                    title: Text("Private profile"),
-                    trailing: Switch(value: widget.privacy,
-                    activeTrackColor: Colors.deepOrange[200],
-                    activeColor: Colors.deepOrange[700],
-                    onChanged: (value){
-                      setState(() {
-                        widget.privacy = value;
-                      });
-                    })
-
-                  ),
-                )
-              ),
+                  padding: const EdgeInsets.all(10.0),
+                  child: Card(
+                    color: Colors.white,
+                    elevation: 1,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    child: ListTile(
+                        title: Text("Private profile"),
+                        trailing: Switch(
+                            value: widget.privacy,
+                            activeTrackColor: Colors.deepOrange[200],
+                            activeColor: Colors.deepOrange[700],
+                            onChanged: (value) {
+                              setState(() {
+                                widget.privacy = value;
+                              });
+                            })),
+                  )),
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: ButtonTheme(
                   shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(100),
-                                side: BorderSide(color: Colors.redAccent)),
-                          child: RaisedButton(
-                            elevation: 1,
-                            color: loginButton,
-                            highlightColor: Colors.red[700],
-                            onPressed: () {
-                              updateProfile();
-                              Navigator.pop(context);
-                          },
-                          child: Text("Save", style: TextStyle(
-                                    fontFamily: "Helvetica",
-                                    color: Colors.white,
-                                    fontSize: 16),),),
-
+                      borderRadius: BorderRadius.circular(100),
+                      side: BorderSide(color: Colors.redAccent)),
+                  child: RaisedButton(
+                    elevation: 1,
+                    color: loginButton,
+                    highlightColor: Colors.red[700],
+                    onPressed: () async {
+                      updateProfile();
+                      print("profile pic is " + profilePic.toString());
+                      await uploadProfilePic(profilePic);
+                      Navigator.pop(context);
+                    },
+                    child: Text(
+                      "Save",
+                      style: TextStyle(
+                          fontFamily: "Helvetica",
+                          color: Colors.white,
+                          fontSize: 16),
+                    ),
+                  ),
                 ),
               )
             ],

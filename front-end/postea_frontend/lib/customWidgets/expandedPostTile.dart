@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:postea_frontend/customWidgets/postTile.dart';
 import 'package:postea_frontend/pages/profile.dart';
 import './comments.dart';
 import 'package:http/http.dart' as http;
@@ -67,14 +68,18 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
   var comment = "";
   var name;
   var myPID;
-  List<String> comments;
+  var num_likes;
+  var num_dislikes;
+  List<String> comments = [];
+  var comment_string = "Add a comment...";
 
   Color like_color = Colors.black;
   Color dislike_color = Colors.black;
 
   Future<http.Response> engagementInfo() async {
     http.Response resp;
-    var url = "http://postea-server.herokuapp.com/engagement?post_id=13739";
+    var url = "http://postea-server.herokuapp.com/engagement?post_id=" +
+        post_id.toString();
     resp = await http.get(url);
     // print(resp.body);
     return resp;
@@ -116,282 +121,296 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
         child: Column(
           children: [
             Expanded(
+                flex: 4,
+                child: PostTile(
+                    post_id,
+                    profile_id,
+                    post_description,
+                    topic_id,
+                    post_img,
+                    creation_date,
+                    post_likes,
+                    post_dislikes,
+                    post_comments,
+                    post_title,
+                    name,
+                    myPID))
+            // Expanded(
+            //   flex: 4,
+            //   child: Column(
+            //     children: [
+            //       Container(
+            //         width: MediaQuery.of(context).size.width,
+            //         child: Card(
+            //           margin: EdgeInsets.all(10),
+            //           child: ListTile(
+            //             leading: ,
+            //             title: Text(
+            //               post_id.toString(),
+            //               style: TextStyle(fontSize: 20),
+            //             ),
+            //             subtitle: Row(
+            //               children: [
+            //                 Icon(
+            //                   Icons.location_on,
+            //                   size: 15,
+            //                   color: Colors.grey,
+            //                 ),
+            //                 Text("with Darshil Kaneria")
+            //               ],
+            //             ),
+            //           ),
+            //         ),
+            //       ),
+            //       Container(
+            //         margin: EdgeInsets.symmetric(horizontal: 16),
+            //         padding: EdgeInsets.only(top: 8),
+            //         decoration: BoxDecoration(
+            //             border: Border(
+            //           top: BorderSide(width: 0.5, color: Colors.grey),
+            //         )),
+            //         child: Card(
+            //           child: ListTile(
+            //               contentPadding:
+            //                   EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+            //               title: Text(post_title,
+            //                   style: TextStyle(
+            //                       fontSize: 18, fontWeight: FontWeight.bold)),
+            //               subtitle: AutoSizeText(
+            //                 post_description,
+            //                 style: TextStyle(fontSize: 16, color: Colors.black),
+            //               )),
+            //         ),
+            //       )
+            //     ],
+            //   ),
+            // ),
+            // Expanded(
+            //   flex: 1,
+            //   child: Row(
+            //     children: [
+            //       Column(
+            //         children: [
+            //           IconButton(
+            //             icon: Icon(
+            //               Icons.thumb_up,
+            //               color: like_color,
+            //             ),
+            //             iconSize: 20,
+            //             onPressed: () {
+            //               like_or_dislike = "1";
+            //               setState(() {
+            //                 if (dislike_color == Colors.deepOrange[200]) {
+            //                   dislike_color = Colors.black;
+            //                 }
+            //                 if (like_color == Colors.deepOrange[200]) {
+            //                   like_color = Colors.black;
+            //                 } else
+            //                   like_color = Colors.deepOrange[200];
+            //               });
+            //               print(post_id);
+            //               print(profile_id);
+            //               print(like_or_dislike);
+            //               print(comment);
+            //               var data = {
+            //                 "engagement_post_id": post_id,
+            //                 "engagement_profile_id": profile_id,
+            //                 "like_dislike": like_or_dislike,
+            //                 "comment": comment
+            //               };
+            //               var sendAnswer = JsonEncoder().convert(data);
+            //               print(sendAnswer);
+            //               Future<http.Response> resp = http.post(
+            //                   'http://postea-server.herokuapp.com/engagement',
+            //                   headers: {'Content-Type': 'application/json'},
+            //                   body: sendAnswer);
+            //             },
+            //           ),
+            //           Text("15k",
+            //               style: TextStyle(
+            //                   fontWeight: FontWeight.bold, fontSize: 15))
+            //         ],
+            //       ),
+            //       Column(
+            //         children: [
+            //           IconButton(
+            //             icon: Icon(
+            //               Icons.thumb_down,
+            //               color: dislike_color,
+            //             ),
+            //             iconSize: 20,
+            //             onPressed: () {
+            //               setState(() {
+            //                 like_or_dislike = "0";
+            //                 if (like_color == Colors.deepOrange[200]) {
+            //                   like_color = Colors.black;
+            //                 }
+            //                 if (dislike_color == Colors.deepOrange[200]) {
+            //                   dislike_color = Colors.black;
+            //                 } else
+            //                   dislike_color = Colors.deepOrange[200];
+            //               });
+
+            //               var data = {
+            //                 "engagement_post_id": post_id,
+            //                 "engagement_profile_id": profile_id,
+            //                 "like_dislike": like_or_dislike,
+            //                 "comment": comment
+            //               };
+            //               var sendAnswer = JsonEncoder().convert(data);
+            //               Future<http.Response> resp = http.post(
+            //                   'http://postea-server.herokuapp.com/engagement',
+            //                   headers: {'Content-Type': 'application/json'},
+            //                   body: sendAnswer);
+            //             },
+            //           ),
+            //           Text(
+            //             "100",
+            //             style: TextStyle(
+            //                 fontWeight: FontWeight.bold, fontSize: 15),
+            //           )
+            //         ],
+            //       ),
+            //       IconButton(
+            //         alignment: Alignment.topCenter,
+            //         icon: Icon(Icons.comment),
+            //         iconSize: 20,
+            //         onPressed: () {},
+            //       ),
+            //       Expanded(
+            //         child: Container(
+            //           padding: EdgeInsets.only(right: 15),
+            //           alignment: Alignment.centerRight,
+            //           child: Text(
+            //             "3 hours ago",
+            //             style: TextStyle(color: Colors.grey),
+            //           ),
+            //         ),
+            //       )
+            //     ],
+            //   ),
+            // ),
+            ,
+            Expanded(
               flex: 4,
-              child: Column(
-                children: [
-                  Container(
-                    width: MediaQuery.of(context).size.width,
-                    child: Card(
-                      margin: EdgeInsets.all(10),
-                      child: ListTile(
-                        leading: GestureDetector(
-                          onTap: () {
-                            if (myPID != widget.profile_id) {
-                              Navigator.of(context).push(new MaterialPageRoute(
-                                  builder: (context) => Profile(
-                                        profileId: int.parse(profile_id),
-                                        isOwner: false,
-                                      )));
-                            } else {
-                              Navigator.of(context).push(new MaterialPageRoute(
-                                  builder: (context) => Profile(
-                                        profileId: int.parse(profile_id),
-                                        isOwner: true,
-                                      )));
-                            }
-                          },
-                          child: CircleAvatar(
-                            backgroundImage:
-                                NetworkImage("https://picsum.photos/200"),
-                            backgroundColor: Colors.deepPurpleAccent[50],
-                          ),
-                        ),
-                        title: Text(
-                          post_id.toString(),
-                          style: TextStyle(fontSize: 20),
-                        ),
-                        subtitle: Row(
-                          children: [
-                            Icon(
-                              Icons.location_on,
-                              size: 15,
-                              color: Colors.grey,
-                            ),
-                            Text("with Darshil Kaneria")
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: 16),
-                    padding: EdgeInsets.only(top: 8),
-                    decoration: BoxDecoration(
-                        border: Border(
-                      top: BorderSide(width: 0.5, color: Colors.grey),
-                    )),
-                    child: Card(
-                      child: ListTile(
-                          contentPadding:
-                              EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-                          title: Text(post_title,
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.bold)),
-                          subtitle: AutoSizeText(
-                            post_description,
-                            style: TextStyle(fontSize: 16, color: Colors.black),
-                          )),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Row(
-                children: [
-                  Column(
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          Icons.thumb_up,
-                          color: like_color,
-                        ),
-                        iconSize: 20,
-                        onPressed: () {
-                          like_or_dislike = "1";
-                          setState(() {
-                            if (dislike_color == Colors.deepOrange[200]) {
-                              dislike_color = Colors.black;
-                            }
-                            if (like_color == Colors.deepOrange[200]) {
-                              like_color = Colors.black;
-                            } else
-                              like_color = Colors.deepOrange[200];
-                          });
-                          print(post_id);
-                          print(profile_id);
-                          print(like_or_dislike);
-                          print(comment);
-                          var data = {
-                            "engagement_post_id": post_id,
-                            "engagement_profile_id": profile_id,
-                            "like_dislike": like_or_dislike,
-                            "comment": comment
-                          };
-                          var sendAnswer = JsonEncoder().convert(data);
-                          print(sendAnswer);
-                          Future<http.Response> resp = http.post(
-                              'http://postea-server.herokuapp.com/engagement',
-                              headers: {'Content-Type': 'application/json'},
-                              body: sendAnswer);
-                        },
-                      ),
-                      Text("15k",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 15))
-                    ],
-                  ),
-                  Column(
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                          Icons.thumb_down,
-                          color: dislike_color,
-                        ),
-                        iconSize: 20,
-                        onPressed: () {
-                          setState(() {
-                            like_or_dislike = "0";
-                            if (like_color == Colors.deepOrange[200]) {
-                              like_color = Colors.black;
-                            }
-                            if (dislike_color == Colors.deepOrange[200]) {
-                              dislike_color = Colors.black;
-                            } else
-                              dislike_color = Colors.deepOrange[200];
-                          });
+              child: PageView(children: [
+                Card(
+                    margin: EdgeInsets.only(top: 15, left: 15),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20)),
+                    child: FutureBuilder(
+                      future: engagementInfo(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<dynamic> snapshot) {
+                        if (snapshot.hasData) {
+                          print("response");
+                          var engagements = jsonDecode(snapshot.data.body);
+                          print(engagements[0]['comment']);
 
-                          var data = {
-                            "engagement_post_id": post_id,
-                            "engagement_profile_id": profile_id,
-                            "like_dislike": like_or_dislike,
-                            "comment": comment
-                          };
-                          var sendAnswer = JsonEncoder().convert(data);
-                          Future<http.Response> resp = http.post(
-                              'http://postea-server.herokuapp.com/engagement',
-                              headers: {'Content-Type': 'application/json'},
-                              body: sendAnswer);
-                        },
-                      ),
-                      Text(
-                        "100",
-                        style: TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15),
-                      )
-                    ],
-                  ),
-                  IconButton(
-                    alignment: Alignment.topCenter,
-                    icon: Icon(Icons.comment),
-                    iconSize: 20,
-                    onPressed: () {},
-                  ),
-                  Expanded(
-                    child: Container(
-                      padding: EdgeInsets.only(right: 15),
-                      alignment: Alignment.centerRight,
-                      child: Text(
-                        "3 hours ago",
-                        style: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Expanded(
-              flex: 7,
-              child: Card(
-                  margin: EdgeInsets.only(top: 15),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20)),
-                  // child: ListView.builder(
-                  //     physics: BouncingScrollPhysics(),
-                  //     itemCount: 5,
-                  //     shrinkWrap: true,
-                  //     itemBuilder: (BuildContext context, int index) {
-                  //       print("comment is " + comments[index]);
-                  //       return ListTile(
-                  //         title: Text("comments[index]"),
-                  //       );
-                  //     }),
+                          for (int i = 0; i < engagements.length; i++) {
+                            comments.add(engagements[i]['comment'].toString());
+                          }
 
-                  child: FutureBuilder(
-                    future: engagementInfo(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<dynamic> snapshot) {
-                      if (snapshot.hasData) {
-                        print("response");
-                        var engagements = jsonDecode(snapshot.data.body);
-                        print(engagements[0]['comment']);
+                          if (comments.length == 0 || comments == null) {
+                            return Container();
+                          }
 
-                        for (int i = 0; i < engagements.length; i++) {
-                          comments.add(engagements[i]['comment'].toString());
+                          return ListView.builder(
+                              itemCount: comments.length,
+                              shrinkWrap: true,
+                              itemBuilder: (BuildContext context, int index) {
+                                print('in list view builder');
+                                print(comments.elementAt(index));
+                                return Comments(
+                                    comments.elementAt(index), "Vidit");
+                              });
+                        } else {
+                          return Container();
                         }
-                        return ListView.builder(
-                            itemCount: comments.length,
-                            shrinkWrap: true,
-                            itemBuilder: (BuildContext context, int index) {
-                              print('in list view builder');
-                              print(comments.elementAt(index));
-                              return Comments(
-                                  comments.elementAt(index), "Vidit Shah");
-                            });
-                      } else {
-                        return Container();
-                      }
-                    },
-                  )
+                      },
+                    )
 
-                  // Column(
-                  //   crossAxisAlignment: CrossAxisAlignment.start,
-                  //   children: [
-                  //     Container(
-                  //       child: Comments("Today is a lovely day!", "Vidit Shah"),
-                  //     ),
-                  //     Divider(
-                  //       color: Colors.grey,
-                  //       indent: 20,
-                  //       endIndent: 20,
-                  //     ),
-                  //     Container(
-                  //       child: Comments(
-                  //           "I am grateful for everything that I have!",
-                  //           "Darshil Kaneria"),
-                  //       width: screenWidth,
-                  //     ),
-                  //     Divider(
-                  //       color: Colors.grey,
-                  //       indent: 20,
-                  //       endIndent: 20,
-                  //     ),
-                  //     Container(
-                  //       child: Comments(
-                  //           "This is a very beautiful day! I am loving it...",
-                  //           "Bharat Iyer"),
-                  //       width: screenWidth,
-                  //     ),
-                  //     Divider(
-                  //       color: Colors.grey,
-                  //       indent: 20,
-                  //       endIndent: 20,
-                  //     ),
-                  //     Container(
-                  //       child: Comments(
-                  //           "You have given me the best gift of my life!\nThank you very much",
-                  //           "Vaibbavi SK"),
-                  //     ),
-                  //     Divider(
-                  //       color: Colors.grey,
-                  //       indent: 20,
-                  //       endIndent: 20,
-                  //     ),
-                  //     Container(
-                  //       child: Comments(
-                  //           "Wishing you a very happy birthday!\nMay you succeed in all your endeavors!\nRock this day and the days to come!!",
-                  //           "Pooja Bhasker"),
-                  //     ),
-                  //     Divider(
-                  //       color: Colors.grey,
-                  //       indent: 20,
-                  //       endIndent: 20,
-                  //     ),
-                  //   ],
-                  // ),
+                    // Column(
+                    //   crossAxisAlignment: CrossAxisAlignment.start,
+                    //   children: [
+                    //     Container(
+                    //       child: Comments("Today is a lovely day!", "Vidit Shah"),
+                    //     ),
+                    //     Divider(
+                    //       color: Colors.grey,
+                    //       indent: 20,
+                    //       endIndent: 20,
+                    //     ),
+                    //     Container(
+                    //       child: Comments(
+                    //           "I am grateful for everything that I have!",
+                    //           "Darshil Kaneria"),
+                    //       width: screenWidth,
+                    //     ),
+                    //     Divider(
+                    //       color: Colors.grey,
+                    //       indent: 20,
+                    //       endIndent: 20,
+                    //     ),
+                    //     Container(
+                    //       child: Comments(
+                    //           "This is a very beautiful day! I am loving it...",
+                    //           "Bharat Iyer"),
+                    //       width: screenWidth,
+                    //     ),
+                    //     Divider(
+                    //       color: Colors.grey,
+                    //       indent: 20,
+                    //       endIndent: 20,
+                    //     ),
+                    //     Container(
+                    //       child: Comments(
+                    //           "You have given me the best gift of my life!\nThank you very much",
+                    //           "Vaibbavi SK"),
+                    //     ),
+                    //     Divider(
+                    //       color: Colors.grey,
+                    //       indent: 20,
+                    //       endIndent: 20,
+                    //     ),
+                    //     Container(
+                    //       child: Comments(
+                    //           "Wishing you a very happy birthday!\nMay you succeed in all your endeavors!\nRock this day and the days to come!!",
+                    //           "Pooja Bhasker"),
+                    //     ),
+                    //     Divider(
+                    //       color: Colors.grey,
+                    //       indent: 20,
+                    //       endIndent: 20,
+                    //     ),
+                    //   ],
+                    // ),
+                    ),
+                Container(
+                  margin: EdgeInsets.only(left: 15, right: 15),
+                  child: TextField(
+                    decoration: InputDecoration(labelText: "Your comment:"),
                   ),
-            )
+                )
+              ]),
+            ),
+            Expanded(
+                flex: 1,
+                child: ButtonTheme(
+                  child: Container(
+                    width: MediaQuery.of(context).size.width / 2.6,
+                    height: MediaQuery.of(context).size.height / 2,
+                    child: RaisedButton(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                      child: Text(
+                        comment_string,
+                        style: TextStyle(fontSize: 15),
+                      ),
+                      onPressed: () => {},
+                    ),
+                  ),
+                ))
           ],
         ),
       ),

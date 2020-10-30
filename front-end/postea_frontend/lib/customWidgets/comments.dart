@@ -1,3 +1,4 @@
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
@@ -43,19 +44,21 @@ class _CommentsState extends State<Comments> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(bottom: 2),
-                    child: Text(
+                    child: AutoSizeText(
                       this.personName,
                       style:
                           TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                   ),
-                  Text(
+                  AutoSizeText(
                     this.comment,
                     // "{\"post retrieved\": \"success\"}",
                     style: TextStyle(fontSize: 15),
                   ),
                 ],
               ),
+              Spacer(),
+              Icon(Icons.thumb_up)
             ],
           ),
         ],
