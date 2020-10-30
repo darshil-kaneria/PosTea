@@ -17,6 +17,8 @@ class PostTile extends StatefulWidget {
   var post_dislikes;
   var post_comments;
   var post_title;
+  var name;
+  var myPID;
 
   PostTile(
       this.post_id,
@@ -28,7 +30,9 @@ class PostTile extends StatefulWidget {
       this.post_likes,
       this.post_dislikes,
       this.post_comments,
-      this.post_title);
+      this.post_title,
+      this.name,
+      this.myPID);
 
   @override
   _PostTileState createState() => _PostTileState(
@@ -41,7 +45,9 @@ class PostTile extends StatefulWidget {
       this.post_likes,
       this.post_dislikes,
       this.post_comments,
-      this.post_title);
+      this.post_title,
+      this.name,
+      this.myPID);
 }
 
 class _PostTileState extends State<PostTile> {
@@ -57,6 +63,8 @@ class _PostTileState extends State<PostTile> {
   var post_title;
   var like_or_dislike = "NULL";
   var comment = "";
+  var name;
+  var myPID;
 
   Color like_color = Colors.black;
   Color dislike_color = Colors.black;
@@ -71,7 +79,9 @@ class _PostTileState extends State<PostTile> {
       this.post_likes,
       this.post_dislikes,
       this.post_comments,
-      this.post_title);
+      this.post_title,
+      this.name,
+      this.myPID);
 
   @override
   Widget build(BuildContext context) {
@@ -89,7 +99,7 @@ class _PostTileState extends State<PostTile> {
               backgroundColor: Colors.deepPurpleAccent[50],
             ),
             title: Text(
-              post_id.toString(),
+              name,
               style: TextStyle(fontSize: 20),
             ),
             subtitle: Row(
@@ -127,7 +137,9 @@ class _PostTileState extends State<PostTile> {
                                       post_likes,
                                       post_dislikes,
                                       post_comments,
-                                      post_title))))
+                                      post_title,
+                                      name,
+                                      myPID))))
                     },
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 0, horizontal: 0),

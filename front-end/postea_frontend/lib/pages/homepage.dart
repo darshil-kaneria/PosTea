@@ -12,11 +12,14 @@ import 'package:postea_frontend/customWidgets/postTile.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 //import 'package:postea_frontend/customWidgets/customAppBar.dart';
 import 'package:postea_frontend/data_models/timer.dart';
+import 'package:postea_frontend/main.dart';
+import 'package:postea_frontend/pages/profile.dart';
 import 'package:provider/provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:postea_frontend/customWidgets/topic_pill.dart';
 import 'package:http/http.dart' as http;
 import 'package:postea_frontend/data_models/process_timeline.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'login.dart';
 
 class HomePage extends StatefulWidget {
@@ -47,9 +50,9 @@ class _HomePageState extends State<HomePage> {
             checkPosScrollController.position.minScrollExtent &&
         !checkPosScrollController.position.outOfRange) {
       setState(() {
-        print("Timeline refreshed");
-        timeLine.clearTimeline();
         offset = 0;
+        print("Timeline refreshed");
+        timeLine.clearTimeline();       
       });
     }
 
@@ -145,9 +148,15 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               title: Text("Logout"),
               onTap: () async {
-                await FirebaseAuth.instance.signOut();
+                SharedPreferences pref = await SharedPreferences.getInstance();
+                pref.clear().then( (value) async {
+                  if(value == true){
+                    await FirebaseAuth.instance.signOut();
                 Navigator.push(
                     context, MaterialPageRoute(builder: (context) => Login()));
+                  }
+                });
+                
               },
             )
           ],
@@ -325,7 +334,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(
               icon: Icon(Icons.account_circle),
               onPressed: () {
-                Navigator.of(context).pushNamed('/profile');
+                Navigator.of(context).push(MaterialPageRoute(builder: (context) => Profile(profileId: widget.profileID, isOwner: true,)));
               }),
         ],
       ),
@@ -396,6 +405,8 @@ class _HomePageState extends State<HomePage> {
                             timeLine.postList.elementAt(index).post_dislikes,
                             timeLine.postList.elementAt(index).post_comments,
                             timeLine.postList.elementAt(index).post_title,
+                            timeLine.postList.elementAt(index).post_name,
+                            widget.profileID.toString()
                           );
                         });
                   } else

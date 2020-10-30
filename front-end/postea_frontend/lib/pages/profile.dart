@@ -8,10 +8,15 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:postea_frontend/main.dart';
 import 'package:postea_frontend/pages/edit_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatefulWidget {
+  int profileId;
+  bool isOwner;
+  var myPID;
+  Profile({this.profileId, this.isOwner});
   @override
   _ProfileState createState() => _ProfileState();
 }
@@ -21,6 +26,7 @@ class _ProfileState extends State<Profile> {
   var bio_data = "";
   bool isPrivate = false;
   Map<String, dynamic> profile;
+  List<dynamic> listFollowing;
   SharedPreferences prefs;
   String username;
 
@@ -37,12 +43,39 @@ class _ProfileState extends State<Profile> {
     // displayImage();
     _value=0;
     getProfile();
+    getFollowing();
   }
 
   @override
   void dispose(){
     controller.dispose();
     super.dispose();
+  }
+
+  getFollowing() async {
+    prefs = await SharedPreferences.getInstance();
+    widget.myPID = prefs.getInt('profileID') ?? 0;
+    print("MY ID"+widget.myPID.toString());
+    http.get("http://postea-server.herokuapp.com/getfollowing?user_id="+widget.myPID.toString()).then((resp) {
+
+
+    listFollowing = jsonDecode(resp.body);
+    print("LIST FOLLOWING"+widget.profileId.toString());
+    for(int i = 0; i < listFollowing.length; i++){
+      // print()
+      if(listFollowing[i]['follower_id'] == widget.profileId){
+        isFollow = true;
+        buttonColor = Colors.redAccent[100];
+        isFollow = true;
+        followButtonText = "Following";
+        setState(() {
+          
+        });
+      }
+    }
+    });
+    
+
   }
 
   updateProfile() async {
@@ -68,9 +101,18 @@ class _ProfileState extends State<Profile> {
   getProfile() async {
     prefs = await SharedPreferences.getInstance();
     username = prefs.getString('username') ?? "";
+    var queryString;
+    if(widget.isOwner){
+      // print("HERE");
+      queryString = "http://postea-server.herokuapp.com/profile?username="+username.toString();
+    }
+    else{
+      // print("Not here");
+      queryString = "http://postea-server.herokuapp.com/profile/"+widget.profileId.toString();
+    }
     print(username);
     http.Response resp = await http
-        .get("http://postea-server.herokuapp.com/profile?username="+username.toString());
+        .get(queryString);
     profile = jsonDecode(resp.body);
     setState(() {
       _nameController.text = profile["message"]["name"];
@@ -92,11 +134,14 @@ class _ProfileState extends State<Profile> {
   //   var url = profilePic.child("tom_and_jerry.jpeg").getDownloadURL();
   //   print("url: " + url.toString());
   // }
-
+  var isFollow = false;
+  var buttonColor = Colors.red[50];
+  var followButtonText = "Follow";
   @override
   Widget build(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
+    
     
 
     // displayImage();
@@ -118,7 +163,7 @@ class _ProfileState extends State<Profile> {
           },
         ),
         actions: [
-          IconButton(
+          widget.isOwner? IconButton(
             icon: Icon(
               Icons.edit,
               color: Colors.black,
@@ -138,7 +183,7 @@ class _ProfileState extends State<Profile> {
                   );
 
             },
-          )
+          ):Container()
         ],
       ),
       body: SafeArea(
@@ -259,95 +304,127 @@ class _ProfileState extends State<Profile> {
                       SizedBox(
                         height: screenHeight / 25,
                       ),
+                      widget.isOwner == false ? Container(
+                        height: screenHeight/14,
+                        padding: EdgeInsets.symmetric(horizontal: screenWidth/15, vertical: 10),
+                        child: ButtonTheme(
+                          buttonColor: buttonColor,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                          minWidth: screenWidth/1.5,
+                          child: RaisedButton(
+                            elevation: 2,
+                            clipBehavior: Clip.antiAlias,
+                            child: Text(followButtonText),
+                            onPressed: (){
+                              print(isFollow);
+                              setState(() {
+                                if(isFollow){
+                                buttonColor = Colors.red[50];
+                                isFollow = false;
+                                followButtonText = "Follow";
+                              }
+                              else{
+                                print("HERE");
+                                buttonColor = Colors.redAccent[100];
+                                isFollow = true;
+                                followButtonText = "Following";
+                              }   
+                                
+                              });
+                                
+                            })
+                            ),
+                        ): Container(),
+                      
                       // Follow & Following Buttons
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: <Widget>[
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      //   crossAxisAlignment: CrossAxisAlignment.center,
+                      //   children: <Widget>[
                           // Follower button
-                          //   Stack(
-                          //     alignment: Alignment.centerRight,
-                          //     children: [
-                          //       ButtonTheme(
-                          //         padding: EdgeInsets.only(right: 40),
-                          //         height: 50,
-                          //         minWidth: screenWidth / 2.5,
-                          //         child: RaisedButton(
-                          //           color: profileButtoColor,
-                          //           onPressed: () {},
-                          //           child: Row(
-                          //               mainAxisAlignment:
-                          //                   MainAxisAlignment.spaceAround,
-                          //               children: [
-                          //                 // IconButton(
-                          //                 //     icon: Icon(Icons.add), onPressed: () {}),
-                          //                 Text("Followers")
-                          //               ]),
-                          //           elevation: 0,
-                          //           shape: RoundedRectangleBorder(
-                          //               borderRadius: BorderRadius.circular(100),
-                          //               side: BorderSide(color: Colors.transparent)),
-                          //         ),
-                          //       ),
-                          //       ButtonTheme(
-                          //         height: 55,
-                          //         minWidth: screenWidth / 7,
-                          //         child: RaisedButton(
-                          //           color: ffDisplayer,
-                          //           onPressed: () {},
-                          //           child: Text("4.2k"),
-                          //           elevation: 6,
-                          //           shape: RoundedRectangleBorder(
-                          //               borderRadius: BorderRadius.only(
-                          //                   topLeft: Radius.zero,
-                          //                   bottomLeft: Radius.zero,
-                          //                   topRight: Radius.circular(100),
-                          //                   bottomRight: Radius.circular(100)),
-                          //               side: BorderSide(color: Colors.black12)),
-                          //         ),
-                          //       )
-                          //     ],
-                          //   ),
-                          //   Stack(
-                          //     alignment: Alignment.centerRight,
-                          //     children: [
-                          //       ButtonTheme(
-                          //         padding: EdgeInsets.only(right: 40),
-                          //         height: 50,
-                          //         minWidth: screenWidth / 2.6,
-                          //         child: RaisedButton(
-                          //           color: profileButtoColor,
-                          //           onPressed: () {},
-                          //           child: Text(
-                          //             "Following",
-                          //           ),
-                          //           elevation: 0,
-                          //           shape: RoundedRectangleBorder(
-                          //               borderRadius: BorderRadius.circular(100),
-                          //               side: BorderSide(color: Colors.transparent)),
-                          //         ),
-                          //       ),
-                          //       ButtonTheme(
-                          //         height: 55,
-                          //         minWidth: screenWidth / 7,
-                          //         child: RaisedButton(
-                          //           color: ffDisplayer,
-                          //           onPressed: () {},
-                          //           child: Text("6.5k"),
-                          //           elevation: 6,
-                          //           shape: RoundedRectangleBorder(
-                          //               borderRadius: BorderRadius.only(
-                          //                   topLeft: Radius.zero,
-                          //                   bottomLeft: Radius.zero,
-                          //                   topRight: Radius.circular(100),
-                          //                   bottomRight: Radius.circular(100)),
-                          //               side: BorderSide(color: Colors.black12)),
-                          //         ),
-                          //       )
-                          //     ],
-                          //   ),
-                        ],
-                      )
+                            // Stack(
+                            //   alignment: Alignment.centerRight,
+                            //   children: [
+                            //     ButtonTheme(
+                            //       padding: EdgeInsets.only(right: 40),
+                            //       height: 50,
+                            //       minWidth: screenWidth / 2.5,
+                            //       child: RaisedButton(
+                            //         color: profileButtoColor,
+                            //         onPressed: () {},
+                            //         child: Row(
+                            //             mainAxisAlignment:
+                            //                 MainAxisAlignment.spaceAround,
+                            //             children: [
+                            //               // IconButton(
+                            //               //     icon: Icon(Icons.add), onPressed: () {}),
+                            //               Text("Followers")
+                            //             ]),
+                            //         elevation: 0,
+                            //         shape: RoundedRectangleBorder(
+                            //             borderRadius: BorderRadius.circular(100),
+                            //             side: BorderSide(color: Colors.transparent)),
+                            //       ),
+                            //     ),
+                            //     ButtonTheme(
+                            //       height: 55,
+                            //       minWidth: screenWidth / 7,
+                            //       child: RaisedButton(
+                            //         color: ffDisplayer,
+                            //         onPressed: () {},
+                            //         child: Text("4.2k"),
+                            //         elevation: 6,
+                            //         shape: RoundedRectangleBorder(
+                            //             borderRadius: BorderRadius.only(
+                            //                 topLeft: Radius.zero,
+                            //                 bottomLeft: Radius.zero,
+                            //                 topRight: Radius.circular(100),
+                            //                 bottomRight: Radius.circular(100)),
+                            //             side: BorderSide(color: Colors.black12)),
+                            //       ),
+                            //     )
+                            //   ],
+                            // ),
+                            // Stack(
+                            //   alignment: Alignment.centerRight,
+                            //   children: [
+                            //     ButtonTheme(
+                            //       padding: EdgeInsets.only(right: 40),
+                            //       height: 50,
+                            //       minWidth: screenWidth / 2.6,
+                            //       child: RaisedButton(
+                            //         color: profileButtoColor,
+                            //         onPressed: () {},
+                            //         child: Text(
+                            //           "Following",
+                            //         ),
+                            //         elevation: 0,
+                            //         shape: RoundedRectangleBorder(
+                            //             borderRadius: BorderRadius.circular(100),
+                            //             side: BorderSide(color: Colors.transparent)),
+                            //       ),
+                            //     ),
+                            //     ButtonTheme(
+                            //       height: 55,
+                            //       minWidth: screenWidth / 7,
+                            //       child: RaisedButton(
+                            //         color: ffDisplayer,
+                            //         onPressed: () {},
+                            //         child: Text("6.5k"),
+                            //         elevation: 6,
+                            //         shape: RoundedRectangleBorder(
+                            //             borderRadius: BorderRadius.only(
+                            //                 topLeft: Radius.zero,
+                            //                 bottomLeft: Radius.zero,
+                            //                 topRight: Radius.circular(100),
+                            //                 bottomRight: Radius.circular(100)),
+                            //             side: BorderSide(color: Colors.black12)),
+                            //       ),
+                            //     )
+                            //   ],
+                            // ),
+                      //   ],
+                      // )
                     ],
                   ),
                 ),

@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:postea_frontend/pages/profile.dart';
 import './comments.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,6 +17,8 @@ class ExpandedPostTile extends StatefulWidget {
   var post_dislikes;
   var post_comments;
   var post_title;
+  var name;
+  var myPID;
 
   List<String> comments;
 
@@ -29,7 +32,9 @@ class ExpandedPostTile extends StatefulWidget {
       this.post_likes,
       this.post_dislikes,
       this.post_comments,
-      this.post_title);
+      this.post_title,
+      this.name,
+      this.myPID);
 
   @override
   _ExpandedPostTileState createState() => _ExpandedPostTileState(
@@ -42,7 +47,9 @@ class ExpandedPostTile extends StatefulWidget {
       this.post_likes,
       this.post_dislikes,
       this.post_comments,
-      this.post_title);
+      this.post_title,
+      this.name,
+      this.myPID);
 }
 
 class _ExpandedPostTileState extends State<ExpandedPostTile> {
@@ -58,7 +65,9 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
   var post_title;
   var like_or_dislike = "NULL";
   var comment = "";
-  List<String> comments = [];
+  var name;
+  var myPID;
+  List<String> comments;
 
   Color like_color = Colors.black;
   Color dislike_color = Colors.black;
@@ -88,7 +97,9 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
       this.post_likes,
       this.post_dislikes,
       this.post_comments,
-      this.post_title);
+      this.post_title,
+      this.name,
+      this.myPID);
 
   @override
   Widget build(BuildContext context) {
@@ -113,10 +124,27 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
                     child: Card(
                       margin: EdgeInsets.all(10),
                       child: ListTile(
-                        leading: CircleAvatar(
-                          backgroundImage:
-                              NetworkImage("https://picsum.photos/200"),
-                          backgroundColor: Colors.deepPurpleAccent[50],
+                        leading: GestureDetector(
+                          onTap: () {
+                            if (myPID != widget.profile_id) {
+                              Navigator.of(context).push(new MaterialPageRoute(
+                                  builder: (context) => Profile(
+                                        profileId: int.parse(profile_id),
+                                        isOwner: false,
+                                      )));
+                            } else {
+                              Navigator.of(context).push(new MaterialPageRoute(
+                                  builder: (context) => Profile(
+                                        profileId: int.parse(profile_id),
+                                        isOwner: true,
+                                      )));
+                            }
+                          },
+                          child: CircleAvatar(
+                            backgroundImage:
+                                NetworkImage("https://picsum.photos/200"),
+                            backgroundColor: Colors.deepPurpleAccent[50],
+                          ),
                         ),
                         title: Text(
                           post_id.toString(),
