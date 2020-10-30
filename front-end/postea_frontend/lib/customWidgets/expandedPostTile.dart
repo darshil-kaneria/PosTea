@@ -387,6 +387,7 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
                     // ),
                     ),
                 Container(
+                  margin: EdgeInsets.only(left: 15, right: 15),
                   child: TextField(
                     decoration: InputDecoration(labelText: "Your comment:"),
                   ),
