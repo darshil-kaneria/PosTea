@@ -269,11 +269,26 @@ app.get("/refreshTimeline", (req, res) => {
   handleRefreshTimeline.on("message", message => {
     res.send(message);
   });
-    
-  
 });
 
-
+app.get("/refreshTopicTimeline", (req, res) => {
+  const handleTopicRefreshTimeline = fork('./func/refreshTopicTimeline.js');
+  console.log("pid forked: "+ handleTopicRefreshTimeline.pid);
+  var to = setTimeout(function(){
+    console.log('Killing process: '+ handleTopicRefreshTimeline.pid);
+    // res.send("Connection killed by server");
+    handleTopicRefreshTimeline.kill();
+  }, 9000);
+  data = {
+    topicID: req.query.topic_id,
+    offset: req.query.post_offset,
+    time: req.query.post_time
+  }
+  handleTopicRefreshTimeline.send(data);
+  handleTopicRefreshTimeline.on("message", message => {
+    res.send(message);
+  });
+});
 
 app.listen(PORT, ()=>console.log("listening on port "+PORT));
 /**
