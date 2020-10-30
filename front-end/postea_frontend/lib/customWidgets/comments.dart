@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 class Comments extends StatefulWidget {
   var personName;
   var comment;
+  var postID;
 
   Comments(this.comment, this.personName);
 
