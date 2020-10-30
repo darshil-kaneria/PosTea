@@ -84,27 +84,29 @@ refreshTimeline = async (profileID, offset, time, connection) => {
                             // for (i = 0; i < length(result); i++) {
             
                             // }
-                            var currentDate = new Date();
+                            var timeDiff = "";
+                        var timeDiffList = [];
+                        var currentDate = new Date();
                             console.log(currentDate.getDay())
                             for(var i = 0; i < result.length; i++){
                                 var postDate = new Date(result[i]['creation_date']);
                                 if(currentDate.getDay() - postDate.getDay() > 1){
-                                    result[i]['creation_date'] = (currentDate.getDay() - postDate.getDay()) + " days ago";
+                                    timeDiff = (currentDate.getDay() - postDate.getDay()) + " days ago";
                                 }
                                 else if(currentDate.getHours() - postDate.getHours() > 1){
-                                    result[i]['creation_date'] = (currentDate.getHours() - postDate.getHours()) + " hours ago";
+                                    timeDiff = (currentDate.getHours() - postDate.getHours()) + " hours ago";
                                 }
                                 else if(currentDate.getMinutes() - postDate.getMinutes() > 1){
-                                    result[i]['creation_date'] = (currentDate.getMinutes() - postDate.getMinutes()) + " min. ago";
+                                    timeDiff = (currentDate.getMinutes() - postDate.getMinutes()) + " min. ago";
                                 }
                                 else if(currentDate.getSeconds() - postDate.getSeconds() > 1){
-                                    result[i]['creation_date'] = (currentDate.getSeconds() - postDate.getSeconds()) + "s ago";
+                                    timeDiff = (currentDate.getSeconds() - postDate.getSeconds()) + "s ago";
                                 }
-                                console.log(result[i]['creation_date'])
+                                timeDiffList.push(timeDiff);
                             }
-                            
                             var dict = {
                                 "result": result,
+                                "timeDiff": timeDiffList,
                                 "error": 0
                             }
                             process.send(dict);
@@ -153,30 +155,33 @@ refreshTimeline = async (profileID, offset, time, connection) => {
                                 // for (i = 0; i < length(result); i++) {
                 
                                 // }
-                                var currentDate = new Date();
+                                var timeDiff = "";
+                        var timeDiffList = [];
+                        var currentDate = new Date();
                             console.log(currentDate.getDay())
                             for(var i = 0; i < result.length; i++){
                                 var postDate = new Date(result[i]['creation_date']);
                                 if(currentDate.getDay() - postDate.getDay() > 1){
-                                    result[i]['creation_date'] = (currentDate.getDay() - postDate.getDay()) + " days ago";
+                                    timeDiff = (currentDate.getDay() - postDate.getDay()) + " days ago";
                                 }
                                 else if(currentDate.getHours() - postDate.getHours() > 1){
-                                    result[i]['creation_date'] = (currentDate.getHours() - postDate.getHours()) + " hours ago";
+                                    timeDiff = (currentDate.getHours() - postDate.getHours()) + " hours ago";
                                 }
                                 else if(currentDate.getMinutes() - postDate.getMinutes() > 1){
-                                    result[i]['creation_date'] = (currentDate.getMinutes() - postDate.getMinutes()) + " min. ago";
+                                    timeDiff = (currentDate.getMinutes() - postDate.getMinutes()) + " min. ago";
                                 }
                                 else if(currentDate.getSeconds() - postDate.getSeconds() > 1){
-                                    result[i]['creation_date'] = (currentDate.getSeconds() - postDate.getSeconds()) + "s ago";
+                                    timeDiff = (currentDate.getSeconds() - postDate.getSeconds()) + "s ago";
                                 }
-                                
+                                timeDiffList.push(timeDiff);
                             }
                                 var dict = {
                                     "result": result,
+                                    "timeDiff": timeDiffList,
                                     "error": 1
                                 }
                                 process.send(dict);
-                                console.log("Query Completeeeeeee");
+                                console.log("Query Complete");
                                 // connection.release();
                                 resolve(result);
                             });
@@ -203,31 +208,33 @@ refreshTimeline = async (profileID, offset, time, connection) => {
                         // for (i = 0; i < length(result); i++) {
         
                         // }
+                        var timeDiff = "";
+                        var timeDiffList = [];
                         var currentDate = new Date();
                             console.log(currentDate.getDay())
                             for(var i = 0; i < result.length; i++){
                                 var postDate = new Date(result[i]['creation_date']);
                                 if(currentDate.getDay() - postDate.getDay() > 1){
-                                    result[i]['creation_date'] = (currentDate.getDay() - postDate.getDay()) + " days ago";
+                                    timeDiff = (currentDate.getDay() - postDate.getDay()) + " days ago";
                                 }
                                 else if(currentDate.getHours() - postDate.getHours() > 1){
-                                    result[i]['creation_date'] = (currentDate.getHours() - postDate.getHours()) + " hours ago";
+                                    timeDiff = (currentDate.getHours() - postDate.getHours()) + " hours ago";
                                 }
                                 else if(currentDate.getMinutes() - postDate.getMinutes() > 1){
-                                    result[i]['creation_date'] = (currentDate.getMinutes() - postDate.getMinutes()) + " min. ago";
+                                    timeDiff = (currentDate.getMinutes() - postDate.getMinutes()) + " min. ago";
                                 }
                                 else if(currentDate.getSeconds() - postDate.getSeconds() > 1){
-                                    result[i]['creation_date'] = (currentDate.getSeconds() - postDate.getSeconds()) + "s ago";
+                                    timeDiff = (currentDate.getSeconds() - postDate.getSeconds()) + "s ago";
                                 }
-                                console.log(result[i]['creation_date'])
+                                timeDiffList.push(timeDiff);
                             }
                         var dict = {
                             "result": result,
+                            "timeDiff": timeDiffList,
                             "error": 0
                         }
-                        console.log("HI");
                         process.send(dict);
-                        console.log("Query completeeeee");
+                        console.log("Query complete");
                         // connection.release();
                         resolve(result);
                     });
