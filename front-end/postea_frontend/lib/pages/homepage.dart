@@ -164,7 +164,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        
+
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -181,7 +181,7 @@ class _HomePageState extends State<HomePage> {
         ],
         onTap: (value) {
           if (value == 2) {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => Topic(profileId: widget.profileID,isOwner: true,)));
+            Navigator.push(context, MaterialPageRoute(builder: (_) => Topic(profileId: widget.profileID,isOwner: true, topicId: "12",)));
           } else if (value == 1)
             // Making a post logic
             showDialog(

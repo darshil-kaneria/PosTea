@@ -36,7 +36,7 @@ class _PosTeaState extends State<PosTea> {
 
     if (user != null) {
       setState(() {
-        firstScreen = '/temp';
+        firstScreen = '/home';
       });
     } else {
       setState(() {

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:postea_frontend/main.dart';
+import 'package:postea_frontend/data_models/process_topic.dart';
 
 class Topic extends StatefulWidget {
 
@@ -19,30 +20,54 @@ class Topic extends StatefulWidget {
 class _TopicState extends State<Topic> {
 
   var offset = 0;
+  var checkPosScrollController = new ScrollController();
 
-  // ProcessTopic topic;
-  // var topicInfo;
+  _scrollListener() {
+    if (checkPosScrollController.offset <=
+            checkPosScrollController.position.minScrollExtent &&
+        !checkPosScrollController.position.outOfRange) {
+      setState(() {
+        offset = 0;
+        print("Timeline refreshed");
+        topic.clearTimeline();       
+      });
+    }
 
-  // getTopicInfo() async {
-  //   topic.getTopic().then((value){
-  //     topicInfo = jsonDecode(value.body);
-  //     print(topicInfo);
-  //   });
-  // }
+    if (checkPosScrollController.offset >=
+            checkPosScrollController.position.maxScrollExtent &&
+        !checkPosScrollController.position.outOfRange) {
+      print("ISPOST" + topic.postRetrieved.toString());
+      if (!topic.isEnd && topic.postRetrieved)
+        setState(() {
+          print("SETSTATE CALLED");
+          offset = offset + 3;
+          // updatePost();
+        });
+    }
+  }
+  ProcessTopic topic;
+  Map<String, dynamic> topicInfo;
 
-  // getTopicContent() async {
-  //   await topic.setOffset(offset);
-  //   return await topic.getPosts();
-  // }
+  getTopicInfo() async {
+    topic.getTopicInfo().then((value){
+      topicInfo = value;
+      print(topicInfo);
+    });
+  }
 
-  // @override void initState() {
-  //   // TODO: implement initState
-  //   topic = new ProcessTopic(profile_id: profileId, topic_id: topicId);
-  //   getTopicInfo();
-  //   getTopicContent();
-  //   super.initState();
+  getTopicContent() async {
+    await topic.setOffset(offset);
+    return await topic.getPosts();
+  }
 
-  // }
+  @override void initState() {
+    // TODO: implement initState
+    topic = new ProcessTopic(profile_id: widget.profileId, topic_id: widget.topicId);
+    getTopicInfo();
+    // getTopicContent();
+    super.initState();
+
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +97,7 @@ class _TopicState extends State<Topic> {
               child: Container(
                 alignment: Alignment.center,
                 child: Text(
-                  "Topic Name",
+                  topicInfo['name'],
                   style: TextStyle(fontSize: 20),
                 ),
               )
@@ -86,7 +111,7 @@ class _TopicState extends State<Topic> {
                 child: Container(
                   width: screenWidth,
                   child: SingleChildScrollView(
-                    child: Text("Random Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom SamplRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample datae dataRandom Sample dataRandom Sample dataRandom Sample dataRandom Sample data"),
+                    child: Text(topicInfo['desc'])
                   ),
                 ),
               ),
@@ -108,6 +133,17 @@ class _TopicState extends State<Topic> {
                   ],
                 ),
               )
+              // child: FutureBuilder(
+              //   future: getTopicContent(),
+              //   builder: (context, snapshot) {
+              //     if(snapshot.hasData)
+              //     return ListView.builder(
+              //       itemBuilder: (context, index) {
+                      
+              //       },
+              //     )
+              //   },
+              // ),
             )
           ],
         ),
