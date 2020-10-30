@@ -3,17 +3,21 @@ const db = require('./db_connection.js');
 
 process.on("message", message => {
     db.conn.getConnection(async function(err, connection) {
-          if (err) {
+        if (err) {
             return console.error('error: ' + err.message);
-          }
-          console.log('Database connection established');
-          await getTopicFollowers(message.topic_id, connection);
-          connection.release();
-          process.send({"Topic Followers retrieved": "success"});
-          process.exit();
-          
+        }
+        console.log('Database connection established');
+        getTopicFollowers(message.topic_id, connection).then((result)=> {
+            process.send(result);
+            connection.release();
+            process.exit();
+        }).catch(function(result) {
+            process.send(result);
+            connection.release();
+            process.exit();
         });
-});
+    });
+}); 
 
 const getTopicFollowers = async(topic_id, connection) => {
     var query = "SELECT * FROM topic_follower WHERE topic_follower.topic_id = ?";
@@ -25,11 +29,11 @@ const getTopicFollowers = async(topic_id, connection) => {
             }
             if (result.length == 0) {
                 console.log("Topic followers record does not exist");
+                resolve("Topic followers record does not exist");
             } else {
                 console.log("Topic Followers retrieved");
                 console.log(result);
                 resolve(result);
-                // return result;  
             }
         });
     });

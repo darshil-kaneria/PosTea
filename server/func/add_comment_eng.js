@@ -17,8 +17,6 @@ process.on("message", message => {
                 process.send({"Error": "engagement does not exist"});
             } else if (answer == "post does not exist") {
                 process.send({"Error": "post does not exist"});
-
-            
             } else {
                 //console.log("sucsess");
                 process.send(answer);

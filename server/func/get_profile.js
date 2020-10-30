@@ -31,7 +31,6 @@ process.on("message", message => {
           name: answer[0].name,
           biodata: answer[0].bio_data
         }
-
         process.send({ "message": profileInfoJson });
       }
       process.exit();

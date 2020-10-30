@@ -22,7 +22,6 @@ function deletePost(postId, profileId, connection) {
     var p_id = postId;
     var prof = profileId;
     var selectfromPost = "SELECT * FROM user_post WHERE post_id = ? AND profile_id = ?";
-    //var selectfromTop = "SELECT * FROM topic_content WHERE postId = ?";
     var deletefromPost = "DELETE FROM user_post WHERE post_id = ?"
     var deletefromtopic = "DELETE FROM topic_content WHERE post_id = ?"
     return new Promise(async function(resolve, reject) {
