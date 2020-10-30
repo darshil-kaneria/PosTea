@@ -65,12 +65,23 @@ app.post('/addtopicinfo', (req, res) => {
 });
 
 // Profile methods
-app.route('/profile')
+app.route('/profile/:pID?')
   .get((req, res) => {
     const handleGetProfile = fork('./func/get_profile.js');
-    var data = {
-    username: req.query.username
-    };
+    if(req.params.pID){
+      var data = {
+        profile: req.params.pID,
+        flag: 1
+
+      };
+    }
+    else{
+      var data = {
+        username: req.query.username,
+        flag: 0
+        };
+    }
+    
     handleGetProfile.send(data);
     handleGetProfile.on("message", message => res.send(message));
   })
