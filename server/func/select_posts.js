@@ -6,16 +6,21 @@ process.on("message", message => {
             return console.error('error: ' + err.message);
           }
           console.log('Database connection established');
-          await getPosts(message.topicID, connection);
-          connection.release();
+          
           //process.send({"posts retrieved": "success"});
-          getEngagement(message.topic_id, connection).then((value)=> {
+          await getPosts(message.topic_id, connection).then((value)=> {
                 process.send(value, );
                 connection.release();
             //process.send(resul);
                 process.exit();
         
-        }) 
+          }).catch((result) => {
+              process.send(result);
+              connection.release();
+              process.exit();
+
+
+          });
           
           
         });
