@@ -7,13 +7,15 @@ class ProcessTopic {
   var topic_image;
   var topic_creator_id;
   var topic_id;
+  var profile_id;
 
   ProcessTopic(
       {this.topic_name,
       this.topic_description,
       this.topic_image,
       this.topic_creator_id,
-      this.topic_id});
+      this.topic_id,
+      this.profile_id});
 
   Future<http.Response> makeTopic() async {
     var url = "http://postea-server.herokuapp.com/addtopicinfo";
@@ -32,13 +34,18 @@ class ProcessTopic {
     return response;
   }
 
-  Future<http.Response> getTopicInfo() async {
+  getTopicInfo() async {
     var url = "http://postea-server.herokuapp.com/gettopic?topic_id=" +
         topic_id.toString();
     http.Response response = await http.get(url);
 
-    print(response.body);
+    var topicInfo = jsonDecode(response.body);
 
-    return response;
+    var info = {
+      "name": topicInfo[0]["topic_name"],
+      "desc": topicInfo[0]["topic_description"]
+    };
+
+    return info;
   }
 }

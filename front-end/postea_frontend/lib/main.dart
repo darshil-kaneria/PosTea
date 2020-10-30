@@ -29,18 +29,16 @@ class PosTea extends StatefulWidget {
 }
 
 class _PosTeaState extends State<PosTea> {
-
   var firstScreen = '/login';
 
-void checkUserLoggedIn() async {
+  void checkUserLoggedIn() async {
     User user = FirebaseAuth.instance.currentUser;
-    
+
     if (user != null) {
       setState(() {
-        firstScreen = '/home';
+        firstScreen = '/temp';
       });
-    }
-    else {
+    } else {
       setState(() {
         firstScreen = '/login';
       });
@@ -57,23 +55,22 @@ void checkUserLoggedIn() async {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setPreferredOrientations([
-        DeviceOrientation.portraitUp,
-        DeviceOrientation.portraitDown,
-      ]);
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
     return ChangeNotifierProvider(
-      create: (context) => TimerCount(),
-      child: MaterialApp(
+        create: (context) => TimerCount(),
+        child: MaterialApp(
           debugShowCheckedModeBanner: false,
           title: "PosTea app",
           initialRoute: firstScreen,
           onGenerateRoute: Router.generateRoute,
           onGenerateInitialRoutes: (initialRoute) {
             return [
-              Router.generateRoute(RouteSettings(name: firstScreen, arguments: HomePage(profileID: profileId)))
+              Router.generateRoute(RouteSettings(
+                  name: firstScreen, arguments: HomePage(profileID: profileId)))
             ];
           },
-
-        )
-    );
+        ));
   }
 }
