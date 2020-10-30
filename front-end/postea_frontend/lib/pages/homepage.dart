@@ -405,6 +405,8 @@ class _HomePageState extends State<HomePage> {
                             timeLine.postList.elementAt(index).post_dislikes,
                             timeLine.postList.elementAt(index).post_comments,
                             timeLine.postList.elementAt(index).post_title,
+                            timeLine.postList.elementAt(index).post_name,
+                            widget.profileID.toString()
                           );
                         });
                   } else

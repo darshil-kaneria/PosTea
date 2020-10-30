@@ -8,12 +8,14 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:postea_frontend/main.dart';
 import 'package:postea_frontend/pages/edit_profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Profile extends StatefulWidget {
   int profileId;
   bool isOwner;
+  var myPID;
   Profile({this.profileId, this.isOwner});
   @override
   _ProfileState createState() => _ProfileState();
@@ -24,6 +26,7 @@ class _ProfileState extends State<Profile> {
   var bio_data = "";
   bool isPrivate = false;
   Map<String, dynamic> profile;
+  List<dynamic> listFollowing;
   SharedPreferences prefs;
   String username;
 
@@ -40,12 +43,39 @@ class _ProfileState extends State<Profile> {
     // displayImage();
     _value=0;
     getProfile();
+    getFollowing();
   }
 
   @override
   void dispose(){
     controller.dispose();
     super.dispose();
+  }
+
+  getFollowing() async {
+    prefs = await SharedPreferences.getInstance();
+    widget.myPID = prefs.getInt('profileID') ?? 0;
+    print("MY ID"+widget.myPID.toString());
+    http.get("http://postea-server.herokuapp.com/getfollowing?user_id="+widget.myPID.toString()).then((resp) {
+
+
+    listFollowing = jsonDecode(resp.body);
+    print("LIST FOLLOWING"+widget.profileId.toString());
+    for(int i = 0; i < listFollowing.length; i++){
+      // print()
+      if(listFollowing[i]['follower_id'] == widget.profileId){
+        isFollow = true;
+        buttonColor = Colors.redAccent[100];
+        isFollow = true;
+        followButtonText = "Following";
+        setState(() {
+          
+        });
+      }
+    }
+    });
+    
+
   }
 
   updateProfile() async {
@@ -71,9 +101,18 @@ class _ProfileState extends State<Profile> {
   getProfile() async {
     prefs = await SharedPreferences.getInstance();
     username = prefs.getString('username') ?? "";
+    var queryString;
+    if(widget.isOwner){
+      // print("HERE");
+      queryString = "http://postea-server.herokuapp.com/profile?username="+username.toString();
+    }
+    else{
+      // print("Not here");
+      queryString = "http://postea-server.herokuapp.com/profile/"+widget.profileId.toString();
+    }
     print(username);
     http.Response resp = await http
-        .get("http://postea-server.herokuapp.com/profile?username="+username.toString());
+        .get(queryString);
     profile = jsonDecode(resp.body);
     setState(() {
       _nameController.text = profile["message"]["name"];

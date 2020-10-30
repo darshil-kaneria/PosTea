@@ -44,7 +44,7 @@ class ProcessTimeline{
       print(dateString.substring(0,dateString.length-5));
       firstPostTime = dateString.substring(0,dateString.length-5);
       
-      processPosts();
+      await processPosts();
 
     } 
     }
@@ -76,10 +76,13 @@ class ProcessTimeline{
     return resp;
   }
 
-  processPosts() {
+  processPosts() async {
 
     for(int i = 0; i < posts['result'].length; i++){
 
+      http.Response resp = await http.get("http://postea-server.herokuapp.com/profile/"+posts['result'][i]['profile_id'].toString());
+      Map<String, dynamic> profileJson = jsonDecode(resp.body);
+      // print(profileJson['message']['name']);
       Post newPost = Post(
         posts['result'][i]['post_id'].toString(),
         posts['result'][i]['profile_id'].toString(),
@@ -90,7 +93,9 @@ class ProcessTimeline{
         posts['result'][i]['post_likes'].toString(),
         posts['result'][i]['post_dislikes'].toString(),
         posts['result'][i]['post_comments'].toString(),
-        posts['result'][i]['post_title'].toString()
+        posts['result'][i]['post_title'].toString(),
+        profileJson['message']['name']
+        // "Darshil Kaneria"
       );
       print(posts['result'][i]['post_id']);
       postList.add(newPost);

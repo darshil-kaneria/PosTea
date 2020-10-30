@@ -17,6 +17,8 @@ class ExpandedPostTile extends StatefulWidget {
   var post_dislikes;
   var post_comments;
   var post_title;
+  var name;
+  var myPID;
 
   ExpandedPostTile(
       this.post_id,
@@ -28,7 +30,9 @@ class ExpandedPostTile extends StatefulWidget {
       this.post_likes,
       this.post_dislikes,
       this.post_comments,
-      this.post_title);
+      this.post_title,
+      this.name,
+      this.myPID);
 
   @override
   _ExpandedPostTileState createState() => _ExpandedPostTileState(
@@ -41,7 +45,9 @@ class ExpandedPostTile extends StatefulWidget {
       this.post_likes,
       this.post_dislikes,
       this.post_comments,
-      this.post_title);
+      this.post_title,
+      this.name,
+      this.myPID);
 }
 
 class _ExpandedPostTileState extends State<ExpandedPostTile> {
@@ -57,6 +63,8 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
   var post_title;
   var like_or_dislike = "NULL";
   var comment = "";
+  var name;
+  var myPID;
 
   Color like_color = Colors.black;
   Color dislike_color = Colors.black;
@@ -81,7 +89,9 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
       this.post_likes,
       this.post_dislikes,
       this.post_comments,
-      this.post_title);
+      this.post_title,
+      this.name,
+      this.myPID);
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +115,12 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
                 child: ListTile(
                   leading: GestureDetector(
                     onTap: () {
-                      Navigator.of(context).push(new MaterialPageRoute(builder: (context) => Profile(profileId: int.parse(widget.profile_id), isOwner: false,)));
+                      if(myPID != widget.profile_id){
+                        Navigator.of(context).push(new MaterialPageRoute(builder: (context) => Profile(profileId: int.parse(profile_id), isOwner: false,)));
+                      }
+                      else{
+                        Navigator.of(context).push(new MaterialPageRoute(builder: (context) => Profile(profileId: int.parse(profile_id), isOwner: true,)));
+                      }
                     },
                     child: CircleAvatar(
                       backgroundImage: NetworkImage("https://picsum.photos/200"),
@@ -113,7 +128,7 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
                     ),
                   ),
                   title: Text(
-                    post_id.toString(),
+                    name,
                     style: TextStyle(fontSize: 20),
                   ),
                   subtitle: Row(
