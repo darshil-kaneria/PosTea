@@ -21,6 +21,7 @@ import 'package:http/http.dart' as http;
 import 'package:postea_frontend/data_models/process_timeline.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'login.dart';
+import 'topic.dart';
 
 class HomePage extends StatefulWidget {
   int profileID;
@@ -163,6 +164,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
+        
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -172,15 +174,14 @@ class _HomePageState extends State<HomePage> {
             icon: Icon(Icons.create),
             title: Text("New Post"),
           ),
+          // BottomNavigationBarItem(
+          //     icon: Icon(Icons.trending_up), title: Text("Trending")),
           BottomNavigationBarItem(
-              icon: Icon(Icons.trending_up), title: Text("Trending"))
+              icon: Icon(Icons.alternate_email), title: Text("Topic"))
         ],
         onTap: (value) {
           if (value == 2) {
-            setState(() {
-              offset = offset + 3;
-              // updatePost();
-            });
+            Navigator.push(context, MaterialPageRoute(builder: (_) => Topic(profileId: widget.profileID,isOwner: true,)));
           } else if (value == 1)
             // Making a post logic
             showDialog(
