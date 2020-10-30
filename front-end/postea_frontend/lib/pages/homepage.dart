@@ -181,7 +181,7 @@ class _HomePageState extends State<HomePage> {
         ],
         onTap: (value) {
           if (value == 2) {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => Topic(profileId: widget.profileID,isOwner: true, topicId: "12",)));
+            Navigator.push(context, MaterialPageRoute(builder: (_) => Topic(profileId: widget.profileID,isOwner: true, topicId: "21",)));
           } else if (value == 1)
             // Making a post logic
             showDialog(

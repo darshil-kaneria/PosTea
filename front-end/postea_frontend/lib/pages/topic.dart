@@ -2,8 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
+import 'package:postea_frontend/customWidgets/postTile.dart';
 import 'package:postea_frontend/main.dart';
 import 'package:postea_frontend/data_models/process_topic.dart';
+
+import '../colors.dart';
 
 class Topic extends StatefulWidget {
 
@@ -55,16 +58,23 @@ class _TopicState extends State<Topic> {
     });
   }
 
-  getTopicContent() async {
+  Future<Response> getTopicContent() async {
     await topic.setOffset(offset);
     return await topic.getPosts();
   }
 
   @override void initState() {
     // TODO: implement initState
-    topic = new ProcessTopic(profile_id: widget.profileId, topic_id: widget.topicId);
+    topic = new ProcessTopic(profile_id: widget.profileId, topic_id: int.parse(widget.topicId));
+    topicInfo = {
+      "name": "",
+      "desc": ""
+    };
     getTopicInfo();
+    setState(() {
+    });
     // getTopicContent();
+    checkPosScrollController.addListener(_scrollListener);
     super.initState();
 
   }
@@ -118,32 +128,56 @@ class _TopicState extends State<Topic> {
             ),
             Expanded(
               flex: 6,
-              child: Container(
-                // color: Colors.limeAccent,
-                child: ListView(
-                  addRepaintBoundaries: false,
-                  shrinkWrap: true,
-                  padding: EdgeInsets.all(0),
-                  children: [
-                    Container(height: screenHeight/3, width: screenWidth, color: Colors.grey,),
-                    Container(height: screenHeight/3, width: screenWidth, color: Colors.pinkAccent,),
-                    Container(height: screenHeight/3, width: screenWidth, color: Colors.orangeAccent,),
-                    Container(height: screenHeight/3, width: screenWidth, color: Colors.yellowAccent,),
-                    Container(height: screenHeight/3, width: screenWidth, color: Colors.blueAccent,)
-                  ],
-                ),
-              )
-              // child: FutureBuilder(
-              //   future: getTopicContent(),
-              //   builder: (context, snapshot) {
-              //     if(snapshot.hasData)
-              //     return ListView.builder(
-              //       itemBuilder: (context, index) {
+              // child: Container(
+              //   // color: Colors.limeAccent,
+              //   child: ListView(
+              //     addRepaintBoundaries: false,
+              //     shrinkWrap: true,
+              //     padding: EdgeInsets.all(0),
+              //     children: [
+              //       Container(height: screenHeight/3, width: screenWidth, color: Colors.grey,),
+              //       Container(height: screenHeight/3, width: screenWidth, color: Colors.pinkAccent,),
+              //       Container(height: screenHeight/3, width: screenWidth, color: Colors.orangeAccent,),
+              //       Container(height: screenHeight/3, width: screenWidth, color: Colors.yellowAccent,),
+              //       Container(height: screenHeight/3, width: screenWidth, color: Colors.blueAccent,)
+              //     ],
+              //   ),
+              // )
+              child: FutureBuilder(
+                future: getTopicContent(),
+                builder: (context,AsyncSnapshot snapshot) {
+                  if(snapshot.hasData)
+                  return ListView.builder(
+                    padding: EdgeInsets.all(0),
+                    physics: BouncingScrollPhysics(),
+                    controller: checkPosScrollController,
+                    itemCount: topic.postList.length,
+                    itemBuilder: (context, index) {
+
+                      return PostTile(
+                            topic.postList.elementAt(index).post_id,
+                            topic.postList.elementAt(index).profile_id,
+                            topic.postList.elementAt(index).post_description,
+                            topic.postList.elementAt(index).topic_id,
+                            topic.postList.elementAt(index).post_img,
+                            topic.postList.elementAt(index).creation_date,
+                            topic.postList.elementAt(index).post_likes,
+                            topic.postList.elementAt(index).post_dislikes,
+                            topic.postList.elementAt(index).post_comments,
+                            topic.postList.elementAt(index).post_title,
+                            topic.postList.elementAt(index).post_name,
+                            widget.profileId.toString()
+                          );
                       
-              //       },
-              //     )
-              //   },
-              // ),
+                    },
+                  );
+                  else
+                    return Center(
+                        child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation(bgGradEnd),
+                    ));
+                },
+              ),
             )
           ],
         ),
