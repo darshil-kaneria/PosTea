@@ -205,9 +205,9 @@ app.post('/adduser', (req, res) => {
 
 // Add engagement for a comment
 app.post('/addcommeng', (req, res) => {
-  const handtopic = fork('./func/add_comment_eng.js');
-  handtopic.send(req.body);
-  handtopic.on("message", message => res.send(message));
+  const handleCommentEngagement = fork('./func/add_comment_eng.js');
+  handleCommentEngagement.send(req.body);
+  handleCommentEngagement.on("message", message => res.send(message));
 });
 
 // Get all posts under a topic
