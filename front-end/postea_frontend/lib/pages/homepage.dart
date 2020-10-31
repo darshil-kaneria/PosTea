@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flappy_search_bar/flappy_search_bar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:postea_frontend/colors.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 //import 'package:postea_frontend/customWidgets/customAppBar.dart';
 import 'package:postea_frontend/data_models/timer.dart';
 import 'package:postea_frontend/main.dart';
+import 'package:postea_frontend/pages/create_topic.dart';
 import 'package:postea_frontend/pages/profile.dart';
 import 'package:postea_frontend/pages/trending.dart';
 import 'package:provider/provider.dart';
@@ -39,6 +41,8 @@ class _HomePageState extends State<HomePage> {
   var postTextController = new TextEditingController();
   var postTitleController = new TextEditingController();
   var checkPosScrollController = new ScrollController();
+  var topicEditingController = new TextEditingController();
+  var topicButtonText = "Topic";
   bool checkBoxVal = false;
   bool checkEnd = false;
   File imgToUpload;
@@ -54,7 +58,7 @@ class _HomePageState extends State<HomePage> {
       setState(() {
         offset = 0;
         print("Timeline refreshed");
-        timeLine.clearTimeline();       
+        timeLine.clearTimeline();
       });
     }
 
@@ -81,7 +85,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void initState() {
-    print("The profile ID is: "+widget.profileID.toString());
+    print("The profile ID is: " + widget.profileID.toString());
     timeLine = new ProcessTimeline(widget.profileID);
     // Timer.periodic(Duration(seconds: 1), (timer) {
     //   var timer = Provider.of<TimerCount>(context, listen: false);
@@ -112,7 +116,7 @@ class _HomePageState extends State<HomePage> {
     var reqBody = {
       "postTitle": postTitleController.text,
       "msg": postTextController.text,
-      "topic": "chess",
+      "topic": topicEditingController.text,
       "img": base64Image,
       "topicID": 21,
       "profileID": widget.profileID,
@@ -151,41 +155,61 @@ class _HomePageState extends State<HomePage> {
               title: Text("Logout"),
               onTap: () async {
                 SharedPreferences pref = await SharedPreferences.getInstance();
-                pref.clear().then( (value) async {
-                  if(value == true){
+                pref.clear().then((value) async {
+                  if (value == true) {
                     await FirebaseAuth.instance.signOut();
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => Login()));
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Login()));
                   }
                 });
-                
               },
             )
           ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        type:BottomNavigationBarType.fixed,
+        type: BottomNavigationBarType.fixed,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home,),
+            icon: Icon(
+              Icons.home,
+            ),
             title: Text("Home"),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.create,),
+            icon: Icon(
+              Icons.create,
+            ),
             title: Text("New Post"),
           ),
           BottomNavigationBarItem(
               icon: Icon(Icons.trending_up), title: Text("Trending")),
           BottomNavigationBarItem(
-              icon: Icon(Icons.alternate_email), title: Text("Topic"))
+              icon: Icon(Icons.alternate_email), title: Text("Topic")),
+          BottomNavigationBarItem(icon: Icon(Icons.add), title: Text("Create")),
         ],
         onTap: (value) {
           if (value == 2) {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => Trending(profileId: widget.profileID)));
-          }
-          if (value == 3) {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => Topic(profileId: widget.profileID,isOwner: true, topicId: "21",)));
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => Trending(profileId: widget.profileID)));
+          } else if (value == 3) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => Topic(
+                          profileId: widget.profileID,
+                          isOwner: true,
+                          topicId: "21",
+                        )));
+          } else if (value == 4) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => CreateTopic(
+                          profile_id: widget.profileID,
+                        )));
           } else if (value == 1)
             // Making a post logic
             showDialog(
@@ -286,9 +310,87 @@ class _HomePageState extends State<HomePage> {
                                                 Radius.circular(15)),
                                             border:
                                                 Border.all(color: Colors.grey)),
-                                        child: Text(
-                                          "Topic",
-                                          style: TextStyle(fontSize: 15),
+                                        child: ButtonTheme(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(17)),
+                                          child: FlatButton(
+                                            onPressed: () => {
+                                              showDialog(
+                                                context: context,
+                                                barrierDismissible: true,
+                                                builder: (context) {
+                                                  return WillPopScope(
+                                                      child: Dialog(
+                                                        shape:
+                                                            RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(20),
+                                                        ),
+                                                        child: Container(
+                                                          width:
+                                                              screenWidth / 1.1,
+                                                          height:
+                                                              screenHeight / 7,
+                                                          child: Column(
+                                                            mainAxisAlignment:
+                                                                MainAxisAlignment
+                                                                    .center,
+                                                            children: [
+                                                              TextField(
+                                                                controller:
+                                                                    topicEditingController,
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                                decoration:
+                                                                    InputDecoration(
+                                                                  border:
+                                                                      InputBorder
+                                                                          .none,
+                                                                  hintText:
+                                                                      "Enter a topic",
+                                                                ),
+                                                              ),
+                                                              ButtonTheme(
+                                                                shape: RoundedRectangleBorder(
+                                                                    borderRadius:
+                                                                        BorderRadius.circular(
+                                                                            20)),
+                                                                child:
+                                                                    RaisedButton(
+                                                                        child: Text(
+                                                                            "Choose Topic"),
+                                                                        onPressed:
+                                                                            () {
+                                                                          setState(
+                                                                              () {
+                                                                            topicButtonText =
+                                                                                topicEditingController.text;
+                                                                            print(topicEditingController.text);
+                                                                          });
+                                                                          Navigator.of(context, rootNavigator: true)
+                                                                              .pop();
+                                                                        }),
+                                                              )
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      onWillPop: () async {
+                                                        topicEditingController
+                                                            .clear();
+                                                        return true;
+                                                      });
+                                                },
+                                              )
+                                            },
+                                            child: Text(
+                                              topicButtonText,
+                                              style: TextStyle(fontSize: 15),
+                                            ),
+                                          ),
                                         ),
                                       ),
                                     ),
@@ -339,7 +441,11 @@ class _HomePageState extends State<HomePage> {
           IconButton(
               icon: Icon(Icons.account_circle),
               onPressed: () {
-                Navigator.of(context).push(MaterialPageRoute(builder: (context) => Profile(profileId: widget.profileID, isOwner: true,)));
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => Profile(
+                          profileId: widget.profileID,
+                          isOwner: true,
+                        )));
               }),
         ],
       ),
@@ -400,19 +506,20 @@ class _HomePageState extends State<HomePage> {
 
                           // }
                           return PostTile(
-                            timeLine.postList.elementAt(index).post_id,
-                            timeLine.postList.elementAt(index).profile_id,
-                            timeLine.postList.elementAt(index).post_description,
-                            timeLine.postList.elementAt(index).topic_id,
-                            timeLine.postList.elementAt(index).post_img,
-                            timeLine.postList.elementAt(index).creation_date,
-                            timeLine.postList.elementAt(index).post_likes,
-                            timeLine.postList.elementAt(index).post_dislikes,
-                            timeLine.postList.elementAt(index).post_comments,
-                            timeLine.postList.elementAt(index).post_title,
-                            timeLine.postList.elementAt(index).post_name,
-                            widget.profileID.toString()
-                          );
+                              timeLine.postList.elementAt(index).post_id,
+                              timeLine.postList.elementAt(index).profile_id,
+                              timeLine.postList
+                                  .elementAt(index)
+                                  .post_description,
+                              timeLine.postList.elementAt(index).topic_id,
+                              timeLine.postList.elementAt(index).post_img,
+                              timeLine.postList.elementAt(index).creation_date,
+                              timeLine.postList.elementAt(index).post_likes,
+                              timeLine.postList.elementAt(index).post_dislikes,
+                              timeLine.postList.elementAt(index).post_comments,
+                              timeLine.postList.elementAt(index).post_title,
+                              timeLine.postList.elementAt(index).post_name,
+                              widget.profileID.toString());
                         });
                   } else
                     return Center(
