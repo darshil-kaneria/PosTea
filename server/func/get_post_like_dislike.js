@@ -7,29 +7,30 @@ process.on("message", message => {
             return console.error('error: ' + err.message);
           }
           console.log('Database connection established');
-          if (message.flag == "likes") {
-            get_likes(message.post_id, message.flag, connection).then((value)=> {
-                process.send({"likes": value.length});
-                connection.release();
-                process.exit();
-            }).catch(function(result) {
-                process.send(result);
-                connection.release();
-                process.exit();
+        //   if (message.flag == "likes") {
+        //     get_likes(message.post_id, message.flag, connection).then((value)=> {
+        //         process.send({"likes": value.length});
+        //         connection.release();
+        //         process.exit();
+        //     }).catch(function(result) {
+        //         process.send(result);
+        //         connection.release();
+        //         process.exit();
 
-            });
-        } else if (message.flag == "dislikes") {
-            get_dislikes(message.post_id, message.flag, connection).then((value)=> {
-                process.send({"dislikes": value});
-                connection.release();
-                process.exit();
-            }).catch(function(result) {
-                process.send(result);
-                connection.release();
-                process.exit();
+        //     });
+        //     } else if (message.flag == "dislikes") {
+        //         get_dislikes(message.post_id, message.flag, connection).then((value)=> {
+        //             process.send({"dislikes": value});
+        //             connection.release();
+        //             process.exit();
+        //         }).catch(function(result) {
+        //             process.send(result);
+        //             connection.release();
+        //             process.exit();
 
-            });
-        }          
+        //     });
+        // }   
+        get_pos       
     });
 });
 

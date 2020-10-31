@@ -27,8 +27,8 @@ const deleteTopic = async(topic_id, user_id, connection) => {
     var deleteQuery2 = "DELETE FROM topic_follower WHERE topic_id = ?";
     var deleteQuery3 = "DELETE FROM topic_content WHERE topic_id = ?";
 
-    return new Promise(function(resolve, reject) {
-        connection.query(selectQuery,[topic_id],  async function (err, result) {
+    return new Promise(async function(resolve, reject) {
+        await connection.query(selectQuery,[topic_id],  async function (err, result) {
             if (err) {
                 reject(err.message);
             }
@@ -38,17 +38,17 @@ const deleteTopic = async(topic_id, user_id, connection) => {
                 } else if (result[0].topic_creator_id != user_id) {
                     resolve("Error: Topic cannot be deleted by other users")
                 } else {
-                    connection.query(deleteQuery, [topic_id], function(err, result) {
+                    await connection.query(deleteQuery, [topic_id], async function(err, result) {
                         if (err) {
                             console.log(err);
                             reject(err.message);
                         } else {
-                            connection.query(deleteQuery2, [topic_id], function(err, result) {
+                            await connection.query(deleteQuery2, [topic_id], async function(err, result) {
                                 if (err) {
                                     console.log(err);
                                     reject(err.message);
                                 } else {
-                                    connection.query(deleteQuery3, [topic_id], function(err, result) {
+                                    await connection.query(deleteQuery3, [topic_id], async function(err, result) {
                                         if (err) {
                                             console.log(err);
                                             reject(err.message);
@@ -65,8 +65,6 @@ const deleteTopic = async(topic_id, user_id, connection) => {
             } catch (error) {
                 reject(err.message);
             }
-            resolve(result);
-
         }
         );
 

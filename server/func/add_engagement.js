@@ -11,7 +11,6 @@ process.on("message", message => {
       connection.release();
       process.exit();
     });
-
   });
 });
 
