@@ -66,6 +66,8 @@ class _PostTileState extends State<PostTile> {
   var comment = "";
   var name;
   var myPID;
+  var like_count;
+  var dislike_count;
 
   Color like_color = Colors.black;
   Color dislike_color = Colors.black;
