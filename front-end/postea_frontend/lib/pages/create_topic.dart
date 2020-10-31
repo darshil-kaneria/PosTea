@@ -23,8 +23,7 @@ class _CreateTopicState extends State<CreateTopic> {
   Future<http.Response> createNewTopic() async {
     var topic_info = {
       "topicText": topicNameController.text,
-      "topicID": 20,
-      "topicCreatorID": this.profile_id,
+      "topicCreatorID": 79341,
       "topicDescription": topidDescController.text
     };
     var topic_info_json = jsonEncode(topic_info);
