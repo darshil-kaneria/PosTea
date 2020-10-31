@@ -99,7 +99,7 @@ refreshTimeline = async (profileID, offset, time, connection) => {
                         result = JSON.stringify(result);
                         result = JSON.parse(result);
 
-                        console.log(result);
+                        // console.log(result);
 
                         // var list = [];
                         // for (i = 0; i < length(result); i++) {
