@@ -10,13 +10,16 @@ process.on("message", message => {
              topic_id: message.topic_id,
              follower_id: message.follower_id
            }
+           console.log(data);
          addTopicFollower(data, connection).then((answer) => {
             connection.release();
             if (answer == "Relationship already exists") {
                 process.send({"Error": "User-Topic relationship already exists"});
-            } else {
+            } else if (answer == "Added") {
                 process.send({"Success": "Topic Follower relationship created"});
-                }
+            } else {
+              process.send({"Error": "Topic Follower relationship not created"});
+            }
             process.exit();
           });
         });

@@ -8,7 +8,11 @@ process.on("message", message => {
         }
         console.log('Database connection established');
         getTopicFollowers(message.topic_id, connection).then((result)=> {
-            process.send(result);
+            if (message.flag == "follower_list") {
+                process.send(result);
+              } else if (message.flag == "follower_count") {
+                process.send({"follower count": result.length});
+              }
             connection.release();
             process.exit();
         }).catch(function(result) {
