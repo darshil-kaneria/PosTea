@@ -14,7 +14,9 @@ process.on("message", message => {
             profileID: message.profileID,
             likes: message.likes,
             dislikes: message.dislikes,
-            comment: message.comment
+            comment: message.comment,
+            anonymous: message.anonymous,
+            is_private: message.is_private
         }
         await addPost(dict, connection).then((answer) => {
             connection.release();
@@ -32,11 +34,11 @@ const addPost = async (dict, connection) => {
     console.log(topic);
     console.log(dict.topicID);
     var queryTopicExists = "SELECT topic_id, topic_name, COUNT(*) FROM topic_info WHERE topic_name='" + dict.topic + "'";
-    var queryString = "INSERT INTO user_post (post_id, profile_id, post_description, topic_id, post_img, creation_date, post_likes, post_dislikes, post_comments, post_title) VALUES ?";
+    var queryString = "INSERT INTO user_post (post_id, profile_id, post_description, topic_id, post_img, creation_date, post_likes, post_dislikes, post_comments, post_title, is_anonymous, is_private) VALUES ?";
     var addTopicContent = "INSERT INTO topic_content (topic_id, post_id) VALUES ?";
     var curr_date = new Date().toISOString().slice(0, 19).replace('T', ' ');
     var topicContentFields = [[dict.topicID, dict.profileID]];
-    var fields = [[id, dict.profileID, userPostMessage, dict.topicID, dict.img, curr_date, dict.likes, dict.dislikes, dict.comment, dict.title]];
+    var fields = [[id, dict.profileID, userPostMessage, dict.topicID, dict.img, curr_date, dict.likes, dict.dislikes, dict.comment, dict.title, dict.anonymous, dict.is_private]];
 
     return new Promise(async (resolve, reject) => {
         await connection.query(queryTopicExists, async (err, result) => {
@@ -56,13 +58,8 @@ const addPost = async (dict, connection) => {
                             addPost(dict, connection);
                         } else {
                             console.log("error: " + err.message);
-                            reject(err.message);
-
-
-
-                            
+                            reject(err.message);   
                         }
-                        
                     }
                     console.log("Post added succesfully!!");
                     resolve(result);

@@ -14,7 +14,6 @@ process.on("message", message => {
     }).catch((err) => {
       console.log("In Error, Oops");
     });
-
   });
 });
 

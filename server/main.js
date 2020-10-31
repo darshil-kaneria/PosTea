@@ -178,7 +178,6 @@ app.route("/topic")
     handtopic.send(req.body);
     handtopic.on("message", message => res.send(message));
   })
-  // TODO - not deleting all instances
   .delete((req, res) => {
     const handtopic = fork('./func/delete_topic.js');
     handtopic.send(req.body);
@@ -189,6 +188,7 @@ app.route("/topic")
  * Individual end points
  */
 
+<<<<<<< HEAD
 
   
  // Get total likes for a post
@@ -212,6 +212,8 @@ app.route("/topic")
     select.on("message", message => res.send(message));
 });
 
+=======
+>>>>>>> 9a0f28093ed584f13808c8f81f77cf36ed3d2796
 // Get all posts for a topic
 app.get('/selectposts', (req, res) => {
     const select = fork('./func/select_posts.js');

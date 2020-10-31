@@ -26,15 +26,7 @@ process.on("message", message => {
             process.send(result);
             connection.release();
             process.exit();
-
-
           }); ;
-
-
-          
-           // console.log(answer.length);
-
-            
         });
         
 });

@@ -15,6 +15,7 @@ process.on("message", message => {
           }
           await addTopicInfo(data, connection);
           connection.release();
+          process.exit();
           //process.send({"userAdded": message.username});
           //p//rocess.exit(); // It is very important to exit, or else heroku server will start accumulating orphaned processes.
           
