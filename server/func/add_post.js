@@ -52,6 +52,8 @@ const addPost = async (dict, connection) => {
             if (result[0].topic_name == null) {
                 flag = 1;
             } else {
+                var topic_id = result[0].topic_id;
+                fields = [[id, dict.profileID, userPostMessage, topic_id, dict.img, curr_date, dict.likes, dict.dislikes, dict.comment, dict.title, dict.anonymous, dict.is_private]];
                 await connection.query(queryString, [fields], (err, result) => {
                     if (err) {
                         if (err.code === 'ER_DUP_ENTRY') {
