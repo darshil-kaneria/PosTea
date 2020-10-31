@@ -16,14 +16,13 @@ class CreateTopic extends StatefulWidget {
 class _CreateTopicState extends State<CreateTopic> {
   var topicNameController = new TextEditingController();
   var topidDescController = new TextEditingController();
-  var profile_id;
 
-  _CreateTopicState({this.profile_id});
+  _CreateTopicState();
 
   Future<http.Response> createNewTopic() async {
     var topic_info = {
       "topicText": topicNameController.text,
-      "topicCreatorID": 79341,
+      "topicCreatorID": widget.profile_id,
       "topicDescription": topidDescController.text
     };
     var topic_info_json = jsonEncode(topic_info);
@@ -45,6 +44,7 @@ class _CreateTopicState extends State<CreateTopic> {
     var screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: new AppBar(
         title: Text("Create a New Topic"),
       ),
@@ -122,6 +122,7 @@ class _CreateTopicState extends State<CreateTopic> {
                           borderRadius: BorderRadius.circular(20)),
                       onPressed: () async {
                         await createNewTopic();
+                        Navigator.pop(context);
                       }),
                 ),
               ),
