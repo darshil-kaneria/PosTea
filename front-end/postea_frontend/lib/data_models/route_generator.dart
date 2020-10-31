@@ -8,6 +8,7 @@ import 'package:postea_frontend/pages/onboarding.dart';
 import 'package:postea_frontend/pages/profile.dart';
 import 'package:postea_frontend/pages/signup.dart';
 import 'package:postea_frontend/pages/loggedIn.dart';
+import 'package:postea_frontend/pages/trending.dart';
 import 'package:postea_frontend/tempUI.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -81,6 +82,8 @@ class Router {
         );
       case '/temp':
         return MaterialPageRoute(builder: (_) => TempUI());
+      case '/trending':
+        return MaterialPageRoute(builder: (_) => Trending());
       default:
         return null;
       //default: return MaterialPageRoute(builder: (_) => HomePage());
