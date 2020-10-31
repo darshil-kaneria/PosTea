@@ -36,16 +36,13 @@ const addTopicInfo = async function(data, connection) {
     var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
     var vals = [[top_id, data.topic_creator_id, data.topicText, data.topic_description, "", date]];
     return new Promise(function(resolve, reject) {
+      connection.query()
       connection.query(addtopicinfoq,[vals], function(err, result) {
         if (err) {
-            //console.log(err);
 
             reject(err.message);
-            //throw err;
         } else {
-          //console.log("topic info added sucessfully");
           resolve(result);
-          //return result;  
         }
 
       });
