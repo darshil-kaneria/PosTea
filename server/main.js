@@ -188,32 +188,6 @@ app.route("/topic")
  * Individual end points
  */
 
-<<<<<<< HEAD
-
-  
- // Get total likes for a post
- app.get('/engagement_likes', (req, res) => {
-    const select = fork('./func/get_post_like_dislike.js');
-    var data = {
-      post_id: req.query.post_id,
-      flag: req.query.flag
-    };
-    select.send(data);
-    select.on("message", message => res.send(message));
- });
-
- app.get('/engagement_dislikes', (req, res) => {
-  const select = fork('./func/get_post_like_dislike.js');
-    var data = {
-      post_id: req.query.post_id,
-      flag: req.query.flag
-    };
-    select.send(data);
-    select.on("message", message => res.send(message));
-});
-
-=======
->>>>>>> 9a0f28093ed584f13808c8f81f77cf36ed3d2796
 // Get all posts for a topic
 app.get('/selectposts', (req, res) => {
     const select = fork('./func/select_posts.js');
