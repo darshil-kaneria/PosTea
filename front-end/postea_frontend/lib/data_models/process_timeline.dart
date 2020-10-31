@@ -44,31 +44,8 @@ class ProcessTimeline{
       print(dateString.substring(0,dateString.length-5));
       firstPostTime = dateString.substring(0,dateString.length-5);
       
-      // await processPosts();
-      for(int i = 0; i < posts['result'].length; i++){
-
-      http.Response resp = await http.get("http://postea-server.herokuapp.com/profile/"+posts['result'][i]['profile_id'].toString());
-      Map<String, dynamic> profileJson = jsonDecode(resp.body);
-      // print(profileJson['message']['name']);
-      Post newPost = Post(
-        posts['result'][i]['post_id'].toString(),
-        posts['result'][i]['profile_id'].toString(),
-        posts['result'][i]['post_description'].toString(),
-        posts['result'][i]['topic_id'].toString(),
-        // posts['result'][i]['post_img'].toString(),
-        "noimg",
-        posts['timeDiff'][i].toString(),
-        posts['result'][i]['post_likes'].toString(),
-        posts['result'][i]['post_dislikes'].toString(),
-        posts['result'][i]['post_comments'].toString(),
-        posts['result'][i]['post_title'].toString(),
-        profileJson['message']['name']
-        // "Darshil Kaneria"
-      );
-      // print(posts['result'][i]['post_id'] + " : " + posts['result'][i]['topic_id']);
-      postList.add(newPost);
-
-    }
+      await processPosts();
+   
     print(postList.length);
 
     } 
@@ -89,32 +66,8 @@ class ProcessTimeline{
     }
     print("OFFSET IS: "+offset.toString());
     if(isEnd == false){
-      // processPosts();
-      for(int i = 0; i < posts['result'].length; i++){
-
-      http.Response resp = await http.get("http://postea-server.herokuapp.com/profile/"+posts['result'][i]['profile_id'].toString());
-      Map<String, dynamic> profileJson = jsonDecode(resp.body);
-      // print(profileJson['message']['name']);
-      Post newPost = Post(
-        posts['result'][i]['post_id'].toString(),
-        posts['result'][i]['profile_id'].toString(),
-        posts['result'][i]['post_description'].toString(),
-        posts['result'][i]['topic_id'].toString(),
-        // posts['result'][i]['post_img'].toString(),
-        "noimg",
-        posts['timeDiff'][i].toString(),
-        posts['result'][i]['post_likes'].toString(),
-        posts['result'][i]['post_dislikes'].toString(),
-        posts['result'][i]['post_comments'].toString(),
-        posts['result'][i]['post_title'].toString(),
-        profileJson['message']['name']
-        // "Darshil Kaneria"
-      );
-      print(posts['result'][i]['profile_id']);
-      print(posts['result'][i]['topic_id']);
-      postList.add(newPost);
-
-    }
+      await processPosts();
+   
     print(postList.length);
     } 
     }
