@@ -4,6 +4,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flappy_search_bar/flappy_search_bar.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:postea_frontend/colors.dart';
 import 'package:flutter/material.dart';
@@ -13,6 +14,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 //import 'package:postea_frontend/customWidgets/customAppBar.dart';
 import 'package:postea_frontend/data_models/timer.dart';
 import 'package:postea_frontend/main.dart';
+import 'package:postea_frontend/pages/create_topic.dart';
 import 'package:postea_frontend/pages/profile.dart';
 import 'package:postea_frontend/pages/trending.dart';
 import 'package:provider/provider.dart';
@@ -114,7 +116,7 @@ class _HomePageState extends State<HomePage> {
     var reqBody = {
       "postTitle": postTitleController.text,
       "msg": postTextController.text,
-      "topic": "chess",
+      "topic": topicEditingController.text,
       "img": base64Image,
       "topicID": 21,
       "profileID": widget.profileID,
@@ -183,7 +185,8 @@ class _HomePageState extends State<HomePage> {
           BottomNavigationBarItem(
               icon: Icon(Icons.trending_up), title: Text("Trending")),
           BottomNavigationBarItem(
-              icon: Icon(Icons.alternate_email), title: Text("Topic"))
+              icon: Icon(Icons.alternate_email), title: Text("Topic")),
+          BottomNavigationBarItem(icon: Icon(Icons.add), title: Text("Create")),
         ],
         onTap: (value) {
           if (value == 2) {
@@ -191,8 +194,7 @@ class _HomePageState extends State<HomePage> {
                 context,
                 MaterialPageRoute(
                     builder: (_) => Trending(profileId: widget.profileID)));
-          }
-          if (value == 3) {
+          } else if (value == 3) {
             Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -200,6 +202,13 @@ class _HomePageState extends State<HomePage> {
                           profileId: widget.profileID,
                           isOwner: true,
                           topicId: "21",
+                        )));
+          } else if (value == 4) {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (_) => CreateTopic(
+                          profile_id: widget.profileID,
                         )));
           } else if (value == 1)
             // Making a post logic
