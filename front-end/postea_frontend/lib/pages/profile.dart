@@ -56,7 +56,7 @@ class _ProfileState extends State<Profile> {
     prefs = await SharedPreferences.getInstance();
     widget.myPID = prefs.getInt('profileID') ?? 0;
     print("MY ID"+widget.myPID.toString());
-    http.get("http://postea-server.herokuapp.com/getfollowing?user_id="+widget.myPID.toString()).then((resp) {
+    http.get("http://postea-server.herokuapp.com/followdata?profile_id="+widget.myPID.toString()+"&flag=following_list").then((resp) {
 
 
     listFollowing = jsonDecode(resp.body);
@@ -315,22 +315,39 @@ class _ProfileState extends State<Profile> {
                             elevation: 2,
                             clipBehavior: Clip.antiAlias,
                             child: Text(followButtonText),
-                            onPressed: (){
+                            onPressed: () async{
                               print(isFollow);
-                              setState(() {
+                              
                                 if(isFollow){
                                 buttonColor = Colors.red[50];
                                 isFollow = false;
                                 followButtonText = "Follow";
+                                final request = http.Request("DELETE", Uri.parse("http://postea-server.herokuapp.com/followdata"));
+                                request.headers.addAll(
+                                  {'Content-Type': 'application/json'}
+                                );
+                                request.body = jsonEncode({
+                                  "profile_id": widget.myPID,
+                                  "follower_id": widget.profileId
+                                });
+                                request.send();
                               }
                               else{
-                                print("HERE");
                                 buttonColor = Colors.redAccent[100];
                                 isFollow = true;
                                 followButtonText = "Following";
+                                var addfollowing = {
+                                  "profile_id": widget.myPID,
+                                  "follower_id": widget.profileId
+                                };
+                                var addfollowingJson = JsonEncoder().convert(addfollowing);
+                                http.post("http://postea-server.herokuapp.com/followdata",
+                                headers: {'Content-Type': 'application/json'},
+                                body: addfollowingJson
+                                );
                               }   
                                 
-                              });
+                              setState(() {});
                                 
                             })
                             ),
