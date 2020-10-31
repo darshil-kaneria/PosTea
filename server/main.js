@@ -189,6 +189,8 @@ app.route("/topic")
  * Individual end points
  */
 
+
+  
  // Get total likes for a post
  app.get('/engagement_likes', (req, res) => {
     const select = fork('./func/get_post_like_dislike.js');
@@ -316,6 +318,20 @@ app.get('/cleartable', (req, res) => {
   };
   clearTableChild.send(data);
   clearTableChild.on("message", message => res.send(message));
+});
+
+app.get('/gettrending', (req, res) => {
+
+  const trending = fork('./func/getTrending.js');
+    var data = {
+      post_id: req.query.post_id,
+      flag: req.query.flag
+    };
+    trending.send(data);
+    trending.on("message", message => res.send(message));
+
+
+
 });
 
 
