@@ -14,6 +14,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:postea_frontend/data_models/timer.dart';
 import 'package:postea_frontend/main.dart';
 import 'package:postea_frontend/pages/profile.dart';
+import 'package:postea_frontend/pages/trending.dart';
 import 'package:provider/provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:postea_frontend/customWidgets/topic_pill.dart';
@@ -164,23 +165,26 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-
+        type:BottomNavigationBarType.fixed,
         items: [
           BottomNavigationBarItem(
-            icon: Icon(Icons.home),
+            icon: Icon(Icons.home,),
             title: Text("Home"),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.create),
+            icon: Icon(Icons.create,),
             title: Text("New Post"),
           ),
-          // BottomNavigationBarItem(
-          //     icon: Icon(Icons.trending_up), title: Text("Trending")),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.trending_up), title: Text("Trending")),
           BottomNavigationBarItem(
               icon: Icon(Icons.alternate_email), title: Text("Topic"))
         ],
         onTap: (value) {
           if (value == 2) {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => Trending(profileId: widget.profileID)));
+          }
+          if (value == 3) {
             Navigator.push(context, MaterialPageRoute(builder: (_) => Topic(profileId: widget.profileID,isOwner: true, topicId: "21",)));
           } else if (value == 1)
             // Making a post logic
