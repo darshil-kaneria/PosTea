@@ -16,4 +16,8 @@ var conn = mysql.createPool({
     connectionLimit: 20
 });
 
+// Redis cache connection
+var redis_conn = require('redis');
+
 module.exports.conn = conn;
+module.exports.redis_conn = redis_conn;

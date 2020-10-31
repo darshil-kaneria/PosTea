@@ -114,7 +114,24 @@ getTrending = async (message, connection) => {
                 if(err){
                     reject(err);
                 }
-                resolve(result);
+                var redis = db.redis_conn.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
+                redis.on("connect", function () {
+                    console.log("Cache connection established");
+                    resultString = JSON.stringify(result);
+                    result = JSON.parse(resultString);
+                    // console.log(result);
+                    redis.set('posts', resultString);
+                    // resolve(finalList);
+                    // for(var i = 0; i < postIdList.length; i++){
+                    //     redis.set(result[i]['post_id'], result[i].toString());
+                    //     redis.get(result[i]['post_id'], (err, data) => {
+                    //         console.log(data);
+                    //     })
+                    // }
+                    // console.log("cache set");
+                    resolve(finalList);
+                })
+                
             });
 
             

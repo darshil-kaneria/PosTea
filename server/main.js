@@ -258,7 +258,20 @@ app.get("/refreshTimeline", (req, res) => {
     res.send(message);
   });
 });
+app.get("/getTrendingPosts", (req, res) => {
 
+  const handleTrendingTimeline = fork('./func/get_trending_posts.js');
+  console.log("pid forked: "+handleTrendingTimeline.pid);
+
+  var data = {
+    "message": "Random"
+  }
+  handleTrendingTimeline.send(data);
+  handleTrendingTimeline.on("message", message => {
+    res.send(message);
+  });
+
+});
 // Refresh topic timeline
 app.get("/refreshTopicTimeline", (req, res) => {
   const handleTopicRefreshTimeline = fork('./func/refreshTopicTimeline.js');
