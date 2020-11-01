@@ -308,6 +308,9 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
                           print(engagements[0]['comment']);
 
                           for (int i = 0; i < engagements.length; i++) {
+                            if (engagements[i]['comment'] == null) {
+                              continue;
+                            }
                             comments.add(engagements[i]['comment'].toString());
                           }
 
