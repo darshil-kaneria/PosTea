@@ -239,6 +239,12 @@ app.get('/getcomments', (req, res) => {
   handleComments.on("message", message => res.send(message));
 });
 
+// Update topic summary
+app.post('/updateTopicDesc', (req, res) => {
+  const handle = fork("./func/update_topic_summary.js");
+  handle.send(req.body);
+  handle.on("message", message => res.send(message));
+});
 // Refresh user timeline
 app.get("/refreshTimeline", (req, res) => {
   const handleRefreshTimeline = fork('./func/refreshTimeline.js');
