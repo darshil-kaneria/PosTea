@@ -6,13 +6,16 @@ process.on("message", message => {
       return console.error('error: ' + err.message);
     }
     console.log('Database connection established');
-    updateTopic(message.originalTopicID, message.creator_id, message. user_id, message.update_topic_desc, connection).then(function(answer) {
-      connection.release();
+    updateTopic(message.originalTopicID, message.creator_id, message.user_id, message.update_topic_desc, connection).then(function(answer) {
       if (answer == "Topic does not exist") {
         process.send({"Error": "No topic with that name exists"});
-      } else {
+      } else if (answer == "Updated") {
         process.send({"Topic information updated": "Successfully"});
       }
+      else {
+        process.send(answer);
+      }
+      connection.release();
       process.exit();
     
   });
@@ -46,7 +49,6 @@ process.on("message", message => {
         catch (error){
           reject (err);
         }
-        return;
       });
     })
   };

@@ -240,11 +240,11 @@ app.get('/getcomments', (req, res) => {
 });
 
 // Update topic summary
-app.get("updateTopicDesc", (req, res) => {
-  const handle = fork("./update_topic_summary.js");
+app.post('/updateTopicDesc', (req, res) => {
+  const handle = fork("./func/update_topic_summary.js");
   handle.send(req.body);
   handle.on("message", message => res.send(message));
-})
+});
 // Refresh user timeline
 app.get("/refreshTimeline", (req, res) => {
   const handleRefreshTimeline = fork('./func/refreshTimeline.js');
