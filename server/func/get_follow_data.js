@@ -13,7 +13,12 @@ process.on("message", message => {
               if (message.flag == "following_list") {
                 process.send(value);
               } else if (message.flag == "following_count") {
-                process.send({"followingCount": value.length});
+                  var followingCount = {
+                    "followingCount": value.length
+                  };
+                  followingCount = JSON.stringify(followingCount);
+                  followingCount = JSON.parse(followingCount);
+                process.send(followingCount);
               }
                 connection.release();
                 process.exit();
@@ -28,7 +33,12 @@ process.on("message", message => {
                 if (message.flag == "follower_list") {
                     process.send(answer);
                   } else if (message.flag == "follower_count") {
-                    process.send({"followerCount": answer.length});
+                    var followerCount = {
+                        "followerCount": answer.length
+                      };
+                    followerCount = JSON.stringify(followerCount);
+                    followerCount = JSON.parse(followerCount);
+                    process.send(followerCount);
                 }
                 connection.release();
                 process.exit();
