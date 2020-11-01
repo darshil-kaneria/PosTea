@@ -21,15 +21,10 @@ process.on("message", message => {
             process.send(error);
             process.exit();
           });
-          
-          //process.send({"userAdded": message.username});
-          //p//rocess.exit(); // It is very important to exit, or else heroku server will start accumulating orphaned processes.
-          
         });
 });
 
 const addTopicInfo = async function(data, connection) {
-    //var topic_id = top_id;
     console.log("data");
     var top_id =  Math.floor(Math.random() * 100000);
     var addtopicinfoq = "INSERT INTO topic_info (topic_id, topic_creator_id, topic_name, topic_description, topic_img, creation_date) VALUES ?";
@@ -38,14 +33,9 @@ const addTopicInfo = async function(data, connection) {
     return new Promise(function(resolve, reject) {
       connection.query(addtopicinfoq,[vals], function(err, result) {
         if (err) {
-            //console.log(err);
-
             reject(err.message);
-            //throw err;
         } else {
-          //console.log("topic info added sucessfully");
           resolve(result);
-          //return result;  
         }
 
       });
