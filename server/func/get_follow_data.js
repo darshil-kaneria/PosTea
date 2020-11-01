@@ -1,10 +1,11 @@
 
+const { json } = require('express');
 const db = require('./db_connection.js');
 
 process.on("message", message => {
     db.conn.getConnection(async function(err, connection) {
           if (err) {
-            return console.error('error: ' + err.message);
+            return console.error('error:' + err.message);
           }
           console.log('Database connection established');
           if (message.flag == "following_count" || message.flag == "following_list") {
@@ -12,7 +13,12 @@ process.on("message", message => {
               if (message.flag == "following_list") {
                 process.send(value);
               } else if (message.flag == "following_count") {
-                process.send({"following count": value.length});
+                  var followingCount = {
+                    "followingCount": value.length
+                  };
+                  followingCount = JSON.stringify(followingCount);
+                  followingCount = JSON.parse(followingCount);
+                process.send(followingCount);
               }
                 connection.release();
                 process.exit();
@@ -27,7 +33,12 @@ process.on("message", message => {
                 if (message.flag == "follower_list") {
                     process.send(answer);
                   } else if (message.flag == "follower_count") {
-                    process.send({"follower count": answer.length});
+                    var followerCount = {
+                        "followerCount": answer.length
+                      };
+                    followerCount = JSON.stringify(followerCount);
+                    followerCount = JSON.parse(followerCount);
+                    process.send(followerCount);
                 }
                 connection.release();
                 process.exit();
@@ -52,6 +63,8 @@ const getFollowing = async(user_id, connection) => {
             if (result.length == 0) {
                 reject("User following record does not exist");
             } else {
+                result = JSON.stringify(result);
+                result = JSON.parse(result);
                 console.log("Following retrieved");
                 console.log(result);
                 resolve(result);
@@ -77,6 +90,8 @@ const getFollowers = async(user_id, connection) => {
             } else {
                 console.log("Followers retrieved");
                 //console.log(result);
+                result = JSON.stringify(result);
+                result = JSON.parse(result);
                 resolve(result);
                 // return result;  
             }
