@@ -34,6 +34,8 @@ const getTopic = async(topic_id, connection) => {
             } else {
                 console.log("Topic retrieved");
                 console.log(result);
+                result = JSON.stringify(result);
+                result = JSON.parse(result);
                 resolve(result);
                 // return result;  
             }
