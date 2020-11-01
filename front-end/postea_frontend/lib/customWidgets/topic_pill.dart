@@ -1,16 +1,21 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import '../pages/topic.dart';
 
 class TopicPill extends StatefulWidget {
 
+  var profileId;
+  bool isOwner;
   var topicId;
   Color col1;
   Color col2;
   var height;
   var width;
 
-  TopicPill({@required this.topicId, this.col1, this.col2, this.height, this.width});
+  TopicPill({@required this.topicId, this.col1, this.col2, this.height, this.width, this.profileId, this.isOwner});
   @override
   _TopicPillState createState() => _TopicPillState();
 }
@@ -22,11 +27,17 @@ class _TopicPillState extends State<TopicPill> {
     getTopicName();
     super.initState();
   }
+ var name = "";
+  getTopicName() async {
 
-  Future<http.Response> getTopicName() async {
+    http.get("http://postea-server.herokuapp.com/topic?topic_id="+widget.topicId.toString()).then((value){
+      var valueString = jsonDecode(value.body);
+      name = valueString[0]['topic_name'];
+      setState(() {
 
-      http.Response resp = await http.get("http://postea-server.herokuapp.com/topic?topic_id="+widget.topicId.toString());
-      return resp;
+      });
+    });
+
     }
   @override
   Widget build(BuildContext context) {
@@ -48,21 +59,15 @@ class _TopicPillState extends State<TopicPill> {
         ]),
         borderRadius: BorderRadius.all(Radius.circular(50))
       ),
-      child: Center(
-        child: FutureBuilder(
-          builder: (context, snapshot) {
-            print(snapshot.connectionState);
-            if(snapshot.hasData){
-              print(snapshot.data);
-              return AutoSizeText(
-            "HELLO",
-            style: TextStyle(fontSize: 20, color: Colors.white),
-          );
-            }
-            else{
-              return CircularProgressIndicator();
-            }
-          },
+      child: GestureDetector(
+        onTap: () {
+          Navigator.push(context, MaterialPageRoute(builder: (_) => Topic(profileId: widget.profileId, isOwner: widget.isOwner, topicId: widget.topicId,)));
+        },
+              child: Center(
+               child: AutoSizeText(
+              name,
+              style: TextStyle(fontSize: 15, color: Colors.white),
+            )
         ),
       ),
       

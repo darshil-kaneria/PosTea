@@ -44,7 +44,7 @@ class ProcessTopic {
   }
 
   getTopicInfo() async {
-    var url = "http://postea-server.herokuapp.com/gettopic?topic_id=" +
+    var url = "http://postea-server.herokuapp.com/topic?topic_id=" +
         topic_id.toString();
     http.Response response = await http.get(url);
 
@@ -56,6 +56,7 @@ class ProcessTopic {
     };
 
     return info;
+
   }
 
   Future<http.Response> getPosts() async {

@@ -96,6 +96,8 @@ class _PostTileState extends State<PostTile> {
     return resp;
   }
 
+
+
   @override
   Widget build(BuildContext context) {
     var screenheight = MediaQuery.of(context).size.height;
@@ -116,6 +118,8 @@ class _PostTileState extends State<PostTile> {
               col2: Colors.purple[400],
               height: screenheight/10,
               width: screenwidth/4,
+              profileId: profile_id,
+              isOwner: true,
             ),
             leading: GestureDetector(
               onTap: () {
