@@ -24,6 +24,7 @@ process.on("message", message => {
           name: answer[0].name,
           biodata: answer[0].bio_data
         }
+        //console.log(profileInfoJson);
 
         process.send({ "message": profileInfoJson });
       }
@@ -50,17 +51,14 @@ function getProfile(user, connection) {
         console.log(err);
         reject(err.message);
       }
-      try {
-        if (result.length == 0) {
-          resolve("Account does not exist");
-        } else {
-          resolve(result);
-        }
+      
+     if (result.length == 0) {
+        resolve("Account does not exist");
+      } else {
+        //console.log(result);
+        resolve(result);
       }
-      catch (error) {
-        reject(err.message);
-      }
-      return;
+      
     });
   })
 };

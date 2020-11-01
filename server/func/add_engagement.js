@@ -15,7 +15,13 @@ process.on("message", message => {
 
     }
     await addEngagement(message, connection).then((answer) => {
+
       connection.release();
+      process.send(answer);
+      process.exit();
+    }).catch ((result) => {
+      connection.release();
+      process.send(result);
       process.exit();
     });
 
@@ -26,6 +32,11 @@ const addEngagement = async (dict, connection) => {
   console.log(dict)
   var existsQuery = "SELECT post_id, profile_id, COUNT(*) FROM engagement WHERE post_id = " + String(dict.engagement_post_id) + " AND profile_id = " + String(dict.engagement_profile_id);
   var engagementID = Math.floor(Math.random() * 100000);
+  var updatequery = "UPDATE user_post SET post_likes = post_likes + 1 WHERE post_id = ?";
+  var updateQuery2 = "UPDATE user_post SET post_dislikes = post_dislikes + 1 WHERE post_id = ?";
+
+
+
 
   return new Promise(async (resolve, reject) => {
     // Check to see if the user has engaged with the post before
@@ -51,6 +62,22 @@ const addEngagement = async (dict, connection) => {
             result = JSON.parse(result);
             // check to see if user has previously liked or disliked the post
             //if (result.like_or_dislike != null) { // If user has liked/disliked the post previously, then update the value
+            
+            if (dict.like_dislike) {
+              updatequery = "UPDATE user_post SET post_likes = post_likes + 1 WHERE post_id = " + String(dict.engagement_post_id);
+            } else if (dict.like_dislike == 0) {
+              updatequery = "UPDATE user_post SET post_dislikes = post_dislikes + 1 WHERE post_id = " + String(dict.engagement_post_id);
+            }
+            await connection.query(updatequery,(err, result) => {
+              if (err) {
+                console.log(err);
+                reject(err.message);
+              }
+              console.log("updated likes or dislikes for post");
+              
+
+
+            });
             updateQuery = "UPDATE engagement SET like_or_dislike = " + String(dict.like_dislike) + " WHERE post_id = " + String(dict.engagement_post_id) + " AND profile_id = " + String(dict.engagement_profile_id);
             await connection.query(updateQuery, (err, result) => {
               if (err) {
@@ -85,10 +112,27 @@ const addEngagement = async (dict, connection) => {
       } else { // User has not engaged with this post before. Add new entry in engagement table in database.
         console.log("not engaged");
         var likes = false;
+
         if ('like_dislike' in dict) {
           likes = true;
           var vals = [[engagementID, dict.engagement_post_id, dict.engagement_profile_id, dict.like_dislike]];
           var addEngagementQuery = "INSERT INTO engagement (engagement_id, post_id, profile_id, like_or_dislike) VALUES ?";
+          if (dict.like_dislike) {
+            updatequery = "UPDATE user_post SET post_likes = post_likes + 1 WHERE post_id = " + String(dict.engagement_post_id);
+          } else if (dict.like_dislike == 0) {
+            updatequery = "UPDATE user_post SET post_dislikes = post_dislikes + 1 WHERE post_id = " + String(dict.engagement_post_id);
+          }
+          await connection.query(updatequery,(err, result) => {
+            if (err) {
+              console.log(err);
+              reject(err.message);
+            }
+            console.log("updated likes or dislikes for post");
+            resolve(result);
+            
+
+
+          });
         } else {
           console.log("no likes");
           var vals = [[engagementID, dict.engagement_post_id, dict.engagement_profile_id, dict.comment]];
@@ -105,6 +149,7 @@ const addEngagement = async (dict, connection) => {
             reject(err.message);
           }
           console.log("Engagement Recorded Successfully!");
+
         });
         if (!likes) {
           console.log("add comment");
@@ -115,11 +160,12 @@ const addEngagement = async (dict, connection) => {
             if (err) {
               reject(err.message);
             }
+            resolve(result);
 
           });
         }
       }
-      resolve(result);
+      //
     });
   });
 

@@ -10,4 +10,7 @@ process.on("message", message => {
   });
 });
 
-function getPosts()
+function getPosts(connection) {
+    var selectposts 
+
+}

@@ -12,7 +12,7 @@ process.on("message", message => {
             like_or_dislike: message.like_or_dislike,
             engagement_id: message.engagement_id,
           }
-          console.log(data);
+          //console.log(data);
           add_comm_eng(data, connection).then((answer) => {
             connection.release();
             if (answer == "engagement does not exist") {
@@ -48,30 +48,40 @@ const add_comm_eng = async ( data, connection) => {
     var like = data.like_or_dislike;
     var engagement_id = data.engagement_id;
     //console.log(postID);
+    
 
     
 
     var id = Math.floor(Math.random() * 100000);
     console.log(postID);
     //var addquery = "INSERT INTO comm_engagement (comm_id, post_id, comm_like, engagement_id) VALUES ?";
-    var selectquery = "SELECT * FROM comm_engement WHERE engagement_id = ? AND post_id = ?" ;
-    var updateQuery1 = "UPDATE comm_engagement SET comm_like = comm_like + 1 WHERE engagement_id = ? and post_id = ?";
-    var updateQuery0 = "UPDATE comm_engagement SET comm_like = comm_like - 1 WHERE engagement_id = ? and post_id = ?";
+   // console.log(engagnment_id);
+    var selectquery = "SELECT * FROM comm_engement WHERE engagement_id=" + String(engagement_id) + "AND post_id=" + String(postID);
+    var updateQuery1 = "UPDATE comm_engagement SET comm_like = comm_like + 1 WHERE engagement_id=" + String(engagement_id) + "AND post_id=" + String(postID);
+    var updateQuery0 = "UPDATE comm_engagement SET comm_like = comm_like - 1 WHERE engagement_id=" + String(engagement_id) +"AND post_id=" + String(postID);
+
+    console.log(like);
+
+    
+    
     //var selectpost = "SELECT * FROM user_post WHERE post_id = ?";
     //var vals = [[id, postID,likes, engagement_id]];
 
     return new Promise(async function(resolve, reject) {
-        await connection.query(selectquery,[engagement_id, postID],  async function (err, result) {
+        await connection.query(selectquery,  async function (err, result) {
+            console.log(result);
             if (err) {
+                console.log(err.message);
                 reject (err.message);
             } else {
                 //console.log("executed");
                 if (result.length == 0) {
                     resolve("engagement and post does not exist");
-                console.log()
+                
                 } else {
+                    console.log(like);
                     if (like == 1) {
-                        await connection.query(updateQuery1, [engagement_id, postID], async function (err, result) {
+                        await connection.query(updateQuery1, async function (err, result) {
                             if (err) {
                                 reject (err.message);
                             }
@@ -79,7 +89,7 @@ const add_comm_eng = async ( data, connection) => {
                         });
 
                     } else {
-                        await connection.query(updateQuery0, [engagement_id, postID], async function (err, result) {
+                        await connection.query(updateQuery0, async function (err, result) {
                             if (err) {
                                 reject (err.message);
                             }

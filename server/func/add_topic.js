@@ -13,12 +13,21 @@ process.on("message", message => {
             topic_creator_id: message.topicCreatorID,
             topic_description: message.topicDescription
           }
-          await addTopicInfo(data, connection);
-          connection.release();
+          await addTopicInfo(data, connection).then(function(answer) {
+
+            process.send(answer);
+            connection.release();
+            process.exit();
           //process.send({"userAdded": message.username});
           //p//rocess.exit(); // It is very important to exit, or else heroku server will start accumulating orphaned processes.
           
-        });
+          }).catch(function (result) {
+            process.send(result);
+            connection.release();
+            process.exit();
+
+          });
+      });
 });
 
 const addTopicInfo = async function(data, connection) {
