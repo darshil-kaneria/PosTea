@@ -46,8 +46,11 @@ class _HomePageState extends State<HomePage> {
   bool checkBoxVal = false;
   bool checkEnd = false;
   File imgToUpload;
-  String base64Image;
+  String base64Image = "";
   ProcessTimeline timeLine;
+  var isAnonymous = 0;
+  Color isAnonColor = Colors.grey;
+  var is_private = 0;
 
   var offset = 0;
 
@@ -122,7 +125,9 @@ class _HomePageState extends State<HomePage> {
       "profileID": widget.profileID,
       "likes": 0,
       "dislikes": 0,
-      "comment": 0
+      "comment": 0,
+      "anonymous": isAnonymous,
+      "is_private": is_private
     };
     var reqBodyJson = jsonEncode(reqBody);
     print("sending" + reqBodyJson);
@@ -216,212 +221,233 @@ class _HomePageState extends State<HomePage> {
               context: context,
               barrierDismissible: false,
               builder: (context) {
-                return WillPopScope(
-                  onWillPop: () async {
-                    postTitleController.clear();
-                    postTextController.clear();
-                    return true;
-                  },
-                  child: Dialog(
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.all(Radius.circular(20))),
-                    child: Container(
-                      width: screenWidth / 1.1,
-                      height: screenHeight / 1.8,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              padding:
-                                  EdgeInsets.only(left: 18, right: 18, top: 15),
-                              color: Colors.transparent,
-                              child: TextField(
-                                decoration: InputDecoration(
-                                  border: InputBorder.none,
-                                  hintText: "Title",
-                                ),
-                                controller: postTitleController,
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            flex: 4,
-                            child: SingleChildScrollView(
-                              padding: EdgeInsets.symmetric(horizontal: 18),
-                              scrollDirection: Axis.vertical,
-                              child: TextField(
-                                maxLines: null,
-                                keyboardType: TextInputType.multiline,
-                                decoration: InputDecoration(
+                return StatefulBuilder(
+
+                  builder: (context, setState){
+                    return WillPopScope(
+                    onWillPop: () async {
+                      postTitleController.clear();
+                      postTextController.clear();
+                      return true;
+                    },
+                    child: Dialog(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(20))),
+                      child: Container(
+                        width: screenWidth / 1.1,
+                        height: screenHeight / 1.8,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Expanded(
+                              flex: 1,
+                              child: Container(
+                                padding:
+                                    EdgeInsets.only(left: 18, right: 18, top: 15),
+                                color: Colors.transparent,
+                                child: TextField(
+                                  decoration: InputDecoration(
                                     border: InputBorder.none,
-                                    hintText: "Post description"),
-                                controller: postTextController,
+                                    hintText: "Title",
+                                  ),
+                                  controller: postTitleController,
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
                               ),
                             ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: Container(
-                              padding: EdgeInsets.only(left: 13, right: 13),
-                              color: Colors.transparent,
-                              child: Row(
-                                children: [
-                                  IconButton(
-                                      icon: Icon(
-                                        Icons.image,
-                                        color: Colors.grey,
-                                      ),
-                                      onPressed: () async {
-                                        await pickImage();
-                                        // Image image = Image.file(imgToUpload);
-                                        if (imgToUpload == null) {
-                                          // final imgErrorSnackBar = SnackBar(content: Text('Image upload failed'));
-                                          // Scaffold.of(context).showSnackBar(imgErrorSnackBar);
-                                        }
-                                        base64Image = base64Encode(
-                                            imgToUpload.readAsBytesSync());
-                                      }),
-                                  IconButton(
-                                      icon: Icon(
-                                        Icons.attachment,
-                                        color: Colors.grey,
-                                      ),
-                                      onPressed: () {}),
-                                  IconButton(
-                                      icon: Icon(
-                                        Icons.location_on,
-                                        color: Colors.grey,
-                                      ),
-                                      onPressed: () {}),
-                                  Expanded(
-                                    child: Container(
-                                      padding: EdgeInsets.only(right: 15),
-                                      alignment: Alignment.centerRight,
+                            Expanded(
+                              flex: 4,
+                              child: SingleChildScrollView(
+                                padding: EdgeInsets.symmetric(horizontal: 18),
+                                scrollDirection: Axis.vertical,
+                                child: TextField(
+                                  maxLines: null,
+                                  keyboardType: TextInputType.multiline,
+                                  decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      hintText: "Post description"),
+                                  controller: postTextController,
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 1,
+                              child: Container(
+                                padding: EdgeInsets.only(left: 13, right: 13),
+                                color: Colors.transparent,
+                                child: Row(
+                                  children: [
+                                    IconButton(
+                                        icon: Icon(
+                                          Icons.image,
+                                          color: Colors.grey,
+                                        ),
+                                        onPressed: () async {
+                                          await pickImage();
+                                          // Image image = Image.file(imgToUpload);
+                                          if (imgToUpload == null) {
+                                            // final imgErrorSnackBar = SnackBar(content: Text('Image upload failed'));
+                                            // Scaffold.of(context).showSnackBar(imgErrorSnackBar);
+                                          }
+                                          base64Image = base64Encode(
+                                              imgToUpload.readAsBytesSync());
+                                        }),
+                                    IconButton(
+                                        icon: Icon(
+                                          Icons.attachment,
+                                          color: Colors.grey,
+                                        ),
+                                        onPressed: () {}),
+                                    IconButton(
+                                        icon: Icon(
+                                          Icons.fingerprint,
+                                          color: isAnonColor,
+                                        ),
+                                        onPressed: () {
+                                          if(isAnonymous == 0){
+                                            isAnonymous = 1;
+                                            isAnonColor = Colors.deepOrange[100];
+                                          }
+                                          else if(isAnonymous == 1){
+                                            isAnonymous = 0;
+                                            isAnonColor = Colors.grey;
+                                          }
+                                          setState((){});
+                                          print(isAnonymous);
+                                        }),
+                                    Expanded(
                                       child: Container(
-                                        alignment: Alignment.center,
-                                        height: screenHeight / 22,
-                                        width: screenWidth / 4.5,
-                                        decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.all(
-                                                Radius.circular(15)),
-                                            border:
-                                                Border.all(color: Colors.grey)),
-                                        child: ButtonTheme(
-                                          shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(17)),
-                                          child: FlatButton(
-                                            onPressed: () => {
-                                              showDialog(
-                                                context: context,
-                                                barrierDismissible: true,
-                                                builder: (context) {
-                                                  return WillPopScope(
-                                                      child: Dialog(
-                                                        shape:
-                                                            RoundedRectangleBorder(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(20),
-                                                        ),
-                                                        child: Container(
-                                                          width:
-                                                              screenWidth / 1.1,
-                                                          height:
-                                                              screenHeight / 7,
-                                                          child: Column(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
-                                                            children: [
-                                                              TextField(
-                                                                controller:
-                                                                    topicEditingController,
-                                                                textAlign:
-                                                                    TextAlign
-                                                                        .center,
-                                                                decoration:
-                                                                    InputDecoration(
-                                                                  border:
-                                                                      InputBorder
-                                                                          .none,
-                                                                  hintText:
-                                                                      "Enter a topic",
+                                        padding: EdgeInsets.only(right: 15),
+                                        alignment: Alignment.centerRight,
+                                        child: Container(
+                                          alignment: Alignment.center,
+                                          height: screenHeight / 22,
+                                          width: screenWidth / 4.5,
+                                          decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(15)),
+                                              border:
+                                                  Border.all(color: Colors.grey)),
+                                          child: ButtonTheme(
+                                            shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(17)),
+                                            child: FlatButton(
+                                              onPressed: () => {
+                                                showDialog(
+                                                  context: context,
+                                                  barrierDismissible: true,
+                                                  builder: (context) {
+                                                    return WillPopScope(
+                                                        child: Dialog(
+                                                          shape:
+                                                              RoundedRectangleBorder(
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(20),
+                                                          ),
+                                                          child: Container(
+                                                            width:
+                                                                screenWidth / 1.1,
+                                                            height:
+                                                                screenHeight / 7,
+                                                            child: Column(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .center,
+                                                              children: [
+                                                                TextField(
+                                                                  controller:
+                                                                      topicEditingController,
+                                                                  textAlign:
+                                                                      TextAlign
+                                                                          .center,
+                                                                  decoration:
+                                                                      InputDecoration(
+                                                                    border:
+                                                                        InputBorder
+                                                                            .none,
+                                                                    hintText:
+                                                                        "Enter a topic",
+                                                                  ),
                                                                 ),
-                                                              ),
-                                                              ButtonTheme(
-                                                                shape: RoundedRectangleBorder(
-                                                                    borderRadius:
-                                                                        BorderRadius.circular(
-                                                                            20)),
-                                                                child:
-                                                                    RaisedButton(
-                                                                        child: Text(
-                                                                            "Choose Topic"),
-                                                                        onPressed:
-                                                                            () {
-                                                                          setState(
+                                                                ButtonTheme(
+                                                                  shape: RoundedRectangleBorder(
+                                                                      borderRadius:
+                                                                          BorderRadius.circular(
+                                                                              20)),
+                                                                  child:
+                                                                      RaisedButton(
+                                                                          child: Text(
+                                                                              "Choose Topic"),
+                                                                          onPressed:
                                                                               () {
-                                                                            topicButtonText =
-                                                                                topicEditingController.text;
-                                                                            print(topicEditingController.text);
-                                                                          });
-                                                                          Navigator.of(context, rootNavigator: true)
-                                                                              .pop();
-                                                                        }),
-                                                              )
-                                                            ],
+                                                                            setState(
+                                                                                () {
+                                                                              topicButtonText =
+                                                                                  topicEditingController.text;
+                                                                              print(topicEditingController.text);
+                                                                            });
+                                                                            Navigator.of(context, rootNavigator: true)
+                                                                                .pop();
+                                                                          }),
+                                                                )
+                                                              ],
+                                                            ),
                                                           ),
                                                         ),
-                                                      ),
-                                                      onWillPop: () async {
-                                                        topicEditingController
-                                                            .clear();
-                                                        return true;
-                                                      });
-                                                },
-                                              )
-                                            },
-                                            child: Text(
-                                              topicButtonText,
-                                              style: TextStyle(fontSize: 15),
+                                                        onWillPop: () async {
+                                                          topicEditingController
+                                                              .clear();
+                                                          return true;
+                                                        });
+                                                  },
+                                                )
+                                              },
+                                              child: Text(
+                                                topicButtonText,
+                                                style: TextStyle(fontSize: 15),
+                                              ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  )
-                                ],
+                                    )
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                          Expanded(
-                            flex: 1,
-                            child: GestureDetector(
-                              onTap: () async {
-                                // Making a post request
-                                makePost();
-                                await uploadImage(imgToUpload);
-                              },
-                              child: Container(
-                                margin: EdgeInsets.symmetric(horizontal: 13),
-                                alignment: Alignment.center,
-                                child: Text("Post"),
-                                decoration: BoxDecoration(
-                                    border: Border(
-                                        top: BorderSide(
-                                            color: Colors.grey, width: 0.5))),
+                            Expanded(
+                              flex: 1,
+                              child: GestureDetector(
+                                onTap: () async {
+                                  // Making a post request
+                                  makePost();
+                                  if(base64Image != ""){
+                                    await uploadImage(imgToUpload);
+                                  }
+                                  
+                                  Navigator.pop(context);
+                                },
+                                child: Container(
+                                  margin: EdgeInsets.symmetric(horizontal: 13),
+                                  alignment: Alignment.center,
+                                  child: Text("Post"),
+                                  decoration: BoxDecoration(
+                                      border: Border(
+                                          top: BorderSide(
+                                              color: Colors.grey, width: 0.5))),
+                                ),
                               ),
-                            ),
-                          )
-                        ],
+                            )
+                          ],
+                        ),
                       ),
                     ),
-                  ),
+                  );
+                  }
+                  
                 );
               },
             );
