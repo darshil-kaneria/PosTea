@@ -7,10 +7,15 @@ process.on("message", message => {
             return console.error('error: ' + err.message);
           }
           console.log('Database connection established');
-          await getTopic(message.topic_id, connection);
-          connection.release();
-          process.send({"Topic retrieved": "success"});
-          process.exit();
+          await getTopic(message.topic_id, connection).then((result) => {
+            connection.release();
+            process.send(result);
+            process.exit();
+          }).catch((reject) => {
+            connection.release();
+            process.send(reject);
+            process.exit();
+          });
           
         });
 });
@@ -21,7 +26,7 @@ const getTopic = async(topic_id, connection) => {
        connection.query(query,[topic_id],function(err, result)  {
             if (err) {
                 console.log("error:" + err.message);
-                reject(err);
+                reject(err.message);
             }
             if (result.length == 0) {
                 console.log("Topic does not exist");
@@ -29,6 +34,8 @@ const getTopic = async(topic_id, connection) => {
             } else {
                 console.log("Topic retrieved");
                 console.log(result);
+                result = JSON.stringify(result);
+                result = JSON.parse(result);
                 resolve(result);
                 // return result;  
             }

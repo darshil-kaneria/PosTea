@@ -1,29 +1,30 @@
 const db = require('./db_connection.js');
 
 process.on("message", message => {
-    db.conn.getConnection(function(err, connection) {
+    db.conn.getConnection(async(err, connection)=> {
           if (err) {
             return console.error('error: ' + err.message);
           }
           console.log('Database connection established');
-           var data = {
-             topic_id: req.query.topic_id,
-             follower_id: req.query.follower_id
+          var data = {
+             topic_id: message.topic_id,
+             follower_id: message.follower_id
            }
-       // addTopicFollower(message.topic_id,message.follower_id, connection).then((answer) => {
+           console.log(data);
          addTopicFollower(data, connection).then((answer) => {
             connection.release();
             if (answer == "Relationship already exists") {
                 process.send({"Error": "User-Topic relationship already exists"});
-            } else {
+            } else if (answer == "Added") {
                 process.send({"Success": "Topic Follower relationship created"});
-                }
+            } else {
+              process.send({"Error": "Topic Follower relationship not created"});
+            }
             process.exit();
           });
         });
         
 });
- //function addTopicFollower(topic_id, follower_id, connection) {
  function addTopicFollower(data, connection) {
     var topic_id = data.topic_id;
     var follower_id = data.follower_id;
@@ -58,7 +59,7 @@ process.on("message", message => {
         catch (error){
           reject(err.message);
         }
-        return;
+        resolve(result);
       });
     })
   };

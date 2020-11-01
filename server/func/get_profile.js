@@ -5,9 +5,16 @@ process.on("message", message => {
     if (err) {
       return console.error('error: ' + err.message);
     }
+    var getVar;
+    if(message.flag == 0){
+      getVar = message.username;
+    }
+    else{
+      getVar = message.profile;
+    }
     console.log('Database connection established');
-    getProfile(message.username, connection).then(function (answer) {
-      
+    getProfile(message.flag, getVar, connection).then(function (answer) {
+      connection.release();
       if (answer == "Account does not exist") {
         process.send({ "Error": "User does not exist" });
       } else {
@@ -24,8 +31,6 @@ process.on("message", message => {
           name: answer[0].name,
           biodata: answer[0].bio_data
         }
-        //console.log(profileInfoJson);
-
         process.send({ "message": profileInfoJson });
       }
       connection.release();
@@ -42,9 +47,14 @@ process.on("message", message => {
   });
 });
 
-function getProfile(user, connection) {
+function getProfile(flag, user, connection) {
   var username = user;
-  var selectQuery = "SELECT * FROM profile WHERE username = ?";
+  if(flag == 0){
+    var selectQuery = "SELECT * FROM profile WHERE username = ?";
+  }
+  else{
+    var selectQuery = "SELECT * FROM profile WHERE profile_id = ?";
+  }
   return new Promise(function (resolve, reject) {
     connection.query(selectQuery, [user], function (err, result) {
       if (err) {

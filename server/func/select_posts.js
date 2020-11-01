@@ -6,12 +6,11 @@ process.on("message", message => {
             return console.error('error: ' + err.message);
           }
           console.log('Database connection established');
-          
-          //process.send({"posts retrieved": "success"});
-          await getPosts(message.topic_id, connection).then((value)=> {
-                process.send(value, );
+          await getPosts(message.topicID, connection);
+          connection.release();
+          getEngagement(message.topic_id, connection).then((value)=> {
+                process.send(value);
                 connection.release();
-            //process.send(resul);
                 process.exit();
         
           }).catch((result) => {

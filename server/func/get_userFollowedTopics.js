@@ -6,12 +6,25 @@ process.on("message", message => {
           if (err) {
             return console.error('error: ' + err.message);
           }
-          console.log('Database connection established');
-          await getTopicsFollowed(message.user_id, connection);
-          connection.release();
-          process.send({"Topic Followers retrieved": "success"});
-          process.exit();
-          
+        console.log('Database connection established');
+        getTopicsFollowed(message.user_id, connection).then((result) => {
+            var flag = message.flag;
+            if (result == "User does not follow topics") {
+                if (flag == "topic_count") {
+                    process.send({"Topic followed": 0});
+                } else if (flag == "topic_list") {
+                    process.send(result);
+                }
+            } else {
+                if (flag == "topic_count") {
+                    process.send({"Topic followed": result.length});
+                } else if (flag == "topic_list")  {
+                    process.send(result);
+                }
+            }
+            connection.release();
+            process.exit();
+          })
         });
 });
 
@@ -24,10 +37,9 @@ const getTopicsFollowed = async(user_id, connection) => {
                 reject(err.message);
             }
             if (result.length == 0) {
-                console.log("User does not follow topics");
+                resolve("User does not follow topics");
             } else {
                 console.log("Topic list followed by user retrieved");
-                console.log(result);
                 resolve(result);
                 // return result;  
             }

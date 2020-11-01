@@ -21,10 +21,11 @@ process.on("message", message => {
       process.exit();
     }).catch ((result) => {
       connection.release();
-      process.send(result);
+      // process.send({"result": "Sent engagement"});
       process.exit();
+    }).catch((err) => {
+      console.log("In Error, Oops");
     });
-
   });
 });
 
@@ -38,6 +39,7 @@ const addEngagement = async (dict, connection) => {
 
 
 
+  var curr_date = new Date().toISOString().slice(0, 19).replace('T', ' ');
   return new Promise(async (resolve, reject) => {
     // Check to see if the user has engaged with the post before
     await connection.query(existsQuery, async (err, result) => {
@@ -78,7 +80,8 @@ const addEngagement = async (dict, connection) => {
 
 
             });
-            updateQuery = "UPDATE engagement SET like_or_dislike = " + String(dict.like_dislike) + " WHERE post_id = " + String(dict.engagement_post_id) + " AND profile_id = " + String(dict.engagement_profile_id);
+            //updateQuery = "UPDATE engagement SET like_or_dislike = " + String(dict.like_dislike) + " WHERE post_id = " + String(dict.engagement_post_id) + " AND profile_id = " + String(dict.engagement_profile_id);
+            updateQuery = "UPDATE engagement SET creation_date='" +curr_date+"', like_or_dislike = " + String(dict.like_dislike) + " WHERE post_id = " + String(dict.engagement_post_id) + " AND profile_id = " + String(dict.engagement_profile_id);
             await connection.query(updateQuery, (err, result) => {
               if (err) {
                 console.log(err);
@@ -86,7 +89,7 @@ const addEngagement = async (dict, connection) => {
               }
               console.log("Successfully updated like_or_dislike field of engagement table!")
               resolve(result);
-            })
+            });
           });
         } else { // User has commented on the post
           var checkNull = "SELECT comment FROM engagement WHERE post_id = " + String(dict.engagement_post_id) + " AND profile_id = " + String(dict.engagement_profile_id);
@@ -98,7 +101,7 @@ const addEngagement = async (dict, connection) => {
             result = JSON.stringify(result);
             result = JSON.parse(result);
             //if (result.comment != null) { // If user has previously commented on this post, then update value
-            var updateQuery2 = "UPDATE engagement SET comment = '" + String(dict.comment) + "' WHERE post_id = " + String(dict.engagement_post_id) + " AND profile_id = " + String(dict.engagement_profile_id);
+            var updateQuery2 = `UPDATE engagement SET creation_date='${curr_date}', comment = "${dict.comment}" WHERE post_id = ${String(dict.engagement_post_id)} AND profile_id = ${String(dict.engagement_profile_id)}`;
             await connection.query(updateQuery2, (err, result) => {
               if (err) {
                 console.log(err);
@@ -141,6 +144,14 @@ const addEngagement = async (dict, connection) => {
           var id = Math.floor(Math.random() * 100000);
           var values = [[id,  dict.engagement_post_id,0,engagementID]];
           var addcomment = "INSERT INTO comm_engagement (comm_id, post_id, comm_like, engagement_id) VALUES ?";
+        
+        if ('like_dislike' in dict) {
+          var vals = [[engagementID, dict.engagement_post_id, dict.engagement_profile_id, dict.like_dislike, curr_date]];
+          var addEngagementQuery = "INSERT INTO engagement (engagement_id, post_id, profile_id, like_or_dislike, creation_date) VALUES ?";
+        } else {
+          var vals = [[engagementID, dict.engagement_post_id, dict.engagement_profile_id, dict.comment, curr_date]];
+          var addEngagementQuery = "INSERT INTO engagement (engagement_id, post_id, profile_id, comment, creation_date) VALUES ?";
+        }
 
         }
         await connection.query(addEngagementQuery, [vals], (err, result) => {
@@ -149,7 +160,7 @@ const addEngagement = async (dict, connection) => {
             reject(err.message);
           }
           console.log("Engagement Recorded Successfully!");
-
+          resolve(result);
         });
         if (!likes) {
           console.log("add comment");
@@ -166,6 +177,7 @@ const addEngagement = async (dict, connection) => {
         }
       }
       //
+      // resolve(result);
     });
   });
 
