@@ -199,7 +199,7 @@ app.get('/selectposts', (req, res) => {
 // Add new user
 app.post('/adduser', (req, res) => {
   const handlePosts = fork('./func/add_user.js');
-  handlePosts.send(req.query);
+  handlePosts.send(req.body);
   handlePosts.on("message", message => res.send(message));
 });
 
