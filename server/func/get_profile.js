@@ -14,7 +14,6 @@ process.on("message", message => {
     }
     console.log('Database connection established');
     getProfile(message.flag, getVar, connection).then(function (answer) {
-      connection.release();
       if (answer == "Account does not exist") {
         process.send({ "Error": "User does not exist" });
       } else {
