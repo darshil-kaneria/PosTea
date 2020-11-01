@@ -44,6 +44,7 @@ class _ProfileState extends State<Profile> {
     _value=0;
     getProfile();
     getFollowing();
+    getCount();
   }
 
   @override
@@ -137,6 +138,29 @@ class _ProfileState extends State<Profile> {
   var isFollow = false;
   var buttonColor = Colors.red[50];
   var followButtonText = "Follow";
+  
+  final ValueNotifier<int> followingCountNotifier = ValueNotifier<int>(0);
+  final ValueNotifier<int> followerCountNotifier = ValueNotifier<int>(0);
+
+  getCount() async {
+    http.get(
+      "http://postea-server.herokuapp.com/followdata?profile_id="+widget.profileId.toString()+"&flag=following_count",
+    ).then((value) {
+      var followingCount = jsonDecode(value.body);
+
+      followingCountNotifier.value = followingCount['followingCount'];
+      // followingCountNotifier.value
+    });
+    http.get(
+      "http://postea-server.herokuapp.com/followdata?profile_id="+widget.profileId.toString()+"&flag=follower_count",
+    ).then((value) {
+      var followerCount = jsonDecode(value.body);
+
+      followerCountNotifier.value = followerCount['followerCount'];
+      // followingCountNotifier.value
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
@@ -269,7 +293,12 @@ class _ProfileState extends State<Profile> {
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold),
                                             ),
-                                            Text("4.5k")
+                                            ValueListenableBuilder(
+                                              valueListenable: followerCountNotifier,
+                                              builder:(_, value, __) => Text(value.toString())
+
+                                              
+                                              )
                                           ],
                                         ),
                                         Padding(
@@ -290,7 +319,12 @@ class _ProfileState extends State<Profile> {
                                               style: TextStyle(
                                                   fontWeight: FontWeight.bold),
                                             ),
-                                            Text("4.4k")
+                                            ValueListenableBuilder(
+                                              valueListenable: followingCountNotifier,
+                                              builder:(_, value, __) => Text(value.toString())
+
+                                              
+                                              )
                                           ],
                                         )
                                       ],

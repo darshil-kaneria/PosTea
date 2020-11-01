@@ -71,18 +71,22 @@ class _TopicState extends State<Topic> {
         widget.profileId +
         "&flag=topic_list";
 
-    http.Response response = await http.get(url);
+    http.get(url).then((value) {
 
-    List topicList = jsonDecode(response.body);
+      var topicList = jsonDecode(value.body);
+      print(value.body);
 
     for (var i = 0; i < topicList.length; i++) {
-      if (topicList[i]['topic_id'] == widget.topicId) {
+      if (topicList[i]['topic_id'].toString() == widget.topicId) {
         topicFollowingText = "Following";
         isFollow = true;
-        buttonColor = Colors.redAccent[100];
-        setState(() {});
+        buttonColor = Colors.redAccent[100];        
       }
     }
+    setState(() {});
+    });
+
+    
   }
 
   @override
@@ -92,6 +96,7 @@ class _TopicState extends State<Topic> {
         profile_id: widget.profileId, topic_id: int.parse(widget.topicId));
     topicInfo = {"name": "", "desc": ""};
     getTopicInfo();
+    getTopicFollowing();
     setState(() {});
     // getTopicContent();
     checkPosScrollController.addListener(_scrollListener);
@@ -132,8 +137,8 @@ class _TopicState extends State<Topic> {
               child: Container(
                 alignment: Alignment.center,
                 child: Text(
-                  "Chess",
-                  // topicInfo['name'],
+                  // "Chess",
+                  topicInfo['name'],
                   style: TextStyle(fontSize: 20),
                 ),
               ),

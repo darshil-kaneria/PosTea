@@ -7,6 +7,7 @@ import 'package:postea_frontend/customWidgets/topic_pill.dart';
 import './expandedPostTile.dart';
 import 'package:postea_frontend/customWidgets/expandedPostTile.dart';
 import '../pages/profile.dart';
+import 'package:badges/badges.dart';
 
 class PostTile extends StatefulWidget {
   var post_id;
@@ -96,10 +97,19 @@ class _PostTileState extends State<PostTile> {
     return resp;
   }
 
-
-
   @override
   Widget build(BuildContext context) {
+
+    int post_likes = int.parse(widget.post_likes);
+    int post_dislikes = int.parse(widget.post_dislikes);
+    int post_comments = int.parse(widget.post_comments);
+
+    // print("post likes = " + widget.post_likes);
+
+    bool showLikeBadge = post_likes > 0;
+    bool showDislikeBadge = post_dislikes > 0;
+    bool showCommentsBadge = post_comments > 0;
+
     var screenheight = MediaQuery.of(context).size.height;
     var screenwidth = MediaQuery.of(context).size.width;
 
@@ -119,7 +129,7 @@ class _PostTileState extends State<PostTile> {
               height: screenheight/10,
               width: screenwidth/4,
               profileId: profile_id,
-              isOwner: true,
+              isOwner: false,
             ),
             leading: GestureDetector(
               onTap: () {
@@ -178,9 +188,9 @@ class _PostTileState extends State<PostTile> {
                                       topic_id,
                                       post_img,
                                       creation_date,
-                                      post_likes,
-                                      post_dislikes,
-                                      post_comments,
+                                      post_likes.toString(),
+                                      post_dislikes.toString(),
+                                      post_comments.toString(),
                                       post_title,
                                       name,
                                       myPID))))
@@ -199,78 +209,108 @@ class _PostTileState extends State<PostTile> {
             children: [
               Column(
                 children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.thumb_up,
-                      color: like_color,
+                  Badge(
+                    badgeColor: Colors.deepOrange[100],
+                    showBadge: showLikeBadge,
+                    animationType: BadgeAnimationType.fade,
+                    position: BadgePosition.topEnd(top: -1, end: -1),
+                    badgeContent: Text(post_likes.toString()),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.thumb_up,
+                        color: like_color,
+                      ),
+                      iconSize: 20,
+                      onPressed: () {
+                        like_or_dislike = "1";
+                        setState(() {
+                          if (dislike_color == Colors.deepOrange[200]) {
+                            dislike_color = Colors.black;
+                            post_likes++;
+                            post_dislikes--;
+                          }
+                          if (like_color == Colors.deepOrange[200]) {
+                            like_color = Colors.black;
+                            post_likes--;
+                          } else{
+                            like_color = Colors.deepOrange[200];
+                            post_likes++;
+                          }
+                        });
+                        print(post_id);
+                        print(profile_id);
+                        print(like_or_dislike);
+                        print(comment);
+                        var data = {
+                          "engagement_post_id": post_id,
+                          "engagement_profile_id": profile_id,
+                          "like_dislike": like_or_dislike,
+                          "comment": comment
+                        };
+                        var sendAnswer = JsonEncoder().convert(data);
+                        print(sendAnswer);
+                        Future<http.Response> resp = http.post(
+                            'http://postea-server.herokuapp.com/engagement',
+                            headers: {'Content-Type': 'application/json'},
+                            body: sendAnswer);
+                      },
                     ),
-                    iconSize: 20,
-                    onPressed: () {
-                      like_or_dislike = "1";
-                      setState(() {
-                        if (dislike_color == Colors.deepOrange[200]) {
-                          dislike_color = Colors.black;
-                        }
-                        if (like_color == Colors.deepOrange[200]) {
-                          like_color = Colors.black;
-                        } else
-                          like_color = Colors.deepOrange[200];
-                      });
-                      print(post_id);
-                      print(profile_id);
-                      print(like_or_dislike);
-                      print(comment);
-                      var data = {
-                        "engagement_post_id": post_id,
-                        "engagement_profile_id": profile_id,
-                        "like_dislike": like_or_dislike,
-                        "comment": comment
-                      };
-                      var sendAnswer = JsonEncoder().convert(data);
-                      print(sendAnswer);
-                      Future<http.Response> resp = http.post(
-                          'http://postea-server.herokuapp.com/engagement',
-                          headers: {'Content-Type': 'application/json'},
-                          body: sendAnswer);
-                    },
                   ),
                 ],
               ),
-              IconButton(
-                icon: Icon(
-                  Icons.thumb_down,
-                  color: dislike_color,
-                ),
-                iconSize: 20,
-                onPressed: () {
-                  setState(() {
-                    like_or_dislike = "0";
-                    if (like_color == Colors.deepOrange[200]) {
-                      like_color = Colors.black;
-                    }
-                    if (dislike_color == Colors.deepOrange[200]) {
-                      dislike_color = Colors.black;
-                    } else
-                      dislike_color = Colors.deepOrange[200];
-                  });
+              Badge(
+                badgeContent: Container(child: Text(post_dislikes.toString())),
+                badgeColor: Colors.deepOrange[100],
+                position: BadgePosition.topEnd(top: -1, end: -1),
+                animationType: BadgeAnimationType.fade,
+                showBadge: showDislikeBadge,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.thumb_down,
+                    color: dislike_color,
+                  ),
+                  iconSize: 20,
+                  onPressed: () {
+                    setState(() {
+                      like_or_dislike = "0";
+                      if (like_color == Colors.deepOrange[200]) {
+                        like_color = Colors.black;
+                        post_likes--;
+                        post_dislikes++;
+                      }
+                      if (dislike_color == Colors.deepOrange[200]) {
+                        dislike_color = Colors.black;
+                        post_dislikes--;
+                      } else
+                        dislike_color = Colors.deepOrange[200];
+                        post_dislikes++;
+                    });
 
-                  var data = {
-                    "engagement_post_id": post_id,
-                    "engagement_profile_id": profile_id,
-                    "like_dislike": like_or_dislike,
-                    "comment": comment
-                  };
-                  var sendAnswer = JsonEncoder().convert(data);
-                  Future<http.Response> resp = http.post(
-                      'http://postea-server.herokuapp.com/engagement',
-                      headers: {'Content-Type': 'application/json'},
-                      body: sendAnswer);
-                },
+                    var data = {
+                      "engagement_post_id": post_id,
+                      "engagement_profile_id": profile_id,
+                      "like_dislike": like_or_dislike,
+                      "comment": comment
+                    };
+                    var sendAnswer = JsonEncoder().convert(data);
+                    Future<http.Response> resp = http.post(
+                        'http://postea-server.herokuapp.com/engagement',
+                        headers: {'Content-Type': 'application/json'},
+                        body: sendAnswer);
+                  },
+                ),
               ),
-              IconButton(
-                icon: Icon(Icons.comment),
-                iconSize: 20,
-                onPressed: () {},
+              Badge(
+                showBadge: showCommentsBadge,
+                badgeColor: Colors.deepOrange[100],
+                position: BadgePosition.topEnd(top: -1, end: -1),
+                badgeContent: Text(post_comments.toString()),
+                animationType: BadgeAnimationType.fade,
+                child: IconButton(
+                  icon: Icon(Icons.comment),
+                  iconSize: 20,
+                  onPressed: () {},
+                ),
               ),
               Expanded(
                 child: Container(

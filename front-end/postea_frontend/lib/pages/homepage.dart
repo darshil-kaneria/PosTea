@@ -543,6 +543,7 @@ class _HomePageState extends State<HomePage> {
                           //   }
 
                           // }
+                          print("LIKES ARE: " + timeLine.postList.elementAt(index).post_likes);
                           return PostTile(
                               timeLine.postList.elementAt(index).post_id,
                               timeLine.postList.elementAt(index).profile_id,
