@@ -1,5 +1,6 @@
 const db = require('./db_connection.js');
 
+
 process.on("message", message => {
   db.conn.getConnection(async (err, connection) => {
     if (err) {
@@ -35,7 +36,8 @@ const addEngagement = async (dict, connection) => {
   var engagementID = Math.floor(Math.random() * 100000);
   var updatequery = "UPDATE user_post SET post_likes = post_likes + 1 WHERE post_id = ?";
   var updateQuery2 = "UPDATE user_post SET post_dislikes = post_dislikes + 1 WHERE post_id = ?";
-
+  var like_dislike_null = false;
+  var commet_null = false;
 
 
 
@@ -62,9 +64,29 @@ const addEngagement = async (dict, connection) => {
             }
             result = JSON.stringify(result);
             result = JSON.parse(result);
+            var isLikeOrDislike = result[0]['like_or_dislike'];
+            if(isLikeOrDislike == dict.like_dislike){
+              // make it null
+             var nullQuery = "UPDATE engagement SET like_or_dislike = NULL";
+             await connection.query(nullQuery, (err, result) => {
+              if(err){
+                reject(err.message);
+              }
+              like_dislike_null = true;
+              resolve("emergency push");
+             });
+            }
             // check to see if user has previously liked or disliked the post
             //if (result.like_or_dislike != null) { // If user has liked/disliked the post previously, then update the value
-            
+            updateQuery = "UPDATE engagement SET creation_date='" +curr_date+"', like_or_dislike = " + String(dict.like_dislike) + " WHERE post_id = " + String(dict.engagement_post_id) + " AND profile_id = " + String(dict.engagement_profile_id);
+            await connection.query(updateQuery, (err, result) => {
+              if (err) {
+                console.log(err);
+                reject(err.message);
+              }
+              console.log("Successfully updated like_or_dislike field of engagement table!")
+              resolve(result);
+            });
             if (dict.like_dislike) {
               updatequery = "UPDATE user_post SET post_likes = post_likes + 1 WHERE post_id = " + String(dict.engagement_post_id);
             } else if (dict.like_dislike == 0) {
@@ -81,15 +103,8 @@ const addEngagement = async (dict, connection) => {
 
             });
             //updateQuery = "UPDATE engagement SET like_or_dislike = " + String(dict.like_dislike) + " WHERE post_id = " + String(dict.engagement_post_id) + " AND profile_id = " + String(dict.engagement_profile_id);
-            updateQuery = "UPDATE engagement SET creation_date='" +curr_date+"', like_or_dislike = " + String(dict.like_dislike) + " WHERE post_id = " + String(dict.engagement_post_id) + " AND profile_id = " + String(dict.engagement_profile_id);
-            await connection.query(updateQuery, (err, result) => {
-              if (err) {
-                console.log(err);
-                reject(err.message);
-              }
-              console.log("Successfully updated like_or_dislike field of engagement table!")
-              resolve(result);
-            });
+            
+            
           });
         } else { // User has commented on the post
           var checkNull = "SELECT comment FROM engagement WHERE post_id = " + String(dict.engagement_post_id) + " AND profile_id = " + String(dict.engagement_profile_id);
