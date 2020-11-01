@@ -83,9 +83,18 @@ class ProcessTimeline{
   processPosts() async {
 
     for(int i = 0; i < posts['result'].length; i++){
+      var name;
+      if(posts['result'][i]['is_anonymous'].toString() == "1"){
+        name = "Anonymous";
+      }
+      else{
 
-      http.Response resp = await http.get("http://postea-server.herokuapp.com/profile/"+posts['result'][i]['profile_id'].toString());
-      Map<String, dynamic> profileJson = jsonDecode(resp.body);
+        http.Response resp = await http.get("http://postea-server.herokuapp.com/profile/"+posts['result'][i]['profile_id'].toString());
+        Map<String, dynamic> profileJson = jsonDecode(resp.body);
+        name = profileJson['message']['name'];
+
+      }
+      
       // print(profileJson['message']['name']);
       Post newPost = Post(
         posts['result'][i]['post_id'].toString(),
@@ -99,7 +108,7 @@ class ProcessTimeline{
         posts['result'][i]['post_dislikes'].toString(),
         posts['result'][i]['post_comments'].toString(),
         posts['result'][i]['post_title'].toString(),
-        profileJson['message']['name']
+        name
         // "Darshil Kaneria"
       );
       print(posts['result'][i]['post_id']);

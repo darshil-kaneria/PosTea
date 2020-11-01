@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:postea_frontend/customWidgets/topic_pill.dart';
 import './expandedPostTile.dart';
 import 'package:postea_frontend/customWidgets/expandedPostTile.dart';
 import '../pages/profile.dart';
@@ -97,6 +98,9 @@ class _PostTileState extends State<PostTile> {
 
   @override
   Widget build(BuildContext context) {
+    var screenheight = MediaQuery.of(context).size.height;
+    var screenwidth = MediaQuery.of(context).size.width;
+
     return Card(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
@@ -106,6 +110,13 @@ class _PostTileState extends State<PostTile> {
       child: Column(
         children: [
           ListTile(
+            trailing: TopicPill(
+              topicId: topic_id,
+              col1: Colors.purple[900],
+              col2: Colors.purple[400],
+              height: screenheight/10,
+              width: screenwidth/4,
+            ),
             leading: GestureDetector(
               onTap: () {
                 if (myPID != widget.profile_id) {
