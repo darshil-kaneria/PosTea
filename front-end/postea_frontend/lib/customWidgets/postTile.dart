@@ -128,7 +128,7 @@ class _PostTileState extends State<PostTile> {
               col2: Colors.purple[400],
               height: screenheight/10,
               width: screenwidth/4,
-              profileId: profile_id,
+              profileId: myPID,
               isOwner: false,
             ),
             leading: GestureDetector(
@@ -153,7 +153,7 @@ class _PostTileState extends State<PostTile> {
               ),
             ),
             title: Text(
-              name,
+              profile_id != -1?name:"Anonymous",
               style: TextStyle(fontSize: 20),
             ),
             subtitle: Row(

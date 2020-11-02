@@ -10,7 +10,10 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:postea_frontend/main.dart';
 import 'package:postea_frontend/pages/edit_profile.dart';
+import 'package:postea_frontend/pages/followingList.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'followerList.dart';
 
 class Profile extends StatefulWidget {
   int profileId;
@@ -141,6 +144,11 @@ class _ProfileState extends State<Profile> {
   
   final ValueNotifier<int> followingCountNotifier = ValueNotifier<int>(0);
   final ValueNotifier<int> followerCountNotifier = ValueNotifier<int>(0);
+  final ValueNotifier<int> followingListNotifier = ValueNotifier<int>(0);
+  final ValueNotifier<int> followerListNotifier = ValueNotifier<int>(0);
+
+  List<String> followingList = [];
+  List<String> followerList = [];
 
   getCount() async {
     http.get(
@@ -160,6 +168,8 @@ class _ProfileState extends State<Profile> {
       // followingCountNotifier.value
     });
   }
+
+  
 
   @override
   Widget build(BuildContext context) {
@@ -288,11 +298,16 @@ class _ProfileState extends State<Profile> {
                                       children: [
                                         Column(
                                           children: [
-                                            Text(
-                                              "Followers",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold),
-                                            ),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.push(context, MaterialPageRoute(builder: (_) => FollowerList(profileId: widget.profileId,))).then((value) => setState((){}));
+                                                  },
+                                                  child: Text(
+                                                    "Followers",
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight.bold),
+                                                  ),
+                                                ),
                                             ValueListenableBuilder(
                                               valueListenable: followerCountNotifier,
                                               builder:(_, value, __) => Text(value.toString())
@@ -314,10 +329,15 @@ class _ProfileState extends State<Profile> {
                                                 horizontal: screenWidth / 25)),
                                         Column(
                                           children: [
-                                            Text(
-                                              "Following",
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold),
+                                            GestureDetector(
+                                              onTap: () {
+                                                    Navigator.push(context, MaterialPageRoute(builder: (_) => FollowingList(profileId: widget.profileId,))).then((value) => setState((){}));
+                                                  },
+                                              child: Text(
+                                                "Following",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold),
+                                              ),
                                             ),
                                             ValueListenableBuilder(
                                               valueListenable: followingCountNotifier,

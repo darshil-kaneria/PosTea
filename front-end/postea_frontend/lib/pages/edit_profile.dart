@@ -4,6 +4,7 @@ import 'package:custom_switch/custom_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/colors.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'dart:io' as io;
 import 'package:file/file.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -12,7 +13,7 @@ class EditProfile extends StatefulWidget {
   var biodata;
   bool privacy;
   var username;
-  File profilePic;
+  io.File profilePic;
 
   EditProfile(
       {@required this.nameText, this.biodata, this.privacy, this.username});
@@ -24,8 +25,9 @@ class EditProfile extends StatefulWidget {
 class _EditProfileState extends State<EditProfile> {
   var nameController = TextEditingController();
   var biodataController = TextEditingController();
-  File profilePic;
+  io.File profilePic;
   var _image;
+   
 
   @override
   void initState() {
@@ -78,7 +80,7 @@ class _EditProfileState extends State<EditProfile> {
   Widget build(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
-
+    var profileImgName = widget.username.toString() + ".JPG";
     return SafeArea(
       child: Scaffold(
         backgroundColor: bgColor,
@@ -262,9 +264,9 @@ class _EditProfileState extends State<EditProfile> {
                     color: loginButton,
                     highlightColor: Colors.red[700],
                     onPressed: () async {
-                      updateProfile();
+                      await updateProfile();
                       print("profile pic is " + profilePic.toString());
-                      await uploadProfilePic(profilePic);
+                      // await uploadProfilePic(profilePic);
                       Navigator.pop(context);
                     },
                     child: Text(
