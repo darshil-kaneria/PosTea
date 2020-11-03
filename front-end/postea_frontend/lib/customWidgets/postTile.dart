@@ -99,7 +99,6 @@ class _PostTileState extends State<PostTile> {
 
   @override
   Widget build(BuildContext context) {
-
     int post_likes = int.parse(widget.post_likes);
     int post_dislikes = int.parse(widget.post_dislikes);
     int post_comments = int.parse(widget.post_comments);
@@ -131,26 +130,27 @@ class _PostTileState extends State<PostTile> {
               profileId: myPID,
               isOwner: false,
             ),
-            leading: GestureDetector(
-              onTap: () {
-                if (myPID != widget.profile_id) {
+            onTap: () => {
+              if (myPID != widget.profile_id)
+                {
                   Navigator.of(context).push(new MaterialPageRoute(
                       builder: (context) => Profile(
                             profileId: int.parse(profile_id),
                             isOwner: false,
-                          )));
-                } else {
+                          )))
+                }
+              else
+                {
                   Navigator.of(context).push(new MaterialPageRoute(
                       builder: (context) => Profile(
                             profileId: int.parse(profile_id),
                             isOwner: true,
-                          )));
-                }
-              },
-              child: CircleAvatar(
-                backgroundImage: NetworkImage("https://picsum.photos/200"),
-                backgroundColor: Colors.deepPurpleAccent[50],
-              ),
+                          )))
+                },
+            },
+            leading: CircleAvatar(
+              backgroundImage: NetworkImage("https://picsum.photos/200"),
+              backgroundColor: Colors.deepPurpleAccent[50],
             ),
             title: Text(
               profile_id != -1?name:"Anonymous",
@@ -232,7 +232,7 @@ class _PostTileState extends State<PostTile> {
                           if (like_color == Colors.deepOrange[200]) {
                             like_color = Colors.black;
                             post_likes--;
-                          } else{
+                          } else {
                             like_color = Colors.deepOrange[200];
                             post_likes++;
                           }
@@ -283,7 +283,7 @@ class _PostTileState extends State<PostTile> {
                         post_dislikes--;
                       } else
                         dislike_color = Colors.deepOrange[200];
-                        post_dislikes++;
+                      post_dislikes++;
                     });
 
                     var data = {

@@ -19,13 +19,11 @@ class ProcessTrending {
   http.Response resp;
 
   Future<http.Response> getPosts() async {
-
     var url = "http://postea-server.herokuapp.com/getTrendingPosts";
-    await http.get(url).then((value) {
+    await http.get(url).then((value) async {
       resp = value;
       posts = jsonDecode(value.body);
-      processPosts();
-
+      await processPosts();
     });
     return resp;
   }
