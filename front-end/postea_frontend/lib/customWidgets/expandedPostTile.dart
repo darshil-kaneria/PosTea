@@ -71,7 +71,7 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
   var num_likes;
   var num_dislikes;
   List<String> comments = [];
-  var comment_string = "Add a comment...";
+  ValueNotifier<String> comment_string = ValueNotifier<String>("Add comment");
 
   Color like_color = Colors.black;
   Color dislike_color = Colors.black;
@@ -306,6 +306,8 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
                           AsyncSnapshot<dynamic> snapshot) {
                             comments = [];
                         if (snapshot.hasData) {
+                          bool myComm = false;
+                          var myCommId = 0;
                           print("response");
                           var engagements = jsonDecode(snapshot.data.body);
                           print(engagements[0]['comment']);
@@ -313,6 +315,13 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
                           for (int i = 0; i < engagements.length; i++) {
                             if (engagements[i]['comment'] == null) {
                               continue;
+                            }
+                            print(engagements[i]['comment'].toString() != null && engagements[i]['profile_id'].toString() == myPID.toString());
+                            if(engagements[i]['comment'].toString() != null && engagements[i]['profile_id'].toString() == myPID.toString()){
+                              print("IN HERE");
+
+                              commentController.text = engagements[i]['comment'];
+                              comment_string.value = "Edit comment";
                             }
                             comments.add(engagements[i]['comment'].toString());
                           }
@@ -410,16 +419,19 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
                     child: RaisedButton(
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20)),
-                      child: Text(
-                        comment_string,
-                        style: TextStyle(fontSize: 15),
+                      child: ValueListenableBuilder(
+                        valueListenable: comment_string,
+                        builder: (_, value, __) => Text(
+                          value.toString(),
+                          style: TextStyle(fontSize: 15),
+                        ),
                       ),
                       onPressed: () async {
                         var reqBody = {
                           "engagement_post_id": post_id,
                           "engagement_profile_id": myPID,
                           "like_dislike": null,
-                          "comment": commentController.text
+                          "comment": commentController.text == "" ? null: commentController.text
                         };
 
                         var reqBodyJson = jsonEncode(reqBody);
