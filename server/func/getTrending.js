@@ -13,7 +13,7 @@ process.on("message", message => {
             process.exit();
         }).catch((err) => {
             connection.release();
-            process.send({"result": "error"});
+            process.send({"result": err.message});
             process.exit();
         });
     });
@@ -27,7 +27,7 @@ getTrending = async (message, connection) => {
         curr_date.setHours(curr_date.getHours()-1)
         printDate = curr_date.toISOString().slice(0, 19).replace('T', ' ');
         // replace hardcode with printDate
-        var getEngLastHour = `select e.engagement_id, e.post_id, e.profile_id, e.like_or_dislike, e.comment, e.creation_date, p.is_private from engagement e join profile p where e.profile_id = p.profile_id and p.is_private != 1 and e.creation_date >= '2020-10-31 07:53:30'`;
+        var getEngLastHour = `select e.engagement_id, e.post_id, e.profile_id, e.like_or_dislike, e.comment, e.creation_date, p.is_private from engagement e join profile p where e.profile_id = p.profile_id and p.is_private != 1 and e.creation_date >= '${curr_date}'`;
         await connection.query({sql: getEngLastHour, timeout: 120000}, async (err, result) => {
             if(err){
                 reject(err.message);
@@ -102,11 +102,22 @@ getTrending = async (message, connection) => {
             finalList.sort((a, b) => (a.ratio >= b.ratio) && (a.totalCountPerPost >= b.totalCountPerPost) ? 1 : -1).reverse();
             console.log(finalList);
             finalListString = "";
-            for(var i = 0; i < finalList.length; i++){
-                if(i != finalList.length-1)
-                    finalListString = finalListString.concat(finalList[i]['postId']+", ");
-                else
-                    finalListString = finalListString.concat(finalList[i]['postId']+")");
+            if(finalList.length == 1){
+                finalListString = "("+finalList[0]+")";
+            }
+            else if(finalList.length > 1){
+
+                for(var i = 0; i < finalList.length; i++){
+                    if(i != finalList.length-1)
+                        finalListString = finalListString.concat(finalList[i]['postId']+", ");
+                    else
+                        finalListString = finalListString.concat(finalList[i]['postId']+")");
+                }
+
+            }
+            
+            if(finalListString == ""){
+                resolve("No_trending");
             }
             var query = `SELECT * FROM user_post WHERE post_id in (${finalListString} ORDER BY FIELD(post_id, ${finalListString}`;
             await connection.query({sql: query, timeout: 120000}, (err, result) => {
