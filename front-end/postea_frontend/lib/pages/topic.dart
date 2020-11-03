@@ -23,6 +23,9 @@ class _TopicState extends State<Topic> {
   var checkPosScrollController = new ScrollController();
   var topicFollowingText = "Follow";
   var isFollow = false;
+
+  ValueNotifier<String> topicNameNotifier = ValueNotifier("");
+  ValueNotifier<String> topicDescNotifier = ValueNotifier("");
   // var isOwner;
 
   // _TopicState({this.isOwner});
@@ -57,6 +60,8 @@ class _TopicState extends State<Topic> {
   getTopicInfo() async {
     topic.getTopicInfo().then((value) {
       topicInfo = value;
+      topicNameNotifier.value = topicInfo['name'];
+      topicDescNotifier.value = topicInfo['desc'];
       print(topicInfo);
     });
   }
@@ -68,32 +73,30 @@ class _TopicState extends State<Topic> {
 
   getTopicFollowing() async {
     var url = "http://postea-server.herokuapp.com/userfollowedtopics?user_id=" +
-        widget.profileId +
+        widget.profileId.toString() +
         "&flag=topic_list";
 
     http.get(url).then((value) {
-
       var topicList = jsonDecode(value.body);
       print(value.body);
 
-    for (var i = 0; i < topicList.length; i++) {
-      if (topicList[i]['topic_id'].toString() == widget.topicId) {
-        topicFollowingText = "Following";
-        isFollow = true;
-        buttonColor = Colors.redAccent[100];        
+      for (var i = 0; i < topicList.length; i++) {
+        if (topicList[i]['topic_id'].toString() == widget.topicId) {
+          topicFollowingText = "Following";
+          isFollow = true;
+          buttonColor = Colors.redAccent[100];
+        }
       }
-    }
-    setState(() {});
+      setState(() {});
     });
-
-    
   }
 
   @override
   void initState() {
     // TODO: implement initState
     topic = new ProcessTopic(
-        profile_id: widget.profileId, topic_id: int.parse(widget.topicId));
+        profile_id: widget.profileId,
+        topic_id: int.parse(widget.topicId.toString()));
     topicInfo = {"name": "", "desc": ""};
     getTopicInfo();
     getTopicFollowing();
@@ -136,11 +139,15 @@ class _TopicState extends State<Topic> {
               flex: 1,
               child: Container(
                 alignment: Alignment.center,
-                child: Text(
-                  // "Chess",
-                  topicInfo['name'],
-                  style: TextStyle(fontSize: 20),
-                ),
+                child: ValueListenableBuilder(
+                    valueListenable: topicNameNotifier,
+                    builder: (_, value, __) {
+                      return Text(
+                        // "Chess",
+                        value,
+                        style: TextStyle(fontSize: 20),
+                      );
+                    }),
               ),
             ),
             Expanded(
@@ -207,7 +214,12 @@ class _TopicState extends State<Topic> {
                 elevation: 0,
                 child: Container(
                   width: screenWidth,
-                  child: SingleChildScrollView(child: Text(topicInfo['desc'])),
+                  child: SingleChildScrollView(
+                      child: ValueListenableBuilder(
+                          valueListenable: topicDescNotifier,
+                          builder: (_, value, __) {
+                            return Text(value);
+                          })),
                 ),
               ),
             ),

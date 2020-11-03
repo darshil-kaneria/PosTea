@@ -6,7 +6,6 @@ import 'package:http/http.dart' as http;
 import '../pages/topic.dart';
 
 class TopicPill extends StatefulWidget {
-
   var profileId;
   bool isOwner;
   var topicId;
@@ -15,10 +14,19 @@ class TopicPill extends StatefulWidget {
   var height;
   var width;
 
-  TopicPill({@required this.topicId, this.col1, this.col2, this.height, this.width, this.profileId, this.isOwner});
+  TopicPill(
+      {@required this.topicId,
+      this.col1,
+      this.col2,
+      this.height,
+      this.width,
+      this.profileId,
+      this.isOwner});
   @override
   _TopicPillState createState() => _TopicPillState();
 }
+
+// final ValueNotifier<String> topicNameNotifier = new ValueNotifier<String>("");
 
 class _TopicPillState extends State<TopicPill> {
   @override
@@ -27,52 +35,48 @@ class _TopicPillState extends State<TopicPill> {
     getTopicName();
     super.initState();
   }
- var name = "";
-  getTopicName() async {
 
-    http.get("http://postea-server.herokuapp.com/topic?topic_id="+widget.topicId.toString()).then((value){
+  var name = "";
+  getTopicName() async {
+    http
+        .get("http://postea-server.herokuapp.com/topic?topic_id=" +
+            widget.topicId.toString())
+        .then((value) {
       var valueString = jsonDecode(value.body);
       name = valueString[0]['topic_name'];
-      setState(() {
-
-      });
+      setState(() {});
     });
+  }
 
-    }
   @override
   Widget build(BuildContext context) {
-
-      
-
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
 
     return Container(
-
       margin: EdgeInsets.only(top: 10, left: 10, right: 10),
       height: widget.height,
       width: widget.width,
       decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [
-          widget.col1,
-          widget.col2
-        ]),
-        borderRadius: BorderRadius.all(Radius.circular(50))
-      ),
+          gradient: LinearGradient(colors: [widget.col1, widget.col2]),
+          borderRadius: BorderRadius.all(Radius.circular(50))),
       child: GestureDetector(
         onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (_) => Topic(profileId: widget.profileId, isOwner: widget.isOwner, topicId: widget.topicId,)));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (_) => Topic(
+                        profileId: widget.profileId,
+                        isOwner: widget.isOwner,
+                        topicId: widget.topicId,
+                      )));
         },
-              child: Center(
-               child: AutoSizeText(
-              name,
-              style: TextStyle(fontSize: 15, color: Colors.white),
-            )
-        ),
+        child: Center(
+            child: AutoSizeText(
+          name,
+          style: TextStyle(fontSize: 15, color: Colors.white),
+        )),
       ),
-      
     );
   }
-  }
-
-
+}
