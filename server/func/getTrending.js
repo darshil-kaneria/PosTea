@@ -126,7 +126,6 @@ getTrending = async (message, connection) => {
                 if(err){
                     reject(err);
                 }
-                redis.del('posts');
                 redis.on("connect", function () {
                     console.log("Cache connection established");
                     resultString = JSON.stringify(result);
