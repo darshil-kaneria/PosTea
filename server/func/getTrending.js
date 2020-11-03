@@ -20,19 +20,19 @@ process.on("message", message => {
 });
 
 getTrending = async (message, connection) => {
-
+    
     return new Promise(async (resolve, reject)=>{
+        var redis = db.redis_conn.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
         var curr_date = new Date()
         var printDate = curr_date.toISOString().slice(0, 19).replace('T', ' ');
-        curr_date.setHours(curr_date.getHours()-1)
+        curr_date.setHours(curr_date.getHours()-3);
         printDate = curr_date.toISOString().slice(0, 19).replace('T', ' ');
         // replace hardcode with printDate
-        var getEngLastHour = `select e.engagement_id, e.post_id, e.profile_id, e.like_or_dislike, e.comment, e.creation_date, p.is_private from engagement e join profile p where e.profile_id = p.profile_id and p.is_private != 1 and e.creation_date >= '${curr_date}'`;
+        var getEngLastHour = `select e.engagement_id, e.post_id, e.profile_id, e.like_or_dislike, e.comment, e.creation_date, p.is_private from engagement e join profile p where e.profile_id = p.profile_id and p.is_private != 1 and e.creation_date >= '${printDate}'`;
         await connection.query({sql: getEngLastHour, timeout: 120000}, async (err, result) => {
             if(err){
                 reject(err.message);
             }
-
             // Calculate total engagements per post
             result = JSON.stringify(result);
             result = JSON.parse(result);
@@ -119,13 +119,14 @@ getTrending = async (message, connection) => {
             if(finalListString == ""){
                 resolve("No_trending");
             }
+            
             var query = `SELECT * FROM user_post WHERE post_id in (${finalListString} ORDER BY FIELD(post_id, ${finalListString}`;
             await connection.query({sql: query, timeout: 120000}, (err, result) => {
 
                 if(err){
                     reject(err);
                 }
-                var redis = db.redis_conn.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
+                redis.del('posts');
                 redis.on("connect", function () {
                     console.log("Cache connection established");
                     resultString = JSON.stringify(result);
