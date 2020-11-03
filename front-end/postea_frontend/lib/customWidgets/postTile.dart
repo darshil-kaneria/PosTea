@@ -65,7 +65,7 @@ class _PostTileState extends State<PostTile> {
   var post_comments;
   var post_title;
   var like_or_dislike = "NULL";
-  var comment = "";
+  var comment;
   var name;
   var myPID;
   var like_count;
@@ -243,7 +243,7 @@ class _PostTileState extends State<PostTile> {
                         print(comment);
                         var data = {
                           "engagement_post_id": post_id,
-                          "engagement_profile_id": profile_id,
+                          "engagement_profile_id": myPID,
                           "like_dislike": like_or_dislike,
                           "comment": comment
                         };
@@ -288,7 +288,7 @@ class _PostTileState extends State<PostTile> {
 
                     var data = {
                       "engagement_post_id": post_id,
-                      "engagement_profile_id": profile_id,
+                      "engagement_profile_id": myPID,
                       "like_dislike": like_or_dislike,
                       "comment": comment
                     };

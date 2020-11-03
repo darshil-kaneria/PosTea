@@ -77,6 +77,7 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
   Color dislike_color = Colors.black;
 
   Future<http.Response> engagementInfo() async {
+    comments = [];
     http.Response resp;
     var url = "http://postea-server.herokuapp.com/engagement?post_id=" +
         post_id.toString();
@@ -91,7 +92,7 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
   //   print("please print comments");
   //   print(comments.comments);
   // }
-
+    var commentController = TextEditingController();
   _ExpandedPostTileState(
       this.post_id,
       this.profile_id,
@@ -115,6 +116,7 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
     double screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       appBar: new AppBar(),
       body: Container(
         color: Colors.white,
@@ -302,6 +304,7 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
                       future: engagementInfo(),
                       builder: (BuildContext context,
                           AsyncSnapshot<dynamic> snapshot) {
+                            comments = [];
                         if (snapshot.hasData) {
                           print("response");
                           var engagements = jsonDecode(snapshot.data.body);
@@ -325,7 +328,7 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
                                 print('in list view builder');
                                 print(comments.elementAt(index));
                                 return Comments(
-                                    comments.elementAt(index), "Vidit");
+                                    comments.elementAt(index), "Darshil");
                               });
                         } else {
                           return Container();
@@ -392,6 +395,7 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
                 Container(
                   margin: EdgeInsets.only(left: 15, right: 15),
                   child: TextField(
+                    controller: commentController,
                     decoration: InputDecoration(labelText: "Your comment:"),
                   ),
                 )
@@ -410,7 +414,21 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
                         comment_string,
                         style: TextStyle(fontSize: 15),
                       ),
-                      onPressed: () => {},
+                      onPressed: () async {
+                        var reqBody = {
+                          "engagement_post_id": post_id,
+                          "engagement_profile_id": myPID,
+                          "like_dislike": null,
+                          "comment": commentController.text
+                        };
+
+                        var reqBodyJson = jsonEncode(reqBody);
+                        http.post(
+                          "http://postea-server.herokuapp.com/engagement",
+                          headers: {"Content-Type": "application/json"},
+                          body: reqBodyJson
+                        ).then((value) => print(value.body));
+                      },
                     ),
                   ),
                 ))
