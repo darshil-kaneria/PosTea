@@ -39,8 +39,6 @@ const addEngagement = async (dict, connection) => {
   var like_dislike_null = false;
   var commet_null = false;
 
-
-
   var curr_date = new Date().toISOString().slice(0, 19).replace('T', ' ');
 
   return new Promise(async (resolve, reject) => {
@@ -49,6 +47,7 @@ const addEngagement = async (dict, connection) => {
     await connection.query(existsQuery, async (err, result) => {
 
       if(err){
+        
         reject(err.message);
       }
 
@@ -123,7 +122,7 @@ const addEngagement = async (dict, connection) => {
         console.log(result);
         // Engagement already exists. Either delete or update according to what the user wants.
         if(dict.like_dislike == 1 && result[0]['like_or_dislike'] == "0"){
-          var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.like_or_dislike = " + String(dict.like_dislike) + ", user_post.post_likes = user_post.post_likes + 1, user_post.post_dislikes = user_post.post_dislikes - 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id)+" AND user_post.profile_id="+ String(dict.engagement_profile_id);
+          var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.like_or_dislike = " + String(dict.like_dislike) + ", user_post.post_likes = user_post.post_likes + 1, user_post.post_dislikes = user_post.post_dislikes - 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id);
           await connection.query(updateQuery, async (err, result) => {
             if(err){
               reject(err.message);
@@ -134,7 +133,7 @@ const addEngagement = async (dict, connection) => {
           });
         }
         else if(dict.like_dislike == 0 && result[0]['like_or_dislike'] == "1"){
-          var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.like_or_dislike = " + String(dict.like_dislike) + ", user_post.post_likes = user_post.post_likes - 1, user_post.post_dislikes = user_post.post_dislikes + 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id)+" AND user_post.profile_id="+ String(dict.engagement_profile_id);
+          var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.like_or_dislike = " + String(dict.like_dislike) + ", user_post.post_likes = user_post.post_likes - 1, user_post.post_dislikes = user_post.post_dislikes + 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id);
           await connection.query(updateQuery, async (err, result) => {
             if(err){
               reject(err.message);
@@ -146,7 +145,7 @@ const addEngagement = async (dict, connection) => {
         }
         else if((dict.like_dislike == 0 || dict.like_dislike == 1) && result[0]['like_or_dislike'] == null){
           if(dict.like_dislike == 1){
-            var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.like_or_dislike = " + String(dict.like_dislike) + ", user_post.post_likes = user_post.post_likes + 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id)+" AND user_post.profile_id="+ String(dict.engagement_profile_id);
+            var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.like_or_dislike = " + String(dict.like_dislike) + ", user_post.post_likes = user_post.post_likes + 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id);
             await connection.query(updateQuery, async (err, result) => {
               if(err){
                 reject(err.message);
@@ -155,7 +154,7 @@ const addEngagement = async (dict, connection) => {
             });
           }
           else if(dict.like_dislike == 0){
-            var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.like_or_dislike = " + String(dict.like_dislike) + ", user_post.post_dislikes = user_post.post_dislikes + 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id)+" AND user_post.profile_id="+ String(dict.engagement_profile_id);
+            var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.like_or_dislike = " + String(dict.like_dislike) + ", user_post.post_dislikes = user_post.post_dislikes + 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id);
             await connection.query(updateQuery, async (err, result) => {
               if(err){
                 reject(err.message);
@@ -167,12 +166,12 @@ const addEngagement = async (dict, connection) => {
         }
         else if(String(dict.like_dislike) == result[0]['like_or_dislike']){
           // Check unlike or undislike
-          var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.like_or_dislike = " + String(dict.like_dislike) + ", user_post.post_dislikes = user_post.post_dislikes + 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id)+" AND user_post.profile_id="+ String(dict.engagement_profile_id);
+          var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.like_or_dislike = " + String(dict.like_dislike) + ", user_post.post_dislikes = user_post.post_dislikes + 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id);
           if(result[0]['like_or_dislike'] == "1"){
-            var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.like_or_dislike = NULL, user_post.post_likes = user_post.post_likes - 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id)+" AND user_post.profile_id="+ String(dict.engagement_profile_id);
+            var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.like_or_dislike = NULL, user_post.post_likes = user_post.post_likes - 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id);
           }
           else if(result[0]['like_or_dislike'] == "0"){
-            var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.like_or_dislike = NULL, user_post.post_dislikes = user_post.post_dislikes - 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id)+" AND user_post.profile_id="+ String(dict.engagement_profile_id);
+            var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.like_or_dislike = NULL, user_post.post_dislikes = user_post.post_dislikes - 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id);
           }
           var tempResult = result;
           await connection.query(updateQuery, async (err, result) => {
@@ -197,9 +196,9 @@ const addEngagement = async (dict, connection) => {
           
           
         }
-        else if(String(dict.comment) == null && result[0]['comment'] != null){
+        else if(dict.comment == null && result[0]['comment'] != null){
 
-          var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.comment = NULL, user_post.post_comments = user_post.post_comments - 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id)+" AND user_post.profile_id="+ String(dict.engagement_profile_id);
+          var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.comment = NULL, user_post.post_comments = user_post.post_comments - 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id);
           await connection.query(updateQuery, async (err, result)=> {
             if(err){
               reject(err.message);
@@ -215,8 +214,8 @@ const addEngagement = async (dict, connection) => {
             }
           });
         }
-        else if(String(dict.comment) != null && result[0]['comment'] == null){
-          var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.comment = '"+String(dict.comment)+"', user_post.post_comments = user_post.post_comments + 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id)+" AND user_post.profile_id="+ String(dict.engagement_profile_id);
+        else if(dict.comment != null && result[0]['comment'] == null){
+          var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date=\"" +curr_date+"\", engagement.comment = \""+String(dict.comment)+"\", user_post.post_comments = user_post.post_comments + 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id);
           await connection.query(updateQuery, async (err, result) => {
             if(err){
               reject(err.message);
