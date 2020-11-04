@@ -223,6 +223,15 @@ const addEngagement = async (dict, connection) => {
             resolve(result);
           });
         }
+        else if(dict.comment != null && result[0]['comment'] != null){
+          var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date=\"" +curr_date+"\", engagement.comment = \""+String(dict.comment)+"\" WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id);
+          await connection.query(updateQuery, async (err, result) => {
+            if(err){
+              reject(err.message);
+            }
+            resolve(result);
+          });
+        }
       }
 
     });
