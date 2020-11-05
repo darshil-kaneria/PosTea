@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -128,84 +129,173 @@ class _TopicState extends State<Topic> {
         child: Column(
           children: [
             Expanded(
-              flex: 2,
+              flex: 3,
               child: Container(
-                color: Colors.greenAccent,
+                // color: Colors.greenAccent,
                 alignment: Alignment.center,
-                child: Text("Image Here"),
+                height: MediaQuery.of(context).size.height / 4,
+                width: double.maxFinite,
+                decoration: BoxDecoration(
+                    image: DecorationImage(
+                        image:
+                            NetworkImage("https://picsum.photos/250?image=180"),
+                        fit: BoxFit.cover)),
+                child: ClipRRect(
+                  child: BackdropFilter(
+                    filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          alignment: Alignment.center,
+                          color: Colors.grey.withOpacity(0.1),
+                          child: ValueListenableBuilder(
+                              valueListenable: topicNameNotifier,
+                              builder: (_, value, __) {
+                                return Text(
+                                  // "Chess",
+                                  value,
+                                  style: TextStyle(
+                                      fontSize: 40,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white),
+                                );
+                              }),
+                        ),
+                        widget.isOwner == false
+                            ? Container(
+                                height: screenHeight / 14,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth / 15, vertical: 10),
+                                child: ButtonTheme(
+                                    buttonColor: buttonColor,
+                                    shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(30)),
+                                    minWidth: screenWidth / 5,
+                                    child: RaisedButton(
+                                        elevation: 2,
+                                        clipBehavior: Clip.antiAlias,
+                                        child: Text(topicFollowingText),
+                                        onPressed: () async {
+                                          print(isFollow);
+
+                                          if (isFollow) {
+                                            buttonColor = Colors.red[50];
+                                            isFollow = false;
+                                            topicFollowingText = "Follow";
+                                            final request = http.Request(
+                                                "DELETE",
+                                                Uri.parse(
+                                                    "http://postea-server.herokuapp.com/topicfollowdata"));
+                                            request.headers.addAll({
+                                              'Content-Type': 'application/json'
+                                            });
+                                            request.body = jsonEncode({
+                                              "topic_id": widget.topicId,
+                                              "follower_id": widget.profileId
+                                            });
+                                            request.send();
+                                          } else {
+                                            buttonColor = Colors.redAccent[100];
+                                            isFollow = true;
+                                            topicFollowingText = "Following";
+                                            var addfollowing = {
+                                              "topic_id": widget.topicId,
+                                              "follower_id": widget.profileId
+                                            };
+                                            var addfollowingJson = JsonEncoder()
+                                                .convert(addfollowing);
+                                            http.post(
+                                                "http://postea-server.herokuapp.com/topicfollowdata",
+                                                headers: {
+                                                  'Content-Type':
+                                                      'application/json'
+                                                },
+                                                body: addfollowingJson);
+                                          }
+
+                                          setState(() {});
+                                        })),
+                              )
+                            : Container(),
+                      ],
+                    ),
+                  ),
+                ),
               ),
             ),
-            Expanded(
-              flex: 1,
-              child: Container(
-                alignment: Alignment.center,
-                child: ValueListenableBuilder(
-                    valueListenable: topicNameNotifier,
-                    builder: (_, value, __) {
-                      return Text(
-                        // "Chess",
-                        value,
-                        style: TextStyle(fontSize: 20),
-                      );
-                    }),
-              ),
-            ),
-            Expanded(
-                flex: 1,
-                child: widget.isOwner == false
-                    ? Container(
-                        height: screenHeight / 14,
-                        padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth / 15, vertical: 10),
-                        child: ButtonTheme(
-                            buttonColor: buttonColor,
-                            shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(30)),
-                            minWidth: screenWidth / 1.5,
-                            child: RaisedButton(
-                                elevation: 2,
-                                clipBehavior: Clip.antiAlias,
-                                child: Text(topicFollowingText),
-                                onPressed: () async {
-                                  print(isFollow);
+            // Expanded(
+            //   flex: 1,
+            //   child: Container(
+            //     alignment: Alignment.center,
+            //     child: ValueListenableBuilder(
+            //         valueListenable: topicNameNotifier,
+            //         builder: (_, value, __) {
+            //           return Text(
+            //             // "Chess",
+            //             value,
+            //             style: TextStyle(fontSize: 20),
+            //           );
+            //         }),
+            //   ),
+            // ),
+            // Expanded(
+            //     flex: 1,
+            //     child: widget.isOwner == false
+            //         ? Container(
+            //             height: screenHeight / 14,
+            //             padding: EdgeInsets.symmetric(
+            //                 horizontal: screenWidth / 15, vertical: 10),
+            //             child: ButtonTheme(
+            //                 buttonColor: buttonColor,
+            //                 shape: RoundedRectangleBorder(
+            //                     borderRadius: BorderRadius.circular(30)),
+            //                 minWidth: screenWidth / 5,
+            //                 child: RaisedButton(
+            //                     elevation: 2,
+            //                     clipBehavior: Clip.antiAlias,
+            //                     child: Text(topicFollowingText),
+            //                     onPressed: () async {
+            //                       print(isFollow);
 
-                                  if (isFollow) {
-                                    buttonColor = Colors.red[50];
-                                    isFollow = false;
-                                    topicFollowingText = "Follow";
-                                    final request = http.Request(
-                                        "DELETE",
-                                        Uri.parse(
-                                            "http://postea-server.herokuapp.com/topicfollowdata"));
-                                    request.headers.addAll(
-                                        {'Content-Type': 'application/json'});
-                                    request.body = jsonEncode({
-                                      "topic_id": widget.topicId,
-                                      "follower_id": widget.profileId
-                                    });
-                                    request.send();
-                                  } else {
-                                    buttonColor = Colors.redAccent[100];
-                                    isFollow = true;
-                                    topicFollowingText = "Following";
-                                    var addfollowing = {
-                                      "topic_id": widget.topicId,
-                                      "follower_id": widget.profileId
-                                    };
-                                    var addfollowingJson =
-                                        JsonEncoder().convert(addfollowing);
-                                    http.post(
-                                        "http://postea-server.herokuapp.com/topicfollowdata",
-                                        headers: {
-                                          'Content-Type': 'application/json'
-                                        },
-                                        body: addfollowingJson);
-                                  }
+            //                       if (isFollow) {
+            //                         buttonColor = Colors.red[50];
+            //                         isFollow = false;
+            //                         topicFollowingText = "Follow";
+            //                         final request = http.Request(
+            //                             "DELETE",
+            //                             Uri.parse(
+            //                                 "http://postea-server.herokuapp.com/topicfollowdata"));
+            //                         request.headers.addAll(
+            //                             {'Content-Type': 'application/json'});
+            //                         request.body = jsonEncode({
+            //                           "topic_id": widget.topicId,
+            //                           "follower_id": widget.profileId
+            //                         });
+            //                         request.send();
+            //                       } else {
+            //                         buttonColor = Colors.redAccent[100];
+            //                         isFollow = true;
+            //                         topicFollowingText = "Following";
+            //                         var addfollowing = {
+            //                           "topic_id": widget.topicId,
+            //                           "follower_id": widget.profileId
+            //                         };
+            //                         var addfollowingJson =
+            //                             JsonEncoder().convert(addfollowing);
+            //                         http.post(
+            //                             "http://postea-server.herokuapp.com/topicfollowdata",
+            //                             headers: {
+            //                               'Content-Type': 'application/json'
+            //                             },
+            //                             body: addfollowingJson);
+            //                       }
 
-                                  setState(() {});
-                                })),
-                      )
-                    : Container()),
+            //                       setState(() {});
+            //                     })),
+            //           )
+            //         : Container()),
             Expanded(
               flex: 1,
               child: Card(
@@ -213,12 +303,20 @@ class _TopicState extends State<Topic> {
                 clipBehavior: Clip.hardEdge,
                 elevation: 0,
                 child: Container(
+                  color: bgGradStart,
                   width: screenWidth,
                   child: SingleChildScrollView(
                       child: ValueListenableBuilder(
                           valueListenable: topicDescNotifier,
                           builder: (_, value, __) {
-                            return Text(value);
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 20, left: 10),
+                              child: Text(
+                                value,
+                                style: TextStyle(
+                                    fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                            );
                           })),
                 ),
               ),
