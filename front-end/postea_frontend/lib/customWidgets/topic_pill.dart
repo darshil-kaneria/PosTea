@@ -56,7 +56,7 @@ class _TopicPillState extends State<TopicPill> {
     var screenWidth = MediaQuery.of(context).size.width;
 
     return Container(
-      margin: EdgeInsets.only(top: 10, left: 10, right: 10),
+      margin: EdgeInsets.only(top: 5, left: 5, right: 5),
       height: widget.height,
       width: widget.width,
       decoration: BoxDecoration(
@@ -79,7 +79,7 @@ class _TopicPillState extends State<TopicPill> {
               builder: (_, value, __) =>
               AutoSizeText(
           value,
-          style: TextStyle(fontSize: 15, color: Colors.white),
+          style: TextStyle(fontSize: 13, color: Colors.white),
         ),
             )),
       ),

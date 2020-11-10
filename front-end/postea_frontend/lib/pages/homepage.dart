@@ -173,286 +173,287 @@ class _HomePageState extends State<HomePage> {
           ],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        type: BottomNavigationBarType.fixed,
-        items: [
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.home,
-            ),
-            title: Text("Home"),
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.create,
-            ),
-            title: Text("New Post"),
-          ),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.trending_up), title: Text("Trending")),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.alternate_email), title: Text("Topic")),
-          BottomNavigationBarItem(icon: Icon(Icons.add), title: Text("Create")),
-        ],
-        onTap: (value) {
-          if (value == 2) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => Trending(profileId: widget.profileID)));
-          } else if (value == 3) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => DiscoverTopics(
-                          profileID: widget.profileID,
-                        )));
-            // MaterialPageRoute(
-            //     builder: (_) => Topic(
-            //           profileId: widget.profileID,
-            //           isOwner: true,
-            //           topicId: "21",
-            //         )));
-          } else if (value == 4) {
-            Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (_) => CreateTopic(
-                          profile_id: widget.profileID,
-                        )));
-          } else if (value == 1)
-            // Making a post logic
-            showDialog(
-              context: context,
-              barrierDismissible: false,
-              builder: (context) {
-                return StatefulBuilder(builder: (context, setState) {
-                  return WillPopScope(
-                    onWillPop: () async {
-                      postTitleController.clear();
-                      postTextController.clear();
-                      return true;
-                    },
-                    child: Dialog(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(20))),
-                      child: Container(
-                        width: screenWidth / 1.1,
-                        height: screenHeight / 1.8,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: Container(
-                                padding: EdgeInsets.only(
-                                    left: 18, right: 18, top: 15),
-                                color: Colors.transparent,
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    hintText: "Title",
-                                  ),
-                                  controller: postTitleController,
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 4,
-                              child: SingleChildScrollView(
-                                padding: EdgeInsets.symmetric(horizontal: 18),
-                                scrollDirection: Axis.vertical,
-                                child: TextField(
-                                  maxLines: null,
-                                  keyboardType: TextInputType.multiline,
-                                  decoration: InputDecoration(
-                                      border: InputBorder.none,
-                                      hintText: "Post description"),
-                                  controller: postTextController,
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: Container(
-                                padding: EdgeInsets.only(left: 13, right: 13),
-                                color: Colors.transparent,
-                                child: Row(
-                                  children: [
-                                    IconButton(
-                                        icon: Icon(
-                                          Icons.image,
-                                          color: Colors.grey,
-                                        ),
-                                        onPressed: () async {
-                                          await pickImage();
-                                          // Image image = Image.file(imgToUpload);
-                                          if (imgToUpload == null) {
-                                            // final imgErrorSnackBar = SnackBar(content: Text('Image upload failed'));
-                                            // Scaffold.of(context).showSnackBar(imgErrorSnackBar);
-                                          }
-                                          base64Image = base64Encode(
-                                              imgToUpload.readAsBytesSync());
-                                        }),
-                                    IconButton(
-                                        icon: Icon(
-                                          Icons.attachment,
-                                          color: Colors.grey,
-                                        ),
-                                        onPressed: () {}),
-                                    IconButton(
-                                        icon: Icon(
-                                          Icons.fingerprint,
-                                          color: isAnonColor,
-                                        ),
-                                        onPressed: () {
-                                          if (isAnonymous == 0) {
-                                            isAnonymous = 1;
-                                            isAnonColor =
-                                                Colors.deepOrange[100];
-                                          } else if (isAnonymous == 1) {
-                                            isAnonymous = 0;
-                                            isAnonColor = Colors.grey;
-                                          }
-                                          setState(() {});
-                                          print(isAnonymous);
-                                        }),
-                                    Expanded(
-                                      child: Container(
-                                        padding: EdgeInsets.only(right: 15),
-                                        alignment: Alignment.centerRight,
-                                        child: Container(
-                                          alignment: Alignment.center,
-                                          height: screenHeight / 22,
-                                          width: screenWidth / 4.5,
-                                          decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(15)),
-                                              border: Border.all(
-                                                  color: Colors.grey)),
-                                          child: ButtonTheme(
-                                            shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(17)),
-                                            child: FlatButton(
-                                              onPressed: () => {
-                                                showDialog(
-                                                  context: context,
-                                                  barrierDismissible: true,
-                                                  builder: (context) {
-                                                    return WillPopScope(
-                                                        child: Dialog(
-                                                          shape:
-                                                              RoundedRectangleBorder(
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        20),
-                                                          ),
-                                                          child: Container(
-                                                            width: screenWidth /
-                                                                1.1,
-                                                            height:
-                                                                screenHeight /
-                                                                    7,
-                                                            child: Column(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .center,
-                                                              children: [
-                                                                TextField(
-                                                                  controller:
-                                                                      topicEditingController,
-                                                                  textAlign:
-                                                                      TextAlign
-                                                                          .center,
-                                                                  decoration:
-                                                                      InputDecoration(
-                                                                    border:
-                                                                        InputBorder
-                                                                            .none,
-                                                                    hintText:
-                                                                        "Enter a topic",
-                                                                  ),
-                                                                ),
-                                                                ButtonTheme(
-                                                                  shape: RoundedRectangleBorder(
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              20)),
-                                                                  child:
-                                                                      RaisedButton(
-                                                                          child: Text(
-                                                                              "Choose Topic"),
-                                                                          onPressed:
-                                                                              () {
-                                                                            setState(() {
-                                                                              topicButtonText = topicEditingController.text;
-                                                                              print(topicEditingController.text);
-                                                                            });
-                                                                            Navigator.of(context, rootNavigator: true).pop();
-                                                                          }),
-                                                                )
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        ),
-                                                        onWillPop: () async {
-                                                          topicEditingController
-                                                              .clear();
-                                                          return true;
-                                                        });
-                                                  },
-                                                )
-                                              },
-                                              child: Text(
-                                                topicButtonText,
-                                                style: TextStyle(fontSize: 15),
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
-                            Expanded(
-                              flex: 1,
-                              child: GestureDetector(
-                                onTap: () async {
-                                  // Making a post request
-                                  makePost();
-                                  if (base64Image != "") {
-                                    await uploadImage(imgToUpload);
-                                  }
+      bottomNavigationBar: CustomNavBar.getNavBar(context),
+      // bottomNavigationBar: BottomNavigationBar(
+      //   type: BottomNavigationBarType.fixed,
+      //   items: [
+      //     BottomNavigationBarItem(
+      //       icon: Icon(
+      //         Icons.home,
+      //       ),
+      //       title: Text("Home"),
+      //     ),
+      //     BottomNavigationBarItem(
+      //       icon: Icon(
+      //         Icons.create,
+      //       ),
+      //       title: Text("New Post"),
+      //     ),
+      //     BottomNavigationBarItem(
+      //         icon: Icon(Icons.trending_up), title: Text("Trending")),
+      //     BottomNavigationBarItem(
+      //         icon: Icon(Icons.alternate_email), title: Text("Topic")),
+      //     BottomNavigationBarItem(icon: Icon(Icons.add), title: Text("Create")),
+      //   ],
+      //   onTap: (value) {
+      //     if (value == 2) {
+      //       Navigator.push(
+      //           context,
+      //           MaterialPageRoute(
+      //               builder: (_) => Trending(profileId: widget.profileID)));
+      //     } else if (value == 3) {
+      //       Navigator.push(
+      //           context,
+      //           MaterialPageRoute(
+      //               builder: (_) => DiscoverTopics(
+      //                     profileID: widget.profileID,
+      //                   )));
+      //       // MaterialPageRoute(
+      //       //     builder: (_) => Topic(
+      //       //           profileId: widget.profileID,
+      //       //           isOwner: true,
+      //       //           topicId: "21",
+      //       //         )));
+      //     } else if (value == 4) {
+      //       Navigator.push(
+      //           context,
+      //           MaterialPageRoute(
+      //               builder: (_) => CreateTopic(
+      //                     profile_id: widget.profileID,
+      //                   )));
+      //     } else if (value == 1)
+      //       // Making a post logic
+      //       showDialog(
+      //         context: context,
+      //         barrierDismissible: false,
+      //         builder: (context) {
+      //           return StatefulBuilder(builder: (context, setState) {
+      //             return WillPopScope(
+      //               onWillPop: () async {
+      //                 postTitleController.clear();
+      //                 postTextController.clear();
+      //                 return true;
+      //               },
+      //               child: Dialog(
+      //                 shape: RoundedRectangleBorder(
+      //                     borderRadius: BorderRadius.all(Radius.circular(20))),
+      //                 child: Container(
+      //                   width: screenWidth / 1.1,
+      //                   height: screenHeight / 1.8,
+      //                   child: Column(
+      //                     mainAxisAlignment: MainAxisAlignment.center,
+      //                     crossAxisAlignment: CrossAxisAlignment.center,
+      //                     children: [
+      //                       Expanded(
+      //                         flex: 1,
+      //                         child: Container(
+      //                           padding: EdgeInsets.only(
+      //                               left: 18, right: 18, top: 15),
+      //                           color: Colors.transparent,
+      //                           child: TextField(
+      //                             decoration: InputDecoration(
+      //                               border: InputBorder.none,
+      //                               hintText: "Title",
+      //                             ),
+      //                             controller: postTitleController,
+      //                             style: TextStyle(fontWeight: FontWeight.bold),
+      //                           ),
+      //                         ),
+      //                       ),
+      //                       Expanded(
+      //                         flex: 4,
+      //                         child: SingleChildScrollView(
+      //                           padding: EdgeInsets.symmetric(horizontal: 18),
+      //                           scrollDirection: Axis.vertical,
+      //                           child: TextField(
+      //                             maxLines: null,
+      //                             keyboardType: TextInputType.multiline,
+      //                             decoration: InputDecoration(
+      //                                 border: InputBorder.none,
+      //                                 hintText: "Post description"),
+      //                             controller: postTextController,
+      //                           ),
+      //                         ),
+      //                       ),
+      //                       Expanded(
+      //                         flex: 1,
+      //                         child: Container(
+      //                           padding: EdgeInsets.only(left: 13, right: 13),
+      //                           color: Colors.transparent,
+      //                           child: Row(
+      //                             children: [
+      //                               IconButton(
+      //                                   icon: Icon(
+      //                                     Icons.image,
+      //                                     color: Colors.grey,
+      //                                   ),
+      //                                   onPressed: () async {
+      //                                     await pickImage();
+      //                                     // Image image = Image.file(imgToUpload);
+      //                                     if (imgToUpload == null) {
+      //                                       // final imgErrorSnackBar = SnackBar(content: Text('Image upload failed'));
+      //                                       // Scaffold.of(context).showSnackBar(imgErrorSnackBar);
+      //                                     }
+      //                                     base64Image = base64Encode(
+      //                                         imgToUpload.readAsBytesSync());
+      //                                   }),
+      //                               IconButton(
+      //                                   icon: Icon(
+      //                                     Icons.attachment,
+      //                                     color: Colors.grey,
+      //                                   ),
+      //                                   onPressed: () {}),
+      //                               IconButton(
+      //                                   icon: Icon(
+      //                                     Icons.fingerprint,
+      //                                     color: isAnonColor,
+      //                                   ),
+      //                                   onPressed: () {
+      //                                     if (isAnonymous == 0) {
+      //                                       isAnonymous = 1;
+      //                                       isAnonColor =
+      //                                           Colors.deepOrange[100];
+      //                                     } else if (isAnonymous == 1) {
+      //                                       isAnonymous = 0;
+      //                                       isAnonColor = Colors.grey;
+      //                                     }
+      //                                     setState(() {});
+      //                                     print(isAnonymous);
+      //                                   }),
+      //                               Expanded(
+      //                                 child: Container(
+      //                                   padding: EdgeInsets.only(right: 15),
+      //                                   alignment: Alignment.centerRight,
+      //                                   child: Container(
+      //                                     alignment: Alignment.center,
+      //                                     height: screenHeight / 22,
+      //                                     width: screenWidth / 4.5,
+      //                                     decoration: BoxDecoration(
+      //                                         borderRadius: BorderRadius.all(
+      //                                             Radius.circular(15)),
+      //                                         border: Border.all(
+      //                                             color: Colors.grey)),
+      //                                     child: ButtonTheme(
+      //                                       shape: RoundedRectangleBorder(
+      //                                           borderRadius:
+      //                                               BorderRadius.circular(17)),
+      //                                       child: FlatButton(
+      //                                         onPressed: () => {
+      //                                           showDialog(
+      //                                             context: context,
+      //                                             barrierDismissible: true,
+      //                                             builder: (context) {
+      //                                               return WillPopScope(
+      //                                                   child: Dialog(
+      //                                                     shape:
+      //                                                         RoundedRectangleBorder(
+      //                                                       borderRadius:
+      //                                                           BorderRadius
+      //                                                               .circular(
+      //                                                                   20),
+      //                                                     ),
+      //                                                     child: Container(
+      //                                                       width: screenWidth /
+      //                                                           1.1,
+      //                                                       height:
+      //                                                           screenHeight /
+      //                                                               7,
+      //                                                       child: Column(
+      //                                                         mainAxisAlignment:
+      //                                                             MainAxisAlignment
+      //                                                                 .center,
+      //                                                         children: [
+      //                                                           TextField(
+      //                                                             controller:
+      //                                                                 topicEditingController,
+      //                                                             textAlign:
+      //                                                                 TextAlign
+      //                                                                     .center,
+      //                                                             decoration:
+      //                                                                 InputDecoration(
+      //                                                               border:
+      //                                                                   InputBorder
+      //                                                                       .none,
+      //                                                               hintText:
+      //                                                                   "Enter a topic",
+      //                                                             ),
+      //                                                           ),
+      //                                                           ButtonTheme(
+      //                                                             shape: RoundedRectangleBorder(
+      //                                                                 borderRadius:
+      //                                                                     BorderRadius.circular(
+      //                                                                         20)),
+      //                                                             child:
+      //                                                                 RaisedButton(
+      //                                                                     child: Text(
+      //                                                                         "Choose Topic"),
+      //                                                                     onPressed:
+      //                                                                         () {
+      //                                                                       setState(() {
+      //                                                                         topicButtonText = topicEditingController.text;
+      //                                                                         print(topicEditingController.text);
+      //                                                                       });
+      //                                                                       Navigator.of(context, rootNavigator: true).pop();
+      //                                                                     }),
+      //                                                           )
+      //                                                         ],
+      //                                                       ),
+      //                                                     ),
+      //                                                   ),
+      //                                                   onWillPop: () async {
+      //                                                     topicEditingController
+      //                                                         .clear();
+      //                                                     return true;
+      //                                                   });
+      //                                             },
+      //                                           )
+      //                                         },
+      //                                         child: Text(
+      //                                           topicButtonText,
+      //                                           style: TextStyle(fontSize: 15),
+      //                                         ),
+      //                                       ),
+      //                                     ),
+      //                                   ),
+      //                                 ),
+      //                               )
+      //                             ],
+      //                           ),
+      //                         ),
+      //                       ),
+      //                       Expanded(
+      //                         flex: 1,
+      //                         child: GestureDetector(
+      //                           onTap: () async {
+      //                             // Making a post request
+      //                             makePost();
+      //                             if (base64Image != "") {
+      //                               await uploadImage(imgToUpload);
+      //                             }
 
-                                  Navigator.pop(context);
-                                },
-                                child: Container(
-                                  margin: EdgeInsets.symmetric(horizontal: 13),
-                                  alignment: Alignment.center,
-                                  child: Text("Post"),
-                                  decoration: BoxDecoration(
-                                      border: Border(
-                                          top: BorderSide(
-                                              color: Colors.grey, width: 0.5))),
-                                ),
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                    ),
-                  );
-                });
-              },
-            );
-        },
-      ),
+      //                             Navigator.pop(context);
+      //                           },
+      //                           child: Container(
+      //                             margin: EdgeInsets.symmetric(horizontal: 13),
+      //                             alignment: Alignment.center,
+      //                             child: Text("Post"),
+      //                             decoration: BoxDecoration(
+      //                                 border: Border(
+      //                                     top: BorderSide(
+      //                                         color: Colors.grey, width: 0.5))),
+      //                           ),
+      //                         ),
+      //                       )
+      //                     ],
+      //                   ),
+      //                 ),
+      //               ),
+      //             );
+      //           });
+      //         },
+      //       );
+      //   },
+      // ),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         // leading: Icon(Icons.menu),
@@ -460,12 +461,12 @@ class _HomePageState extends State<HomePage> {
         iconTheme: IconThemeData(color: Colors.black),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.search),
+            icon: Icon(Icons.search, size: 20,),
             onPressed: () {},
           ),
-          IconButton(icon: Icon(Icons.notifications), onPressed: () {}),
+          IconButton(icon: Icon(Icons.notifications, size: 20,), onPressed: () {}),
           IconButton(
-              icon: Icon(Icons.account_circle),
+              icon: Icon(Icons.account_circle, size: 20,),
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => Profile(
@@ -479,7 +480,7 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: [
           Container(
-            height: 50,
+            height: screenHeight/15,
             width: screenWidth,
             child: ListView(
               controller: _scrollController,
@@ -489,7 +490,7 @@ class _HomePageState extends State<HomePage> {
                   topicId: 2,
                   col1: Colors.purple[900],
                   col2: Colors.purple[400],
-                  height: screenHeight / 10,
+                  height: screenHeight / 15,
                   width: screenWidth / 4,
                   profileId: widget.profileID,
                   isOwner: true,
@@ -498,7 +499,7 @@ class _HomePageState extends State<HomePage> {
                   topicId: 26894,
                   col1: Colors.green[700],
                   col2: Colors.lightGreen[400],
-                  height: screenHeight / 10,
+                  height: screenHeight / 15,
                   width: screenWidth / 4,
                   profileId: widget.profileID,
                   isOwner: true,
@@ -507,7 +508,7 @@ class _HomePageState extends State<HomePage> {
                   topicId: 51561,
                   col1: Colors.blue[700],
                   col2: Colors.lightBlueAccent[200],
-                  height: screenHeight / 10,
+                  height: screenHeight / 15,
                   width: screenWidth / 4,
                   profileId: widget.profileID,
                   isOwner: true,
@@ -516,7 +517,7 @@ class _HomePageState extends State<HomePage> {
                   topicId: 99841,
                   col1: Colors.red[700],
                   col2: Colors.pink[400],
-                  height: screenHeight / 10,
+                  height: screenHeight / 15,
                   width: screenWidth / 4,
                   profileId: widget.profileID,
                   isOwner: true,
@@ -524,7 +525,7 @@ class _HomePageState extends State<HomePage> {
               ],
             ),
           ),
-          Padding(padding: EdgeInsets.only(top: 20)),
+          Padding(padding: EdgeInsets.only(top: 15)),
           Expanded(
             child: FutureBuilder(
                 future: updatePost(),
