@@ -11,9 +11,14 @@ process.on("message", message => {
       if (answer == "Account already exists") {
         process.send({"Error": "User information already exists"});
       } else {
-      process.send({"Profile user information added": "Successfully"});
+        process.send(answer);
       }
       process.exit();
+  }).catch(function(result) {
+    process.send(result);
+    process.exit();
+
+
   });
 });
 });
@@ -28,27 +33,28 @@ process.on("message", message => {
     return new Promise(function(resolve, reject) {
       connection.query(selectQuery,[user],  function (err, result) {
         if (err) {
-          console.log(err);
-          throw err;}
+          //console.log(err);
+          reject(err.message);
+        }
         try {
           if (result.length == 1) {
             resolve("Account already exists");
           } else {
             connection.query(addProfileQuery, [values], function (err, result) {
-              if (err) {
-                if (err.code === 'ER_DUP_ENTRY') {
-                    addProfile(user, is_private, name, bio_data, connection);
-                } else {
-                console.log(err);
-                throw err;
-                }
-              } 
-                resolve("Added");
+              // if (err) {
+              //   if (err.code != 'ER_DUP_ENTRY') {
+              //       addProfile(user, is_private, name, bio_data, connection);
+              //   } else {
+              //   console.log(err);
+              //   reject(err.message);
+              // }
+              // } 
+                resolve({"profile_id": profile_id});
               });
           }
         }
         catch (error){
-          throw err;
+          reject(err.message);
         }
         return;
       });

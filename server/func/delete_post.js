@@ -6,71 +6,75 @@ process.on("message", message => {
       return console.error('error: ' + err.message);
     }
     console.log('Database connection established');
-    await deletePost(message.deletePostID, message.deleteProfileID, connection).then(function(answer) {
+    deleteTopic(message.topic_id, message.user_id, connection).then(function(answer) {
       connection.release();
-      if (answer == "Post does not exist") {
-        process.send({"Error": "No account with that post or user exists"});
-      } else {
-        process.send({"Post deleted": "Successfully"});
-      }
+      if (answer == "Topic does not exist") {
+        process.send({"Error": "Topic does not exist"});
+      } else if (answer == "Success") {
+            process.send({"Success": "Topic deleted"});
+        }
+        else {
+            process.send(answer);
+        }
       process.exit();
-  });
-});
+    });
+    });
 });
 
-function deletePost(postId, profileId, connection) {
-    var p_id = postId;
-    var prof = profileId;
-    var selectfromPost = "SELECT * FROM user_post WHERE post_id = ? AND profile_id = ?";
-    //var selectfromTop = "SELECT * FROM topic_content WHERE postId = ?";
-    var deletefromPost = "DELETE FROM user_post WHERE post_id = ?"
-    var deletefromtopic = "DELETE FROM topic_content WHERE post_id = ?"
+const deleteTopic = async(topic_id, user_id, connection) => {
+    var selectQuery = "SELECT * FROM topic_info WHERE topic_id = ?";
+    var deleteQuery = "DELETE FROM topic_info WHERE topic_id = ?";
+    var deleteQuery2 = "DELETE FROM topic_follower WHERE topic_id = ?";
+    var deleteQuery3 = "DELETE FROM topic_content WHERE topic_id = ?";
+    var deleteQuery4 = "DELETE FROM user_post WHERE topic_id = ?";
     return new Promise(async function(resolve, reject) {
-        await connection.query(selectfromPost,[p_id, prof],  async function (err, result) {
+        await connection.query(selectQuery,[topic_id],  async function (err, result) {
             if (err) {
-                console.log("hi");
-                console.log(err);
-                throw err;
+                reject(err.message);
             }
             try {
                 if (result.length == 0) {
-                    resolve("Post does not exist");
+                    resolve("Topic does not exist");
+                } else if (result[0].topic_creator_id != user_id) {
+                    resolve("Error: Topic cannot be deleted by other users")
                 } else {
-                    await connection.query(deletefromPost, [p_id], function(err, result) {
+                    await connection.query(deleteQuery, [topic_id], async function(err, result) {
                         if (err) {
-                            console.log("hi2");
                             console.log(err);
-                            throw err;
-                        }
-                        return result;
-                    }
-                    );
-                    await connection.query(deletefromtopic, [p_id], function(err, result) {
-                        if (err) {
-                            console.log("hi3");
-                            console.log(err);
-                            throw err;
+                            reject(err.message);
                         } else {
-                            resolve("Post deleted");
+                            await connection.query(deleteQuery2, [topic_id], async function(err, result) {
+                                if (err) {
+                                    console.log(err);
+                                    reject(err.message);
+                                } else {
+                                    await connection.query(deleteQuery3, [topic_id], async function(err, result) {
+                                        if (err) {
+                                            console.log(err);
+                                            reject(err.message);
+                                        } else {
+                                            await connection.query(deleteQuery4, [topic_id], async function(err, result) {
+                                                if (err) {
+                                                    console.log(err);
+                                                    reject(err.message);
+                                                } else {
+                                                    resolve("Success");
+                                                }
+
+                                            });
+                                        }
+                                    });
+                                }
+                            });
                         }
-                        
                     }
-                    );
-                    
+                 );   
                 }
-
             } catch (error) {
-                throw err;
+                reject(err.message);
             }
-            return;
-
         }
         );
 
     })
-
-
-
-
-
 }

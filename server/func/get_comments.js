@@ -15,17 +15,17 @@ process.on("message", message => {
 });
 
  function getComments(post_id, connection) {
-    var selectQuery = "SELECT comment FROM engagement WHERE post_id = " + post_id;
+    var selectQuery = "SELECT comment FROM engagement WHERE post_id = " + post_id + " ORDER BY creation_date DESC";
     return new Promise(async function(resolve, reject) {
       await connection.query(selectQuery, function (err, result) {
         if (err) {
           console.log(err);
-          throw err;
+          reject(err.message);
         }
         result = JSON.stringify(result);
         result = JSON.parse(result);
         process.send({"message": result});
-        return result;
+        resolve(result);
       });
     })
   };

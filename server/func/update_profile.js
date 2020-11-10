@@ -28,7 +28,7 @@ process.on("message", message => {
       connection.query(selectQuery,[originalUsername],  async function (err, result) {
         if (err) {
           console.log(err);
-          throw err;}
+          reject(err);}
         try {
           if (result.length == 0) {
             resolve("Account does not exist");
@@ -63,14 +63,14 @@ process.on("message", message => {
             await connection.query(updateQuery, function (err, result) {
               if (err) {
                 console.log(err);
-                throw err;
+                reject (err);
               } 
                 resolve("Updated");
               });
           }
         }
         catch (error){
-          throw err;
+          reject (err);
         }
         return;
       });
