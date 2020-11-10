@@ -1,7 +1,10 @@
 import 'dart:convert';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import '../colors.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 
 class CreateTopic extends StatefulWidget {
@@ -16,6 +19,8 @@ class CreateTopic extends StatefulWidget {
 class _CreateTopicState extends State<CreateTopic> {
   var topicNameController = new TextEditingController();
   var topidDescController = new TextEditingController();
+
+  File topicPic;
 
   _CreateTopicState();
 
@@ -36,6 +41,27 @@ class _CreateTopicState extends State<CreateTopic> {
     print(response.body);
 
     return response;
+  }
+
+  chooseTopicPic() async {
+    // PickedFile img = await ImagePicker().getImage(source: ImageSource.gallery);
+    print("about to choose image");
+    ImagePicker.pickImage(source: ImageSource.gallery).then((value) {
+      print("In dot then");
+      print(value);
+      topicPic = value;
+    });
+    print("chosen image is " + topicPic.toString());
+    print(topicPic);
+  }
+
+  Future uploadTopicPic(File file, String username) async {
+    StorageReference storageReference =
+        FirebaseStorage.instance.ref().child("topic").child(username);
+    print("before query");
+    await storageReference.putFile(file).onComplete;
+    print("after query");
+    print("Uploaded image to Firebase from edit profile");
   }
 
   @override
@@ -60,10 +86,15 @@ class _CreateTopicState extends State<CreateTopic> {
               // height: MediaQuery.of(context).size.height / 7,
               child: Column(
                 children: [
-                  CircleAvatar(
-                    maxRadius: screenWidth / 5,
-                    backgroundImage:
-                        NetworkImage("https://picsum.photos/250?image=18"),
+                  GestureDetector(
+                    child: CircleAvatar(
+                      maxRadius: screenWidth / 5,
+                      backgroundImage:
+                          NetworkImage("https://picsum.photos/250?image=18"),
+                    ),
+                    onTap: () async {
+                      await chooseTopicPic();
+                    },
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),

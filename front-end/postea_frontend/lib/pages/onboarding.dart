@@ -47,7 +47,7 @@ class _OnboardingState extends State<Onboarding> {
     StorageReference storageReference =
         FirebaseStorage.instance.ref().child("profile").child(profileID);
     await storageReference.putFile(file).onComplete;
-    print("Uploaded image to Firebase from edit profile");
+    print("Uploaded image to Firebase from onboarding profile");
   }
 
   @override
