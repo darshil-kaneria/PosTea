@@ -22,8 +22,8 @@ class Topic extends StatefulWidget {
 class _TopicState extends State<Topic> {
   var offset = 0;
   var checkPosScrollController = new ScrollController();
-  var topicFollowingText = "Follow";
-  var isFollow = false;
+  ValueNotifier<String> topicFollowingText = ValueNotifier<String>("Follow");
+  ValueNotifier<bool> isFollow = ValueNotifier<bool>(false);
 
   ValueNotifier<String> topicNameNotifier = ValueNotifier("");
   ValueNotifier<String> topicDescNotifier = ValueNotifier("");
@@ -83,12 +83,12 @@ class _TopicState extends State<Topic> {
 
       for (var i = 0; i < topicList.length; i++) {
         if (topicList[i]['topic_id'].toString() == widget.topicId) {
-          topicFollowingText = "Following";
-          isFollow = true;
-          buttonColor = Colors.redAccent[100];
+          topicFollowingText.value = "Following";
+          isFollow.value = true;
+          buttonColor.value = Colors.redAccent[100];
         }
       }
-      setState(() {});
+      // setState(() {});
     });
   }
 
@@ -107,7 +107,7 @@ class _TopicState extends State<Topic> {
     super.initState();
   }
 
-  var buttonColor = Colors.red[50];
+  ValueNotifier<Color> buttonColor = ValueNotifier<Color>(Colors.red[50]);
   @override
   Widget build(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
@@ -167,56 +167,59 @@ class _TopicState extends State<Topic> {
                                 height: screenHeight / 14,
                                 padding: EdgeInsets.symmetric(
                                     horizontal: screenWidth / 15, vertical: 10),
-                                child: ButtonTheme(
-                                    buttonColor: buttonColor,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(30)),
-                                    minWidth: screenWidth / 5,
-                                    child: RaisedButton(
-                                        elevation: 2,
-                                        clipBehavior: Clip.antiAlias,
-                                        child: Text(topicFollowingText),
-                                        onPressed: () async {
-                                          print(isFollow);
+                                child: ValueListenableBuilder(
+                                  valueListenable: isFollow,
+                                  builder: (_, isFollowValue, __) => ButtonTheme(
+                                      buttonColor: buttonColor.value,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30)),
+                                      minWidth: screenWidth / 5,
+                                      child: RaisedButton(
+                                          elevation: 2,
+                                          clipBehavior: Clip.antiAlias,
+                                          child: Text(topicFollowingText.value),
+                                          onPressed: () async {
+                                            print("IS FOLLOW VALUE: "+isFollowValue.toString());
 
-                                          if (isFollow) {
-                                            buttonColor = Colors.red[50];
-                                            isFollow = false;
-                                            topicFollowingText = "Follow";
-                                            final request = http.Request(
-                                                "DELETE",
-                                                Uri.parse(
-                                                    "http://postea-server.herokuapp.com/topicfollowdata"));
-                                            request.headers.addAll({
-                                              'Content-Type': 'application/json'
-                                            });
-                                            request.body = jsonEncode({
-                                              "topic_id": widget.topicId,
-                                              "follower_id": widget.profileId
-                                            });
-                                            request.send();
-                                          } else {
-                                            buttonColor = Colors.redAccent[100];
-                                            isFollow = true;
-                                            topicFollowingText = "Following";
-                                            var addfollowing = {
-                                              "topic_id": widget.topicId,
-                                              "follower_id": widget.profileId
-                                            };
-                                            var addfollowingJson = JsonEncoder()
-                                                .convert(addfollowing);
-                                            http.post(
-                                                "http://postea-server.herokuapp.com/topicfollowdata",
-                                                headers: {
-                                                  'Content-Type':
-                                                      'application/json'
-                                                },
-                                                body: addfollowingJson);
-                                          }
+                                            if (isFollowValue) {
+                                              buttonColor.value = Colors.red[50];
+                                              isFollow.value = false;
+                                              topicFollowingText.value = "Follow";
+                                              final request = http.Request(
+                                                  "DELETE",
+                                                  Uri.parse(
+                                                      "http://postea-server.herokuapp.com/topicfollowdata"));
+                                              request.headers.addAll({
+                                                'Content-Type': 'application/json'
+                                              });
+                                              request.body = jsonEncode({
+                                                "topic_id": widget.topicId,
+                                                "follower_id": widget.profileId
+                                              });
+                                              request.send();
+                                            } else {
+                                              buttonColor.value = Colors.redAccent[100];
+                                              isFollow.value = true;
+                                              topicFollowingText.value = "Following";
+                                              var addfollowing = {
+                                                "topic_id": widget.topicId,
+                                                "follower_id": widget.profileId
+                                              };
+                                              var addfollowingJson = JsonEncoder()
+                                                  .convert(addfollowing);
+                                              http.post(
+                                                  "http://postea-server.herokuapp.com/topicfollowdata",
+                                                  headers: {
+                                                    'Content-Type':
+                                                        'application/json'
+                                                  },
+                                                  body: addfollowingJson);
+                                            }
 
-                                          setState(() {});
-                                        })),
+                                            // setState(() {});
+                                          })),
+                                ),
                               )
                             : Container(),
                       ],
