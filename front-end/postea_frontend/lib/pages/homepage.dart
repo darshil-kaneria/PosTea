@@ -15,6 +15,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:postea_frontend/data_models/timer.dart';
 import 'package:postea_frontend/main.dart';
 import 'package:postea_frontend/pages/create_topic.dart';
+import 'package:postea_frontend/pages/discoverTopics.dart';
 import 'package:postea_frontend/pages/profile.dart';
 import 'package:postea_frontend/pages/trending.dart';
 import 'package:provider/provider.dart';
@@ -120,7 +121,7 @@ class _HomePageState extends State<HomePage> {
       "postTitle": postTitleController.text,
       "msg": postTextController.text,
       "topic": topicEditingController.text,
-      "img": base64Image == ""? "0" : "1",
+      "img": base64Image == "" ? "0" : "1",
       "topicID": 21,
       "profileID": widget.profileID,
       "likes": 0,
@@ -203,11 +204,15 @@ class _HomePageState extends State<HomePage> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => Topic(
-                          profileId: widget.profileID,
-                          isOwner: true,
-                          topicId: "21",
+                    builder: (_) => DiscoverTopics(
+                          profileID: widget.profileID,
                         )));
+            // MaterialPageRoute(
+            //     builder: (_) => Topic(
+            //           profileId: widget.profileID,
+            //           isOwner: true,
+            //           topicId: "21",
+            //         )));
           } else if (value == 4) {
             Navigator.push(
                 context,
@@ -221,10 +226,8 @@ class _HomePageState extends State<HomePage> {
               context: context,
               barrierDismissible: false,
               builder: (context) {
-                return StatefulBuilder(
-
-                  builder: (context, setState){
-                    return WillPopScope(
+                return StatefulBuilder(builder: (context, setState) {
+                  return WillPopScope(
                     onWillPop: () async {
                       postTitleController.clear();
                       postTextController.clear();
@@ -243,8 +246,8 @@ class _HomePageState extends State<HomePage> {
                             Expanded(
                               flex: 1,
                               child: Container(
-                                padding:
-                                    EdgeInsets.only(left: 18, right: 18, top: 15),
+                                padding: EdgeInsets.only(
+                                    left: 18, right: 18, top: 15),
                                 color: Colors.transparent,
                                 child: TextField(
                                   decoration: InputDecoration(
@@ -305,15 +308,15 @@ class _HomePageState extends State<HomePage> {
                                           color: isAnonColor,
                                         ),
                                         onPressed: () {
-                                          if(isAnonymous == 0){
+                                          if (isAnonymous == 0) {
                                             isAnonymous = 1;
-                                            isAnonColor = Colors.deepOrange[100];
-                                          }
-                                          else if(isAnonymous == 1){
+                                            isAnonColor =
+                                                Colors.deepOrange[100];
+                                          } else if (isAnonymous == 1) {
                                             isAnonymous = 0;
                                             isAnonColor = Colors.grey;
                                           }
-                                          setState((){});
+                                          setState(() {});
                                           print(isAnonymous);
                                         }),
                                     Expanded(
@@ -327,8 +330,8 @@ class _HomePageState extends State<HomePage> {
                                           decoration: BoxDecoration(
                                               borderRadius: BorderRadius.all(
                                                   Radius.circular(15)),
-                                              border:
-                                                  Border.all(color: Colors.grey)),
+                                              border: Border.all(
+                                                  color: Colors.grey)),
                                           child: ButtonTheme(
                                             shape: RoundedRectangleBorder(
                                                 borderRadius:
@@ -345,13 +348,15 @@ class _HomePageState extends State<HomePage> {
                                                               RoundedRectangleBorder(
                                                             borderRadius:
                                                                 BorderRadius
-                                                                    .circular(20),
+                                                                    .circular(
+                                                                        20),
                                                           ),
                                                           child: Container(
-                                                            width:
-                                                                screenWidth / 1.1,
+                                                            width: screenWidth /
+                                                                1.1,
                                                             height:
-                                                                screenHeight / 7,
+                                                                screenHeight /
+                                                                    7,
                                                             child: Column(
                                                               mainAxisAlignment:
                                                                   MainAxisAlignment
@@ -383,14 +388,11 @@ class _HomePageState extends State<HomePage> {
                                                                               "Choose Topic"),
                                                                           onPressed:
                                                                               () {
-                                                                            setState(
-                                                                                () {
-                                                                              topicButtonText =
-                                                                                  topicEditingController.text;
+                                                                            setState(() {
+                                                                              topicButtonText = topicEditingController.text;
                                                                               print(topicEditingController.text);
                                                                             });
-                                                                            Navigator.of(context, rootNavigator: true)
-                                                                                .pop();
+                                                                            Navigator.of(context, rootNavigator: true).pop();
                                                                           }),
                                                                 )
                                                               ],
@@ -424,10 +426,10 @@ class _HomePageState extends State<HomePage> {
                                 onTap: () async {
                                   // Making a post request
                                   makePost();
-                                  if(base64Image != ""){
+                                  if (base64Image != "") {
                                     await uploadImage(imgToUpload);
                                   }
-                                  
+
                                   Navigator.pop(context);
                                 },
                                 child: Container(
@@ -446,9 +448,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   );
-                  }
-                  
-                );
+                });
               },
             );
         },
@@ -486,37 +486,41 @@ class _HomePageState extends State<HomePage> {
               scrollDirection: Axis.horizontal,
               children: [
                 TopicPill(
-                    topicId: 2,
-                    col1: Colors.purple[900],
-                    col2: Colors.purple[400],
-                    height: screenHeight/10,
-                    width: screenWidth/4,
-                    profileId: widget.profileID,
-              isOwner: true,),
+                  topicId: 2,
+                  col1: Colors.purple[900],
+                  col2: Colors.purple[400],
+                  height: screenHeight / 10,
+                  width: screenWidth / 4,
+                  profileId: widget.profileID,
+                  isOwner: true,
+                ),
                 TopicPill(
-                    topicId: 26894,
-                    col1: Colors.green[700],
-                    col2: Colors.lightGreen[400],
-                    height: screenHeight/10,
-                    width: screenWidth/4,
-                    profileId: widget.profileID,
-              isOwner: true,),
+                  topicId: 26894,
+                  col1: Colors.green[700],
+                  col2: Colors.lightGreen[400],
+                  height: screenHeight / 10,
+                  width: screenWidth / 4,
+                  profileId: widget.profileID,
+                  isOwner: true,
+                ),
                 TopicPill(
-                    topicId: 51561,
-                    col1: Colors.blue[700],
-                    col2: Colors.lightBlueAccent[200],
-                    height: screenHeight/10,
-                    width: screenWidth/4,
-                    profileId: widget.profileID,
-              isOwner: true,),
+                  topicId: 51561,
+                  col1: Colors.blue[700],
+                  col2: Colors.lightBlueAccent[200],
+                  height: screenHeight / 10,
+                  width: screenWidth / 4,
+                  profileId: widget.profileID,
+                  isOwner: true,
+                ),
                 TopicPill(
-                    topicId: 99841,
-                    col1: Colors.red[700],
-                    col2: Colors.pink[400],
-                    height: screenHeight/10,
-                    width: screenWidth/4,
-                    profileId: widget.profileID,
-              isOwner: true,)
+                  topicId: 99841,
+                  col1: Colors.red[700],
+                  col2: Colors.pink[400],
+                  height: screenHeight / 10,
+                  width: screenWidth / 4,
+                  profileId: widget.profileID,
+                  isOwner: true,
+                )
               ],
             ),
           ),
@@ -543,7 +547,8 @@ class _HomePageState extends State<HomePage> {
                           //   }
 
                           // }
-                          print("LIKES ARE: " + timeLine.postList.elementAt(index).post_likes);
+                          print("LIKES ARE: " +
+                              timeLine.postList.elementAt(index).post_likes);
                           return PostTile(
                               timeLine.postList.elementAt(index).post_id,
                               timeLine.postList.elementAt(index).profile_id,
