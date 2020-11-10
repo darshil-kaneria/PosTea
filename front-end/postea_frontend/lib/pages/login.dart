@@ -22,7 +22,7 @@ class _LoginState extends State<Login> {
   var _usernameController = TextEditingController();
   var _passwordController = TextEditingController();
   var _forgotPasswordController = TextEditingController();
-  
+
   PageController _pageController = PageController(
     initialPage: 0,
     keepPage: true,
@@ -37,22 +37,48 @@ class _LoginState extends State<Login> {
   //   }
   // }
 
+  getUsername(String email) async {
+    final databaseReference =
+        FirebaseDatabase.instance.reference().child("users");
+
+    var username = "No username found";
+
+    await databaseReference.once().then((DataSnapshot dataSnapshot) {
+      Map<dynamic, dynamic> map = dataSnapshot.value;
+      map.forEach((key, value) {
+        var usernameEmail = value[key.toString()];
+        if (usernameEmail == email) {
+          username = key.toString();
+        }
+      });
+    });
+    return username;
+  }
+
   logInUser(String email, String password, String username) async {
     print(email);
     print(password);
+    print("current username is " + username);
+    if (username.contains("@")) {
+      username = await getUsername(email);
+      print("username after retrieval is " + username.toString());
+    }
     try {
       User user = (await FirebaseAuth.instance
               .signInWithEmailAndPassword(email: email, password: password))
           .user;
 
       print("hello from logInUser()");
-      Response response = await get("http://postea-server.herokuapp.com/profile?username="+username);
+      Response response = await get(
+          "http://postea-server.herokuapp.com/profile?username=" + username);
       var respBody = jsonDecode(response.body);
-      if(respBody.containsKey("Error")){
-        Navigator.push(context, MaterialPageRoute(builder: (context) => Onboarding(username: username)));
+      if (respBody.containsKey("Error")) {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => Onboarding(username: username)));
         print("Error occurred");
-      }
-      else if (user != null) {
+      } else if (user != null) {
         print("hello from logInUser() success");
         // print(respBody['message']['profile_id']);
         final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -60,7 +86,11 @@ class _LoginState extends State<Login> {
         prefs.setInt('profileID', respBody['message']['profile_id']);
         prefs.setString('username', username);
         Navigator.push(
-            context, MaterialPageRoute(builder: (context) => HomePage(profileID: respBody['message']['profile_id'],)));
+            context,
+            MaterialPageRoute(
+                builder: (context) => HomePage(
+                      profileID: respBody['message']['profile_id'],
+                    )));
         // this.loginSucces = true;
       } else {
         print("hello from logInUser() err");
@@ -83,14 +113,12 @@ class _LoginState extends State<Login> {
 
   @override
   void initState() {
-    
     super.initState();
     // checkUserLoggedIn();
   }
 
   @override
   Widget build(BuildContext context) {
-
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
 
@@ -223,7 +251,7 @@ class _LoginState extends State<Login> {
                                 final databaseReference = FirebaseDatabase
                                     .instance
                                     .reference()
-                                    .child("users"); 
+                                    .child("users");
 
                                 print("hello");
 
@@ -269,99 +297,141 @@ class _LoginState extends State<Login> {
                           onTap: () {
                             // Implement forgot password
 
-                            showDialog(context: context,
-                            barrierDismissible: false,
-                              builder: (context){
-                                return WillPopScope(
-                                  onWillPop: () async {
-                                    _forgotPasswordController.clear();
-                                    return true;
-                                  },
+                            showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (context) {
+                                  return WillPopScope(
+                                    onWillPop: () async {
+                                      _forgotPasswordController.clear();
+                                      return true;
+                                    },
                                     child: Dialog(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.all(Radius.circular(20)),
-                                    ),
-                                    
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.all(Radius.circular(20)),
-                                        
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20)),
                                       ),
-                                      padding: EdgeInsets.all(20),
-                                      alignment: Alignment.center,
-                                      height: screenHeight/2.5,
-                                      width: screenWidth/1.1,
-                                      child: PageView(
-                                        controller: _pageController,
-                                        physics: NeverScrollableScrollPhysics(),
-                                        scrollDirection: Axis.horizontal,
-                                          children: [
-                                            Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Text("Enter your Email Address", 
-                                            style: TextStyle(fontSize: 19),),
-                                            Padding(padding: EdgeInsets.all(0),),
-                                            Container(
-                                              padding: EdgeInsets.fromLTRB(20, 25, 20, 15),
-                                              child: TextField(
-                                                controller: _forgotPasswordController,
-                                                obscureText: false,
-                                                decoration: InputDecoration(
-                                                    contentPadding: EdgeInsets.only(left: 30),
-                                                    hintText: "Email",
-                                                    enabledBorder: OutlineInputBorder(
-                                                        borderSide:
-                                                            BorderSide(color: loginButton),
-                                                        borderRadius: BorderRadius.all(
-                                                            Radius.circular(50))),
-                                                    focusedBorder: OutlineInputBorder(
-                                                      borderSide:
-                                                          BorderSide(color: Colors.red[400]),
-                                                      borderRadius:
-                                                          BorderRadius.all(Radius.circular(100)),
-                                                    )),
-                                              )),
-                                              ButtonTheme(
-                                                height: screenHeight/17,
-                                                minWidth: screenWidth/4,
-                                                child: RaisedButton(
-                                                  elevation: 1,
-                                                  color: loginButton,
-                                                  highlightColor: Colors.red[700],
-                                                  onPressed: () async {
-                                                  await FirebaseAuth.instance.sendPasswordResetEmail(email: _forgotPasswordController.text);
-                                                  _pageController.jumpToPage(1);
-                                                },
-                                                child: Text(
-                                                  "Submit",
-                                                  style: TextStyle(
-                                                      fontFamily: "Helvetica",
-                                                      color: Colors.white,
-                                                      fontSize: 16),
-                                                ),
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius: BorderRadius.circular(100),
-                                                    side: BorderSide(color: Colors.redAccent)),),
-                                              )
-                                          ],
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(20)),
                                         ),
-                                        Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: [
-                                            Text("If we find an account linked with this ID, you will shortly receive an email to reset your password.", 
-                                            style: TextStyle(fontSize: 16),)
-                                          ],
-                                        ),
-                                        ]
+                                        padding: EdgeInsets.all(20),
+                                        alignment: Alignment.center,
+                                        height: screenHeight / 2.5,
+                                        width: screenWidth / 1.1,
+                                        child: PageView(
+                                            controller: _pageController,
+                                            physics:
+                                                NeverScrollableScrollPhysics(),
+                                            scrollDirection: Axis.horizontal,
+                                            children: [
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    "Enter your Email Address",
+                                                    style:
+                                                        TextStyle(fontSize: 19),
+                                                  ),
+                                                  Padding(
+                                                    padding: EdgeInsets.all(0),
+                                                  ),
+                                                  Container(
+                                                      padding:
+                                                          EdgeInsets.fromLTRB(
+                                                              20, 25, 20, 15),
+                                                      child: TextField(
+                                                        controller:
+                                                            _forgotPasswordController,
+                                                        obscureText: false,
+                                                        decoration:
+                                                            InputDecoration(
+                                                                contentPadding:
+                                                                    EdgeInsets.only(
+                                                                        left:
+                                                                            30),
+                                                                hintText:
+                                                                    "Email",
+                                                                enabledBorder: OutlineInputBorder(
+                                                                    borderSide:
+                                                                        BorderSide(
+                                                                            color:
+                                                                                loginButton),
+                                                                    borderRadius:
+                                                                        BorderRadius.all(Radius.circular(
+                                                                            50))),
+                                                                focusedBorder:
+                                                                    OutlineInputBorder(
+                                                                  borderSide: BorderSide(
+                                                                      color: Colors
+                                                                              .red[
+                                                                          400]),
+                                                                  borderRadius:
+                                                                      BorderRadius.all(
+                                                                          Radius.circular(
+                                                                              100)),
+                                                                )),
+                                                      )),
+                                                  ButtonTheme(
+                                                    height: screenHeight / 17,
+                                                    minWidth: screenWidth / 4,
+                                                    child: RaisedButton(
+                                                      elevation: 1,
+                                                      color: loginButton,
+                                                      highlightColor:
+                                                          Colors.red[700],
+                                                      onPressed: () async {
+                                                        await FirebaseAuth
+                                                            .instance
+                                                            .sendPasswordResetEmail(
+                                                                email:
+                                                                    _forgotPasswordController
+                                                                        .text);
+                                                        _pageController
+                                                            .jumpToPage(1);
+                                                      },
+                                                      child: Text(
+                                                        "Submit",
+                                                        style: TextStyle(
+                                                            fontFamily:
+                                                                "Helvetica",
+                                                            color: Colors.white,
+                                                            fontSize: 16),
+                                                      ),
+                                                      shape: RoundedRectangleBorder(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      100),
+                                                          side: BorderSide(
+                                                              color: Colors
+                                                                  .redAccent)),
+                                                    ),
+                                                  )
+                                                ],
+                                              ),
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    "If we find an account linked with this ID, you will shortly receive an email to reset your password.",
+                                                    style:
+                                                        TextStyle(fontSize: 16),
+                                                  )
+                                                ],
+                                              ),
+                                            ]),
                                       ),
                                     ),
-                                  ),
-                                );
-                              }
-                            );
+                                  );
+                                });
                           },
                           child: Text(
                             "Forgot my password",
