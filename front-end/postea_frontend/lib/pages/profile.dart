@@ -37,21 +37,20 @@ class _ProfileState extends State<Profile> {
   var _biodataController = TextEditingController();
   int _value;
   PageController controller = PageController(initialPage: 0);
-  
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     // displayImage();
-    _value=0;
+    _value = 0;
     getProfile();
     getFollowing();
     getCount();
   }
 
   @override
-  void dispose(){
+  void dispose() {
     controller.dispose();
     super.dispose();
   }
@@ -59,27 +58,25 @@ class _ProfileState extends State<Profile> {
   getFollowing() async {
     prefs = await SharedPreferences.getInstance();
     widget.myPID = prefs.getInt('profileID') ?? 0;
-    print("MY ID"+widget.myPID.toString());
-    http.get("http://postea-server.herokuapp.com/followdata?profile_id="+widget.myPID.toString()+"&flag=following_list").then((resp) {
-
-
-    listFollowing = jsonDecode(resp.body);
-    print("LIST FOLLOWING"+widget.profileId.toString());
-    for(int i = 0; i < listFollowing.length; i++){
-      // print()
-      if(listFollowing[i]['follower_id'] == widget.profileId){
-        isFollow = true;
-        buttonColor = Colors.redAccent[100];
-        isFollow = true;
-        followButtonText = "Following";
-        setState(() {
-          
-        });
+    print("MY ID" + widget.myPID.toString());
+    http
+        .get("http://postea-server.herokuapp.com/followdata?profile_id=" +
+            widget.myPID.toString() +
+            "&flag=following_list")
+        .then((resp) {
+      listFollowing = jsonDecode(resp.body);
+      print("LIST FOLLOWING" + widget.profileId.toString());
+      for (int i = 0; i < listFollowing.length; i++) {
+        // print()
+        if (listFollowing[i]['follower_id'] == widget.profileId) {
+          isFollow = true;
+          buttonColor = Colors.redAccent[100];
+          isFollow = true;
+          followButtonText = "Following";
+          setState(() {});
+        }
       }
-    }
     });
-    
-
   }
 
   updateProfile() async {
@@ -106,17 +103,17 @@ class _ProfileState extends State<Profile> {
     prefs = await SharedPreferences.getInstance();
     username = prefs.getString('username') ?? "";
     var queryString;
-    if(widget.isOwner){
+    if (widget.isOwner) {
       // print("HERE");
-      queryString = "http://postea-server.herokuapp.com/profile?username="+username.toString();
-    }
-    else{
+      queryString = "http://postea-server.herokuapp.com/profile?username=" +
+          username.toString();
+    } else {
       // print("Not here");
-      queryString = "http://postea-server.herokuapp.com/profile/"+widget.profileId.toString();
+      queryString = "http://postea-server.herokuapp.com/profile/" +
+          widget.profileId.toString();
     }
     print(username);
-    http.Response resp = await http
-        .get(queryString);
+    http.Response resp = await http.get(queryString);
     profile = jsonDecode(resp.body);
     setState(() {
       _nameController.text = profile["message"]["name"];
@@ -141,7 +138,7 @@ class _ProfileState extends State<Profile> {
   var isFollow = false;
   var buttonColor = Colors.red[50];
   var followButtonText = "Follow";
-  
+
   final ValueNotifier<int> followingCountNotifier = ValueNotifier<int>(0);
   final ValueNotifier<int> followerCountNotifier = ValueNotifier<int>(0);
   final ValueNotifier<int> followingListNotifier = ValueNotifier<int>(0);
@@ -151,17 +148,25 @@ class _ProfileState extends State<Profile> {
   List<String> followerList = [];
 
   getCount() async {
-    http.get(
-      "http://postea-server.herokuapp.com/followdata?profile_id="+widget.profileId.toString()+"&flag=following_count",
-    ).then((value) {
+    http
+        .get(
+      "http://postea-server.herokuapp.com/followdata?profile_id=" +
+          widget.profileId.toString() +
+          "&flag=following_count",
+    )
+        .then((value) {
       var followingCount = jsonDecode(value.body);
 
       followingCountNotifier.value = followingCount['followingCount'];
       // followingCountNotifier.value
     });
-    http.get(
-      "http://postea-server.herokuapp.com/followdata?profile_id="+widget.profileId.toString()+"&flag=follower_count",
-    ).then((value) {
+    http
+        .get(
+      "http://postea-server.herokuapp.com/followdata?profile_id=" +
+          widget.profileId.toString() +
+          "&flag=follower_count",
+    )
+        .then((value) {
       var followerCount = jsonDecode(value.body);
 
       followerCountNotifier.value = followerCount['followerCount'];
@@ -169,14 +174,10 @@ class _ProfileState extends State<Profile> {
     });
   }
 
-  
-
   @override
   Widget build(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
-    
-    
 
     // displayImage();
 
@@ -197,586 +198,636 @@ class _ProfileState extends State<Profile> {
           },
         ),
         actions: [
-          widget.isOwner? IconButton(
-            icon: Icon(
-              Icons.edit,
-              color: Colors.black,
-            ),
-            onPressed: () {
-                Navigator.push(
-                  context,
-                  PageRouteBuilder(
-                    transitionDuration: Duration(milliseconds: 300),
-                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                      return FadeTransition(opacity: animation, child: SlideTransition(position: Tween<Offset>(begin: Offset(0,-1), end: Offset(0,0)).animate(CurvedAnimation(parent: animation, curve: Curves.decelerate)), child: child,));
-                    },
-                    pageBuilder: (BuildContext context, Animation<double> animation, Animation<double> secAnimation) {
-                      return EditProfile(nameText: name, biodata: bio_data, privacy: isPrivate, username: username,);
-                    },
-                  )
-                  );
-
-            },
-          ):Container()
+          widget.isOwner
+              ? IconButton(
+                  icon: Icon(
+                    Icons.edit,
+                    color: Colors.black,
+                  ),
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          transitionDuration: Duration(milliseconds: 300),
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            return FadeTransition(
+                                opacity: animation,
+                                child: SlideTransition(
+                                  position: Tween<Offset>(
+                                          begin: Offset(0, -1),
+                                          end: Offset(0, 0))
+                                      .animate(CurvedAnimation(
+                                          parent: animation,
+                                          curve: Curves.decelerate)),
+                                  child: child,
+                                ));
+                          },
+                          pageBuilder: (BuildContext context,
+                              Animation<double> animation,
+                              Animation<double> secAnimation) {
+                            return EditProfile(
+                              nameText: name,
+                              biodata: bio_data,
+                              privacy: isPrivate,
+                              username: username,
+                            );
+                          },
+                        ));
+                  },
+                )
+              : Container()
         ],
       ),
       body: SafeArea(
         child: PageView(
-          scrollDirection: Axis.horizontal,
-          physics: NeverScrollableScrollPhysics(),
-          controller: controller,
-          children: [
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Container(
-                  // height: screenHeight / 4,
-                  width: screenWidth,
-                  color: Colors.transparent,
-                  // padding: EdgeInsets.only(top: screenHeight / 20),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.max,
-                    children: <Widget>[
-                      Container(
-                        margin: EdgeInsets.symmetric(horizontal: 12),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Container(
-                              height: screenWidth / 4,
-                              width: screenWidth / 4,
-                              decoration: ShapeDecoration(
-                                  shape: CircleBorder(
-                                      side: BorderSide(
-                                          width: 1, color: Colors.blueGrey))),
-                              child: FutureBuilder(
-                                future: FirebaseStorageService.getImage(context, "tom_and_jerry.jpeg"),
-                                builder: (context, AsyncSnapshot<dynamic> snapshot){
-
-                                  if(snapshot.hasData){
-
-                                    return CircleAvatar(
-                                    backgroundImage: NetworkImage(snapshot.data),
-                                    maxRadius: screenWidth / 8,
-                                );
-                                  }
-                                  else{
-                                    return CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                      backgroundColor: bgColor,
-                                      valueColor: AlwaysStoppedAnimation(loginButtonEnd),
-                                    );
-                                    
-                                  }
-                                  
-                                }
-                                
-                              ),
-                            ),
-                            Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.center,
-                                children: [
-                                  AutoSizeText(
-                                    name,
-                                    maxFontSize: 29,
-                                    minFontSize: 27,
-                                    softWrap: true,
-                                  ),
-                                  Padding(
-                                      padding: EdgeInsets.only(
-                                          bottom: screenHeight / 40)),
-                                  IntrinsicHeight(
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceAround,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.stretch,
-                                      children: [
-                                        Column(
+            scrollDirection: Axis.horizontal,
+            physics: NeverScrollableScrollPhysics(),
+            controller: controller,
+            children: [
+              Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Container(
+                      // height: screenHeight / 4,
+                      width: screenWidth,
+                      color: Colors.transparent,
+                      // padding: EdgeInsets.only(top: screenHeight / 20),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.max,
+                        children: <Widget>[
+                          Container(
+                            margin: EdgeInsets.symmetric(horizontal: 12),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Container(
+                                  height: screenWidth / 4,
+                                  width: screenWidth / 4,
+                                  decoration: ShapeDecoration(
+                                      shape: CircleBorder(
+                                          side: BorderSide(
+                                              width: 1,
+                                              color: Colors.blueGrey))),
+                                  child: FutureBuilder(
+                                      future: FirebaseStorageService.getImage(
+                                          context, username),
+                                      builder: (context,
+                                          AsyncSnapshot<dynamic> snapshot) {
+                                        if (snapshot.hasData) {
+                                          return CircleAvatar(
+                                            backgroundImage:
+                                                NetworkImage(snapshot.data),
+                                            maxRadius: screenWidth / 8,
+                                          );
+                                        } else {
+                                          return CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            backgroundColor: bgColor,
+                                            valueColor: AlwaysStoppedAnimation(
+                                                loginButtonEnd),
+                                          );
+                                        }
+                                      }),
+                                ),
+                                Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      AutoSizeText(
+                                        name,
+                                        maxFontSize: 29,
+                                        minFontSize: 27,
+                                        softWrap: true,
+                                      ),
+                                      Padding(
+                                          padding: EdgeInsets.only(
+                                              bottom: screenHeight / 40)),
+                                      IntrinsicHeight(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
                                           children: [
+                                            Column(
+                                              children: [
                                                 GestureDetector(
                                                   onTap: () {
-                                                    Navigator.push(context, MaterialPageRoute(builder: (_) => FollowerList(profileId: widget.profileId,))).then((value) => setState((){}));
+                                                    Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (_) =>
+                                                                FollowerList(
+                                                                  profileId: widget
+                                                                      .profileId,
+                                                                ))).then(
+                                                        (value) =>
+                                                            setState(() {}));
                                                   },
                                                   child: Text(
                                                     "Followers",
                                                     style: TextStyle(
-                                                        fontWeight: FontWeight.bold),
+                                                        fontWeight:
+                                                            FontWeight.bold),
                                                   ),
                                                 ),
-                                            ValueListenableBuilder(
-                                              valueListenable: followerCountNotifier,
-                                              builder:(_, value, __) => Text(value.toString())
-
-                                              
-                                              )
-                                          ],
-                                        ),
-                                        Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: screenWidth / 25)),
-                                        Container(
-                                          // height: 20,
-                                          width: 0.5,
-                                          color: Colors.blueGrey,
-                                        ),
-                                        Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: screenWidth / 25)),
-                                        Column(
-                                          children: [
-                                            GestureDetector(
-                                              onTap: () {
-                                                    Navigator.push(context, MaterialPageRoute(builder: (_) => FollowingList(profileId: widget.profileId,))).then((value) => setState((){}));
-                                                  },
-                                              child: Text(
-                                                "Following",
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold),
-                                              ),
+                                                ValueListenableBuilder(
+                                                    valueListenable:
+                                                        followerCountNotifier,
+                                                    builder: (_, value, __) =>
+                                                        Text(value.toString()))
+                                              ],
                                             ),
-                                            ValueListenableBuilder(
-                                              valueListenable: followingCountNotifier,
-                                              builder:(_, value, __) => Text(value.toString())
-
-                                              
-                                              )
+                                            Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal:
+                                                        screenWidth / 25)),
+                                            Container(
+                                              // height: 20,
+                                              width: 0.5,
+                                              color: Colors.blueGrey,
+                                            ),
+                                            Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal:
+                                                        screenWidth / 25)),
+                                            Column(
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                            builder: (_) =>
+                                                                FollowingList(
+                                                                  profileId: widget
+                                                                      .profileId,
+                                                                ))).then(
+                                                        (value) =>
+                                                            setState(() {}));
+                                                  },
+                                                  child: Text(
+                                                    "Following",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                ),
+                                                ValueListenableBuilder(
+                                                    valueListenable:
+                                                        followingCountNotifier,
+                                                    builder: (_, value, __) =>
+                                                        Text(value.toString()))
+                                              ],
+                                            )
                                           ],
-                                        )
+                                        ),
+                                      )
+                                    ]),
+                              ],
+                            ),
+                          ),
+                          // Profile circle
+                          SizedBox(
+                            height: screenHeight / 25,
+                          ),
+                          widget.isOwner == false
+                              ? Container(
+                                  height: screenHeight / 14,
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: screenWidth / 15,
+                                      vertical: 10),
+                                  child: ButtonTheme(
+                                      buttonColor: buttonColor,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30)),
+                                      minWidth: screenWidth / 1.5,
+                                      child: RaisedButton(
+                                          elevation: 2,
+                                          clipBehavior: Clip.antiAlias,
+                                          child: Text(followButtonText),
+                                          onPressed: () async {
+                                            print(isFollow);
+
+                                            if (isFollow) {
+                                              buttonColor = Colors.red[50];
+                                              isFollow = false;
+                                              followButtonText = "Follow";
+                                              final request = http.Request(
+                                                  "DELETE",
+                                                  Uri.parse(
+                                                      "http://postea-server.herokuapp.com/followdata"));
+                                              request.headers.addAll({
+                                                'Content-Type':
+                                                    'application/json'
+                                              });
+                                              request.body = jsonEncode({
+                                                "profile_id": widget.myPID,
+                                                "follower_id": widget.profileId
+                                              });
+                                              request.send();
+                                            } else {
+                                              buttonColor =
+                                                  Colors.redAccent[100];
+                                              isFollow = true;
+                                              followButtonText = "Following";
+                                              var addfollowing = {
+                                                "profile_id": widget.myPID,
+                                                "follower_id": widget.profileId
+                                              };
+                                              var addfollowingJson =
+                                                  JsonEncoder()
+                                                      .convert(addfollowing);
+                                              http.post(
+                                                  "http://postea-server.herokuapp.com/followdata",
+                                                  headers: {
+                                                    'Content-Type':
+                                                        'application/json'
+                                                  },
+                                                  body: addfollowingJson);
+                                            }
+
+                                            setState(() {});
+                                          })),
+                                )
+                              : Container(),
+
+                          // Follow & Following Buttons
+                          // Row(
+                          //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          //   crossAxisAlignment: CrossAxisAlignment.center,
+                          //   children: <Widget>[
+                          // Follower button
+                          // Stack(
+                          //   alignment: Alignment.centerRight,
+                          //   children: [
+                          //     ButtonTheme(
+                          //       padding: EdgeInsets.only(right: 40),
+                          //       height: 50,
+                          //       minWidth: screenWidth / 2.5,
+                          //       child: RaisedButton(
+                          //         color: profileButtoColor,
+                          //         onPressed: () {},
+                          //         child: Row(
+                          //             mainAxisAlignment:
+                          //                 MainAxisAlignment.spaceAround,
+                          //             children: [
+                          //               // IconButton(
+                          //               //     icon: Icon(Icons.add), onPressed: () {}),
+                          //               Text("Followers")
+                          //             ]),
+                          //         elevation: 0,
+                          //         shape: RoundedRectangleBorder(
+                          //             borderRadius: BorderRadius.circular(100),
+                          //             side: BorderSide(color: Colors.transparent)),
+                          //       ),
+                          //     ),
+                          //     ButtonTheme(
+                          //       height: 55,
+                          //       minWidth: screenWidth / 7,
+                          //       child: RaisedButton(
+                          //         color: ffDisplayer,
+                          //         onPressed: () {},
+                          //         child: Text("4.2k"),
+                          //         elevation: 6,
+                          //         shape: RoundedRectangleBorder(
+                          //             borderRadius: BorderRadius.only(
+                          //                 topLeft: Radius.zero,
+                          //                 bottomLeft: Radius.zero,
+                          //                 topRight: Radius.circular(100),
+                          //                 bottomRight: Radius.circular(100)),
+                          //             side: BorderSide(color: Colors.black12)),
+                          //       ),
+                          //     )
+                          //   ],
+                          // ),
+                          // Stack(
+                          //   alignment: Alignment.centerRight,
+                          //   children: [
+                          //     ButtonTheme(
+                          //       padding: EdgeInsets.only(right: 40),
+                          //       height: 50,
+                          //       minWidth: screenWidth / 2.6,
+                          //       child: RaisedButton(
+                          //         color: profileButtoColor,
+                          //         onPressed: () {},
+                          //         child: Text(
+                          //           "Following",
+                          //         ),
+                          //         elevation: 0,
+                          //         shape: RoundedRectangleBorder(
+                          //             borderRadius: BorderRadius.circular(100),
+                          //             side: BorderSide(color: Colors.transparent)),
+                          //       ),
+                          //     ),
+                          //     ButtonTheme(
+                          //       height: 55,
+                          //       minWidth: screenWidth / 7,
+                          //       child: RaisedButton(
+                          //         color: ffDisplayer,
+                          //         onPressed: () {},
+                          //         child: Text("6.5k"),
+                          //         elevation: 6,
+                          //         shape: RoundedRectangleBorder(
+                          //             borderRadius: BorderRadius.only(
+                          //                 topLeft: Radius.zero,
+                          //                 bottomLeft: Radius.zero,
+                          //                 topRight: Radius.circular(100),
+                          //                 bottomRight: Radius.circular(100)),
+                          //             side: BorderSide(color: Colors.black12)),
+                          //       ),
+                          //     )
+                          //   ],
+                          // ),
+                          //   ],
+                          // )
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        // height: screenHeight / 1.6,
+                        width: screenWidth,
+                        color: Colors.transparent,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10.0, horizontal: 12),
+                              child: Container(
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(10.0),
+                                    color: Colors.red[50],
+                                    border: Border.all(color: Colors.black12)),
+                                child: Theme(
+                                  data: Theme.of(context).copyWith(
+                                      canvasColor: Colors.red[100],
+                                      buttonTheme: ButtonTheme.of(context)
+                                          .copyWith(
+                                              shape: RoundedRectangleBorder(
+                                                  side:
+                                                      BorderSide(
+                                                          width: 1.0,
+                                                          style: BorderStyle
+                                                              .solid),
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          50.0)),
+                                              alignedDropdown: true)),
+                                  child: DropdownButton(
+                                      isExpanded: true,
+                                      underline: SizedBox(),
+                                      icon: null,
+                                      value: _value,
+                                      items: [
+                                        DropdownMenuItem(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10.0),
+                                            child: Container(
+                                              child: Text("About"),
+                                            ),
+                                          ),
+                                          value: 0,
+                                        ),
+                                        DropdownMenuItem(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10.0),
+                                            child: Container(
+                                              child: Text("Posts"),
+                                            ),
+                                          ),
+                                          value: 1,
+                                        ),
+                                        DropdownMenuItem(
+                                          child: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 10.0),
+                                            child: Container(
+                                              child: Text("Topics"),
+                                            ),
+                                          ),
+                                          value: 2,
+                                        ),
                                       ],
-                                    ),
-                                  )
-                                ]),
+                                      onChanged: (num value) {
+                                        setState(() {
+                                          _value = value;
+                                        });
+                                        controller.animateToPage(_value,
+                                            duration:
+                                                Duration(milliseconds: 150),
+                                            curve: Curves.decelerate);
+                                        print(controller.page);
+                                      }),
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Container(
+                                // height: screenHeight / 1.8,
+                                color: Colors.transparent,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    children: <Widget>[
+                                      Card(
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                          ),
+                                          margin: EdgeInsets.only(
+                                              top: 10, left: 12, right: 12),
+                                          elevation: 1,
+                                          clipBehavior: Clip.antiAlias,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(20.0),
+                                            child: Container(
+                                              child: Text(bio_data),
+                                            ),
+                                          ))
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            )
                           ],
                         ),
                       ),
-                      // Profile circle
-                      SizedBox(
-                        height: screenHeight / 25,
-                      ),
-                      widget.isOwner == false ? Container(
-                        height: screenHeight/14,
-                        padding: EdgeInsets.symmetric(horizontal: screenWidth/15, vertical: 10),
-                        child: ButtonTheme(
-                          buttonColor: buttonColor,
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                          minWidth: screenWidth/1.5,
-                          child: RaisedButton(
-                            elevation: 2,
-                            clipBehavior: Clip.antiAlias,
-                            child: Text(followButtonText),
-                            onPressed: () async{
-                              print(isFollow);
-                              
-                                if(isFollow){
-                                buttonColor = Colors.red[50];
-                                isFollow = false;
-                                followButtonText = "Follow";
-                                final request = http.Request("DELETE", Uri.parse("http://postea-server.herokuapp.com/followdata"));
-                                request.headers.addAll(
-                                  {'Content-Type': 'application/json'}
-                                );
-                                request.body = jsonEncode({
-                                  "profile_id": widget.myPID,
-                                  "follower_id": widget.profileId
-                                });
-                                request.send();
-                              }
-                              else{
-                                buttonColor = Colors.redAccent[100];
-                                isFollow = true;
-                                followButtonText = "Following";
-                                var addfollowing = {
-                                  "profile_id": widget.myPID,
-                                  "follower_id": widget.profileId
-                                };
-                                var addfollowingJson = JsonEncoder().convert(addfollowing);
-                                http.post("http://postea-server.herokuapp.com/followdata",
-                                headers: {'Content-Type': 'application/json'},
-                                body: addfollowingJson
-                                );
-                              }   
-                                
-                              setState(() {});
-                                
-                            })
-                            ),
-                        ): Container(),
-                      
-                      // Follow & Following Buttons
-                      // Row(
-                      //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      //   crossAxisAlignment: CrossAxisAlignment.center,
-                      //   children: <Widget>[
-                          // Follower button
-                            // Stack(
-                            //   alignment: Alignment.centerRight,
-                            //   children: [
-                            //     ButtonTheme(
-                            //       padding: EdgeInsets.only(right: 40),
-                            //       height: 50,
-                            //       minWidth: screenWidth / 2.5,
-                            //       child: RaisedButton(
-                            //         color: profileButtoColor,
-                            //         onPressed: () {},
-                            //         child: Row(
-                            //             mainAxisAlignment:
-                            //                 MainAxisAlignment.spaceAround,
-                            //             children: [
-                            //               // IconButton(
-                            //               //     icon: Icon(Icons.add), onPressed: () {}),
-                            //               Text("Followers")
-                            //             ]),
-                            //         elevation: 0,
-                            //         shape: RoundedRectangleBorder(
-                            //             borderRadius: BorderRadius.circular(100),
-                            //             side: BorderSide(color: Colors.transparent)),
-                            //       ),
-                            //     ),
-                            //     ButtonTheme(
-                            //       height: 55,
-                            //       minWidth: screenWidth / 7,
-                            //       child: RaisedButton(
-                            //         color: ffDisplayer,
-                            //         onPressed: () {},
-                            //         child: Text("4.2k"),
-                            //         elevation: 6,
-                            //         shape: RoundedRectangleBorder(
-                            //             borderRadius: BorderRadius.only(
-                            //                 topLeft: Radius.zero,
-                            //                 bottomLeft: Radius.zero,
-                            //                 topRight: Radius.circular(100),
-                            //                 bottomRight: Radius.circular(100)),
-                            //             side: BorderSide(color: Colors.black12)),
-                            //       ),
-                            //     )
-                            //   ],
-                            // ),
-                            // Stack(
-                            //   alignment: Alignment.centerRight,
-                            //   children: [
-                            //     ButtonTheme(
-                            //       padding: EdgeInsets.only(right: 40),
-                            //       height: 50,
-                            //       minWidth: screenWidth / 2.6,
-                            //       child: RaisedButton(
-                            //         color: profileButtoColor,
-                            //         onPressed: () {},
-                            //         child: Text(
-                            //           "Following",
-                            //         ),
-                            //         elevation: 0,
-                            //         shape: RoundedRectangleBorder(
-                            //             borderRadius: BorderRadius.circular(100),
-                            //             side: BorderSide(color: Colors.transparent)),
-                            //       ),
-                            //     ),
-                            //     ButtonTheme(
-                            //       height: 55,
-                            //       minWidth: screenWidth / 7,
-                            //       child: RaisedButton(
-                            //         color: ffDisplayer,
-                            //         onPressed: () {},
-                            //         child: Text("6.5k"),
-                            //         elevation: 6,
-                            //         shape: RoundedRectangleBorder(
-                            //             borderRadius: BorderRadius.only(
-                            //                 topLeft: Radius.zero,
-                            //                 bottomLeft: Radius.zero,
-                            //                 topRight: Radius.circular(100),
-                            //                 bottomRight: Radius.circular(100)),
-                            //             side: BorderSide(color: Colors.black12)),
-                            //       ),
-                            //     )
-                            //   ],
-                            // ),
-                      //   ],
-                      // )
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                    // height: screenHeight / 1.6,
-                    width: screenWidth,
-                    color: Colors.transparent,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 12),
-                          child: Container(
-                            alignment: Alignment.center,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10.0),
-                              color: Colors.red[50],
-                              border: Border.all(color: Colors.black12)),
-                            child: Theme(
-                              data: Theme.of(context).copyWith(
-                                canvasColor: Colors.red[100],
-                                buttonTheme: ButtonTheme.of(context).copyWith(
-                                  shape: RoundedRectangleBorder(
-                                    side: BorderSide(width: 1.0, style: BorderStyle.solid),
-                                    borderRadius: BorderRadius.circular(50.0)
-                                    ),
-                                    alignedDropdown:true
-                                  )
-                                ),
-                              child: DropdownButton(
-                                isExpanded: true,
-                                underline: SizedBox(),
-                                icon: null,
-                                value: _value,
-                                items: [
-                                  DropdownMenuItem(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                      child: Container(
-                                        child: Text("About"),
-                                      ),
-                                    ),
-                                    value: 0,
-                                  ),
-                                  DropdownMenuItem(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                      child: Container(
-                                        child: Text("Posts"),
-                                      ),
-                                    ),
-                                    value: 1,
-                                  ),
-                                  DropdownMenuItem(
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                      child: Container(
-                                        child: Text("Topics"),
-                                      ),
-                                    ),
-                                    value: 2,
-                                  ),
-                                  
-
-                                ], 
-                              onChanged: (num value) {
-                              setState(() {
-                              _value = value;
-                              });
-                              controller.animateToPage(
-                                _value,
-                                duration: Duration(milliseconds: 150),
-                                curve: Curves.decelerate
-                              );
-                                print(controller.page);
-                              }
-                              ),
-                            ),
-                          ),
-                        ),
-                        Expanded(
-                          flex: 4,
-                          child: Container(
-                            // height: screenHeight / 1.8,
-                            color: Colors.transparent,
-                            child: SingleChildScrollView(
-                              child: Column(
-                                children: <Widget>[
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    margin: EdgeInsets.only(top: 10, left: 12, right: 12),
-                                    elevation: 1,
-                                    clipBehavior: Clip.antiAlias,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: Container(
-                                        child: Text(bio_data),
-                                      ),
-                                    )
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
                     ),
-                  ),
-                ),
-                // Container(
-                //   height: screenHeight/3,
-                //   width: screenWidth,
-                //   color: Colors.yellowAccent,
-                // ),
-              ]),
+                    // Container(
+                    //   height: screenHeight/3,
+                    //   width: screenWidth,
+                    //   color: Colors.yellowAccent,
+                    // ),
+                  ]),
               // Posts page
-            Column(
+              Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   Hero(
                     tag: 'dmenu',
                     child: Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 12),
-                            child: Container(
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10.0),
-                                color: Colors.red[50],
-                                border: Border.all(color: Colors.black12)),
-                              child: Theme(
-                                data: Theme.of(context).copyWith(
-                                  canvasColor: Colors.red[100],
-                                  buttonTheme: ButtonTheme.of(context).copyWith(
-                                    alignedDropdown:true
-                                  )
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 10.0, horizontal: 12),
+                      child: Container(
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                            color: Colors.red[50],
+                            border: Border.all(color: Colors.black12)),
+                        child: Theme(
+                          data: Theme.of(context).copyWith(
+                              canvasColor: Colors.red[100],
+                              buttonTheme: ButtonTheme.of(context)
+                                  .copyWith(alignedDropdown: true)),
+                          child: DropdownButton(
+                              isDense: false,
+                              isExpanded: true,
+                              underline: SizedBox(),
+                              icon: null,
+                              value: _value,
+                              items: [
+                                DropdownMenuItem(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10.0),
+                                    child: Container(
+                                      child: Text("About"),
+                                    ),
                                   ),
-                                child: DropdownButton(
-                                  isDense: false,
-                                  isExpanded: true,
-                                  underline: SizedBox(),
-                                  icon: null,
-                                  value: _value,
-                                  items: [
-                                    DropdownMenuItem(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                        child: Container(
-                                          child: Text("About"),
-                                        ),
-                                      ),
-                                      value: 0,
+                                  value: 0,
+                                ),
+                                DropdownMenuItem(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10.0),
+                                    child: Container(
+                                      child: Text("Posts"),
                                     ),
-                                    DropdownMenuItem(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                        child: Container(
-                                          child: Text("Posts"),
-                                        ),
-                                      ),
-                                      value: 1,
+                                  ),
+                                  value: 1,
+                                ),
+                                DropdownMenuItem(
+                                  child: Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 10.0),
+                                    child: Container(
+                                      child: Text("Topics"),
                                     ),
-                                    DropdownMenuItem(
-                                      child: Padding(
-                                        padding: const EdgeInsets.symmetric(horizontal: 10.0),
-                                        child: Container(
-                                          child: Text("Topics"),
-                                        ),
-                                      ),
-                                      value: 2,
-                                    ),
-                                    
-
-                                  ], 
-                                onChanged: (num value) {
+                                  ),
+                                  value: 2,
+                                ),
+                              ],
+                              onChanged: (num value) {
                                 setState(() {
-                                _value = value;
-                                controller.animateToPage(
-                                  _value,
-                                  duration: Duration(milliseconds: 150),
-                                  curve: Curves.decelerate
-                                  );
-                                print(value);
+                                  _value = value;
+                                  controller.animateToPage(_value,
+                                      duration: Duration(milliseconds: 150),
+                                      curve: Curves.decelerate);
+                                  print(value);
                                 });
                                 // print(value);
-                                
-                                }
-                                ),
-                              ),
-                            ),
-                          ),
+                              }),
+                        ),
+                      ),
+                    ),
                   ),
-                        Expanded(
-                          child: Container(
-                            child: SingleChildScrollView(
-                              scrollDirection: Axis.vertical,
-                              child: Column(
-                                children: [
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    margin: EdgeInsets.only(top: 10, left: 12, right: 12),
-                                    elevation: 1,
-                                    clipBehavior: Clip.antiAlias,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: Container(
-                                        child: Text(bio_data),
-                                      ),
-                                    )
+                  Expanded(
+                    child: Container(
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.vertical,
+                        child: Column(
+                          children: [
+                            Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                margin: EdgeInsets.only(
+                                    top: 10, left: 12, right: 12),
+                                elevation: 1,
+                                clipBehavior: Clip.antiAlias,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Container(
+                                    child: Text(bio_data),
                                   ),
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    margin: EdgeInsets.only(top: 10, left: 12, right: 12),
-                                    elevation: 1,
-                                    clipBehavior: Clip.antiAlias,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: Container(
-                                        child: Text(bio_data),
-                                      ),
-                                    )
+                                )),
+                            Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                margin: EdgeInsets.only(
+                                    top: 10, left: 12, right: 12),
+                                elevation: 1,
+                                clipBehavior: Clip.antiAlias,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Container(
+                                    child: Text(bio_data),
                                   ),
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    margin: EdgeInsets.only(top: 10, left: 12, right: 12),
-                                    elevation: 1,
-                                    clipBehavior: Clip.antiAlias,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: Container(
-                                        child: Text(bio_data),
-                                      ),
-                                    )
+                                )),
+                            Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                margin: EdgeInsets.only(
+                                    top: 10, left: 12, right: 12),
+                                elevation: 1,
+                                clipBehavior: Clip.antiAlias,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Container(
+                                    child: Text(bio_data),
                                   ),
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    margin: EdgeInsets.only(top: 10, left: 12, right: 12),
-                                    elevation: 1,
-                                    clipBehavior: Clip.antiAlias,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: Container(
-                                        child: Text(bio_data),
-                                      ),
-                                    )
+                                )),
+                            Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                margin: EdgeInsets.only(
+                                    top: 10, left: 12, right: 12),
+                                elevation: 1,
+                                clipBehavior: Clip.antiAlias,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Container(
+                                    child: Text(bio_data),
                                   ),
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    margin: EdgeInsets.only(top: 10, left: 12, right: 12),
-                                    elevation: 1,
-                                    clipBehavior: Clip.antiAlias,
-                                    child: Padding(
-                                      padding: const EdgeInsets.all(20.0),
-                                      child: Container(
-                                        child: Text(bio_data),
-                                      ),
-                                    )
-                                  )
-                                ],
-                              ),
-                            ),
-                          ),
-                        )
+                                )),
+                            Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                margin: EdgeInsets.only(
+                                    top: 10, left: 12, right: 12),
+                                elevation: 1,
+                                clipBehavior: Clip.antiAlias,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(20.0),
+                                  child: Container(
+                                    child: Text(bio_data),
+                                  ),
+                                ))
+                          ],
+                        ),
+                      ),
+                    ),
+                  )
                 ],
               )
-              ]
-        ),
+            ]),
       ),
     );
   }
@@ -785,6 +836,10 @@ class _ProfileState extends State<Profile> {
 class FirebaseStorageService extends ChangeNotifier {
   FirebaseStorageService();
   static Future<dynamic> getImage(BuildContext context, String image) async {
-    return await FirebaseStorage.instance.ref().child("profile").child(image).getDownloadURL();
+    return await FirebaseStorage.instance
+        .ref()
+        .child("profile")
+        .child(image)
+        .getDownloadURL();
   }
 }

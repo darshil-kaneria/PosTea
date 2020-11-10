@@ -4,16 +4,16 @@ import 'package:custom_switch/custom_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/colors.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'dart:io' as io;
-import 'package:file/file.dart';
+import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:postea_frontend/main.dart';
 
 class EditProfile extends StatefulWidget {
   var nameText;
   var biodata;
   bool privacy;
   var username;
-  io.File profilePic;
+  File profilePic;
 
   EditProfile(
       {@required this.nameText, this.biodata, this.privacy, this.username});
@@ -25,9 +25,8 @@ class EditProfile extends StatefulWidget {
 class _EditProfileState extends State<EditProfile> {
   var nameController = TextEditingController();
   var biodataController = TextEditingController();
-  io.File profilePic;
+  File profilePic;
   var _image;
-   
 
   @override
   void initState() {
@@ -49,10 +48,12 @@ class _EditProfileState extends State<EditProfile> {
     print(profilePic);
   }
 
-  Future uploadProfilePic(File file) async {
+  Future uploadProfilePic(File file, String username) async {
     StorageReference storageReference =
-        FirebaseStorage.instance.ref().child("profile").child("testUpload2");
+        FirebaseStorage.instance.ref().child("profile").child(username);
+    print("before query");
     await storageReference.putFile(file).onComplete;
+    print("after query");
     print("Uploaded image to Firebase from edit profile");
   }
 
@@ -138,7 +139,7 @@ class _EditProfileState extends State<EditProfile> {
                                   )
                                 : FutureBuilder(
                                     future: FirebaseStorageService.getImage(
-                                        context, "tom_and_jerry.jpeg"),
+                                        context, widget.username),
                                     builder: (context,
                                         AsyncSnapshot<dynamic> snapshot) {
                                       if (snapshot.hasData) {
@@ -266,7 +267,7 @@ class _EditProfileState extends State<EditProfile> {
                     onPressed: () async {
                       await updateProfile();
                       print("profile pic is " + profilePic.toString());
-                      // await uploadProfilePic(profilePic);
+                      await uploadProfilePic(profilePic, widget.username);
                       Navigator.pop(context);
                     },
                     child: Text(
