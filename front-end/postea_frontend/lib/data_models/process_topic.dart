@@ -1,21 +1,63 @@
-import 'dart:developer';
-
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'post.dart';
 
-class ProcessTimeline{
+class ProcessTopic {
+  var topic_name;
+  var topic_description;
+  var topic_image;
+  var topic_creator_id;
+  int topic_id;
+  var profile_id;
 
   List<Post> postList = [];
   var firstPostTime = null;
   var offset = 0;
   var temp;
-  int profile_id;
   bool isEnd = false;
   bool postRetrieved = true;
   Map<String, dynamic> posts;
 
-  ProcessTimeline(this.profile_id);
+  ProcessTopic(
+      {this.topic_name,
+      this.topic_description,
+      this.topic_image,
+      this.topic_creator_id,
+      this.topic_id,
+      this.profile_id});
+
+  Future<http.Response> makeTopic() async {
+    var url = "http://postea-server.herokuapp.com/addtopicinfo";
+    var topicInfo = {
+      "topicText": this.topic_name,
+      "topicID": 1,
+      "topicCreatorID": this.topic_creator_id,
+      "topicDescription": this.topic_description
+    };
+    var postTopicInfo = JsonEncoder().convert(topicInfo);
+    http.Response response = await http.post(url,
+        headers: {'Content-Type': 'application/json'}, body: postTopicInfo);
+
+    print(response.body);
+
+    return response;
+  }
+
+  getTopicInfo() async {
+    var url = "http://postea-server.herokuapp.com/topic?topic_id=" +
+        topic_id.toString();
+    http.Response response = await http.get(url);
+
+    var topicInfo = jsonDecode(response.body);
+
+    var info = {
+      "name": topicInfo[0]["topic_name"],
+      "desc": topicInfo[0]["topic_description"]
+    };
+
+    return info;
+
+  }
 
   Future<http.Response> getPosts() async {
   
@@ -25,7 +67,7 @@ class ProcessTimeline{
       print("POST RETRIEVED IS: "+ postRetrieved.toString());
        if(firstPostTime == null){
          print("IS NULL");
-         var url = "http://postea-server.herokuapp.com/refreshTimeline?profile_id="+profile_id.toString()+"&post_offset="+offset.toString();
+         var url = "http://postea-server.herokuapp.com/refreshTopicTimeline?topic_id="+topic_id.toString()+"&post_offset="+offset.toString();
         resp = await http.get(url);
         
         postRetrieved = true;
@@ -45,14 +87,12 @@ class ProcessTimeline{
       firstPostTime = dateString.substring(0,dateString.length-5);
       
       await processPosts();
-   
-    print(postList.length);
 
     } 
     }
     else{
       print("IS NOT NULL");
-      var url = "http://postea-server.herokuapp.com/refreshTimeline?profile_id="+profile_id.toString()+"&post_offset="+offset.toString()+"&post_time='"+firstPostTime+"'";
+      var url = "http://postea-server.herokuapp.com/refreshTopicTimeline?topic_id="+topic_id.toString()+"&post_offset="+offset.toString()+"&post_time='"+firstPostTime+"'";
         resp = await http.get(url);
         
         postRetrieved = true;
@@ -66,9 +106,7 @@ class ProcessTimeline{
     }
     print("OFFSET IS: "+offset.toString());
     if(isEnd == false){
-      await processPosts();
-   
-    print(postList.length);
+      processPosts();
     } 
     }
       
@@ -83,32 +121,22 @@ class ProcessTimeline{
   processPosts() async {
 
     for(int i = 0; i < posts['result'].length; i++){
-      var name;
-      if(posts['result'][i]['is_anonymous'].toString() == "1"){
-        name = "Anonymous";
-      }
-      else{
 
-        http.Response resp = await http.get("http://postea-server.herokuapp.com/profile/"+posts['result'][i]['profile_id'].toString());
-        Map<String, dynamic> profileJson = jsonDecode(resp.body);
-        name = profileJson['message']['name'];
-
-      }
-      
+      http.Response resp = await http.get("http://postea-server.herokuapp.com/profile/"+posts['result'][i]['profile_id'].toString());
+      Map<String, dynamic> profileJson = jsonDecode(resp.body);
       // print(profileJson['message']['name']);
       Post newPost = Post(
         posts['result'][i]['post_id'].toString(),
         posts['result'][i]['profile_id'].toString(),
         posts['result'][i]['post_description'].toString(),
         posts['result'][i]['topic_id'].toString(),
-        // posts['result'][i]['post_img'].toString(),
-        "noimg",
+        posts['result'][i]['post_img'].toString(),
         posts['timeDiff'][i].toString(),
         posts['result'][i]['post_likes'].toString(),
         posts['result'][i]['post_dislikes'].toString(),
         posts['result'][i]['post_comments'].toString(),
         posts['result'][i]['post_title'].toString(),
-        name
+        profileJson['message']['name']
         // "Darshil Kaneria"
       );
       print(posts['result'][i]['post_id']);
