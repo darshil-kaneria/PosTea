@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import '../pages/topic.dart';
@@ -37,14 +38,15 @@ class _TopicPillState extends State<TopicPill> {
   }
 
   var name = "";
+  ValueNotifier<String> pillText = ValueNotifier<String>("");
   getTopicName() async {
     http
         .get("http://postea-server.herokuapp.com/topic?topic_id=" +
             widget.topicId.toString())
         .then((value) {
       var valueString = jsonDecode(value.body);
-      name = valueString[0]['topic_name'];
-      setState(() {});
+      pillText.value = valueString[0]['topic_name'];
+      // setState(() {});
     });
   }
 
@@ -72,10 +74,14 @@ class _TopicPillState extends State<TopicPill> {
                       )));
         },
         child: Center(
-            child: AutoSizeText(
-          name,
+            child: ValueListenableBuilder(
+              valueListenable: pillText,
+              builder: (_, value, __) =>
+              AutoSizeText(
+          value,
           style: TextStyle(fontSize: 15, color: Colors.white),
-        )),
+        ),
+            )),
       ),
     );
   }
