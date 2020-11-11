@@ -16,7 +16,8 @@ process.on("message", message => {
             dislikes: message.dislikes,
             comment: message.comment,
             anonymous: message.anonymous,
-            is_private: message.is_private
+            is_private: message.is_private,
+            post_id: message.postID
         }
         await addPost(dict, connection).then((answer) => {
             connection.release();
@@ -33,7 +34,7 @@ process.on("message", message => {
 });
 
 const addPost = async (dict, connection) => {
-    var id = Math.floor(Math.random() * 100000);
+    var id = dict.post_id;
     console.log(id)
     var userPostMessage = dict.post;
     var topic = dict.topic
