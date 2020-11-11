@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:ui';
 
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:postea_frontend/customWidgets/postTile.dart';
@@ -169,56 +170,67 @@ class _TopicState extends State<Topic> {
                                     horizontal: screenWidth / 15, vertical: 10),
                                 child: ValueListenableBuilder(
                                   valueListenable: isFollow,
-                                  builder: (_, isFollowValue, __) => ButtonTheme(
-                                      buttonColor: buttonColor.value,
-                                      shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30)),
-                                      minWidth: screenWidth / 5,
-                                      child: RaisedButton(
-                                          elevation: 2,
-                                          clipBehavior: Clip.antiAlias,
-                                          child: Text(topicFollowingText.value),
-                                          onPressed: () async {
-                                            print("IS FOLLOW VALUE: "+isFollowValue.toString());
+                                  builder: (_, isFollowValue, __) =>
+                                      ButtonTheme(
+                                          buttonColor: buttonColor.value,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(30)),
+                                          minWidth: screenWidth / 5,
+                                          child: RaisedButton(
+                                              elevation: 2,
+                                              clipBehavior: Clip.antiAlias,
+                                              child: Text(
+                                                  topicFollowingText.value),
+                                              onPressed: () async {
+                                                print("IS FOLLOW VALUE: " +
+                                                    isFollowValue.toString());
 
-                                            if (isFollowValue) {
-                                              buttonColor.value = Colors.red[50];
-                                              isFollow.value = false;
-                                              topicFollowingText.value = "Follow";
-                                              final request = http.Request(
-                                                  "DELETE",
-                                                  Uri.parse(
-                                                      "http://postea-server.herokuapp.com/topicfollowdata"));
-                                              request.headers.addAll({
-                                                'Content-Type': 'application/json'
-                                              });
-                                              request.body = jsonEncode({
-                                                "topic_id": widget.topicId,
-                                                "follower_id": widget.profileId
-                                              });
-                                              request.send();
-                                            } else {
-                                              buttonColor.value = Colors.redAccent[100];
-                                              isFollow.value = true;
-                                              topicFollowingText.value = "Following";
-                                              var addfollowing = {
-                                                "topic_id": widget.topicId,
-                                                "follower_id": widget.profileId
-                                              };
-                                              var addfollowingJson = JsonEncoder()
-                                                  .convert(addfollowing);
-                                              http.post(
-                                                  "http://postea-server.herokuapp.com/topicfollowdata",
-                                                  headers: {
+                                                if (isFollowValue) {
+                                                  buttonColor.value =
+                                                      Colors.red[50];
+                                                  isFollow.value = false;
+                                                  topicFollowingText.value =
+                                                      "Follow";
+                                                  final request = http.Request(
+                                                      "DELETE",
+                                                      Uri.parse(
+                                                          "http://postea-server.herokuapp.com/topicfollowdata"));
+                                                  request.headers.addAll({
                                                     'Content-Type':
                                                         'application/json'
-                                                  },
-                                                  body: addfollowingJson);
-                                            }
+                                                  });
+                                                  request.body = jsonEncode({
+                                                    "topic_id": widget.topicId,
+                                                    "follower_id":
+                                                        widget.profileId
+                                                  });
+                                                  request.send();
+                                                } else {
+                                                  buttonColor.value =
+                                                      Colors.redAccent[100];
+                                                  isFollow.value = true;
+                                                  topicFollowingText.value =
+                                                      "Following";
+                                                  var addfollowing = {
+                                                    "topic_id": widget.topicId,
+                                                    "follower_id":
+                                                        widget.profileId
+                                                  };
+                                                  var addfollowingJson =
+                                                      JsonEncoder().convert(
+                                                          addfollowing);
+                                                  http.post(
+                                                      "http://postea-server.herokuapp.com/topicfollowdata",
+                                                      headers: {
+                                                        'Content-Type':
+                                                            'application/json'
+                                                      },
+                                                      body: addfollowingJson);
+                                                }
 
-                                            // setState(() {});
-                                          })),
+                                                // setState(() {});
+                                              })),
                                 ),
                               )
                             : Container(),
@@ -378,5 +390,16 @@ class _TopicState extends State<Topic> {
         ),
       ),
     );
+  }
+}
+
+class FirebaseStorageService extends ChangeNotifier {
+  FirebaseStorageService();
+  static Future<dynamic> getImage(BuildContext context, String image) async {
+    return await FirebaseStorage.instance
+        .ref()
+        .child("topic")
+        .child(image)
+        .getDownloadURL();
   }
 }

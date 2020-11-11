@@ -6,6 +6,7 @@ import '../colors.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'dart:math';
 
 class CreateTopic extends StatefulWidget {
   var profile_id;
@@ -19,16 +20,22 @@ class CreateTopic extends StatefulWidget {
 class _CreateTopicState extends State<CreateTopic> {
   var topicNameController = new TextEditingController();
   var topidDescController = new TextEditingController();
+  var topicID;
 
   File topicPic;
 
   _CreateTopicState();
 
   Future<http.Response> createNewTopic() async {
+    Random random = new Random();
+    topicID = (random.nextInt(10000000));
+
+    print("topic id is " + topicID.toString());
     var topic_info = {
       "topicText": topicNameController.text,
       "topicCreatorID": widget.profile_id,
-      "topicDescription": topidDescController.text
+      "topicDescription": topidDescController.text,
+      "topicID": topicID
     };
     var topic_info_json = jsonEncode(topic_info);
 
@@ -55,9 +62,9 @@ class _CreateTopicState extends State<CreateTopic> {
     print(topicPic);
   }
 
-  Future uploadTopicPic(File file, String username) async {
+  Future uploadTopicPic(File file, String topicID) async {
     StorageReference storageReference =
-        FirebaseStorage.instance.ref().child("topic").child(username);
+        FirebaseStorage.instance.ref().child("topic").child(topicID);
     print("before query");
     await storageReference.putFile(file).onComplete;
     print("after query");
@@ -153,6 +160,7 @@ class _CreateTopicState extends State<CreateTopic> {
                           borderRadius: BorderRadius.circular(20)),
                       onPressed: () async {
                         await createNewTopic();
+                        await uploadTopicPic(topicPic, topicID.toString());
                         Navigator.pop(context);
                       }),
                 ),

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 // import 'dart:html';
 import 'dart:io';
+import 'dart:math';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flappy_search_bar/flappy_search_bar.dart';
 import 'package:flutter/cupertino.dart';
@@ -52,7 +53,7 @@ class _HomePageState extends State<HomePage> {
   var isAnonymous = 0;
   Color isAnonColor = Colors.grey;
   var is_private = 0;
-
+  var postID;
   var offset = 0;
 
   _scrollListener() {
@@ -111,12 +112,14 @@ class _HomePageState extends State<HomePage> {
 
   Future uploadImage(File file) async {
     StorageReference storageReference =
-        FirebaseStorage.instance.ref().child("post").child("testUpload2");
+        FirebaseStorage.instance.ref().child("post").child(postID.toString());
     await storageReference.putFile(file).onComplete;
     print("Uploaded image to Firebase");
   }
 
   void makePost() async {
+    Random random = new Random();
+    postID = (random.nextInt(10000000));
     var reqBody = {
       "postTitle": postTitleController.text,
       "msg": postTextController.text,
@@ -128,7 +131,8 @@ class _HomePageState extends State<HomePage> {
       "dislikes": 0,
       "comment": 0,
       "anonymous": isAnonymous,
-      "is_private": is_private
+      "is_private": is_private,
+      "postID": postID
     };
     var reqBodyJson = jsonEncode(reqBody);
     print("sending" + reqBodyJson);
@@ -174,7 +178,7 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       bottomNavigationBar: CustomNavBar(
-        context, 
+        context,
         onTap: (value) {
           if (value == 2) {
             Navigator.push(
@@ -185,8 +189,8 @@ class _HomePageState extends State<HomePage> {
             Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (_) => DiscoverTopics(
-                          profileID: widget.profileID,
+                    builder: (_) => CreateTopic(
+                          profile_id: widget.profileID,
                         )));
             // MaterialPageRoute(
             //     builder: (_) => Topic(
@@ -441,12 +445,23 @@ class _HomePageState extends State<HomePage> {
         iconTheme: IconThemeData(color: Colors.black),
         actions: <Widget>[
           IconButton(
-            icon: Icon(Icons.search, size: 20,),
+            icon: Icon(
+              Icons.search,
+              size: 20,
+            ),
             onPressed: () {},
           ),
-          IconButton(icon: Icon(Icons.notifications, size: 20,), onPressed: () {}),
           IconButton(
-              icon: Icon(Icons.account_circle, size: 20,),
+              icon: Icon(
+                Icons.notifications,
+                size: 20,
+              ),
+              onPressed: () {}),
+          IconButton(
+              icon: Icon(
+                Icons.account_circle,
+                size: 20,
+              ),
               onPressed: () {
                 Navigator.of(context).push(MaterialPageRoute(
                     builder: (context) => Profile(
@@ -460,7 +475,7 @@ class _HomePageState extends State<HomePage> {
       body: Column(
         children: [
           Container(
-            height: screenHeight/15,
+            height: screenHeight / 15,
             width: screenWidth,
             child: ListView(
               controller: _scrollController,
