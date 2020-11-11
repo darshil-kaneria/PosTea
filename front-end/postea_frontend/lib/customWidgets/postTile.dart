@@ -4,6 +4,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:postea_frontend/customWidgets/topic_pill.dart';
+import '../colors.dart';
 import './expandedPostTile.dart';
 import 'package:postea_frontend/customWidgets/expandedPostTile.dart';
 import '../pages/profile.dart';
@@ -109,7 +110,7 @@ class _PostTileState extends State<PostTile> {
     bool showLikeBadge = post_likes > 0;
     bool showDislikeBadge = post_dislikes > 0;
     bool showCommentsBadge = post_comments > 0;
-
+    var profilePicName = name == "Anonymous" ? "default-big.png" : profile_id.toString();
     var screenheight = MediaQuery.of(context).size.height;
     var screenwidth = MediaQuery.of(context).size.width;
 
@@ -149,24 +150,39 @@ class _PostTileState extends State<PostTile> {
                           )))
                 },
             },
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage("https://picsum.photos/200"),
-              backgroundColor: Colors.deepPurpleAccent[50],
+            leading: FutureBuilder(
+              future: FirebaseStorageService.getImage(context, profilePicName),
+              builder: (context, snapshot) {
+                if(snapshot.hasData){
+                  return CircleAvatar(
+                backgroundImage: NetworkImage(snapshot.data),
+                backgroundColor: Colors.deepPurpleAccent[50],
+              );
+                }
+                else{
+                  return CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            backgroundColor: bgColor,
+                                            valueColor: AlwaysStoppedAnimation(
+                                                loginButtonEnd),
+                                          );
+                } 
+              },
             ),
             title: Text(
               profile_id != -1?name:"Anonymous",
               style: TextStyle(fontSize: 16),
             ),
-            subtitle: Row(
-              children: [
-                Icon(
-                  Icons.location_on,
-                  size: 15,
-                  color: Colors.grey,
-                ),
-                Text("with Darshil Kaneria",style: TextStyle(fontSize: 12),)
-              ],
-            ),
+            // subtitle: Row(
+            //   children: [
+            //     Icon(
+            //       Icons.location_on,
+            //       size: 15,
+            //       color: Colors.grey,
+            //     ),
+            //     Text("with Darshil Kaneria",style: TextStyle(fontSize: 12),)
+            //   ],
+            // ),
           ),
           Container(
             margin: EdgeInsets.symmetric(horizontal: 16),
