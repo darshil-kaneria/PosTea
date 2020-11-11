@@ -231,6 +231,7 @@ class _ProfileState extends State<Profile> {
                               biodata: bio_data,
                               privacy: isPrivate,
                               username: username,
+                              profile_id: widget.myPID
                             );
                           },
                         ));
@@ -274,7 +275,7 @@ class _ProfileState extends State<Profile> {
                                               color: Colors.blueGrey))),
                                   child: FutureBuilder(
                                       future: FirebaseStorageService.getImage(
-                                          context, username),
+                                          context, widget.profileId.toString()),
                                       builder: (context,
                                           AsyncSnapshot<dynamic> snapshot) {
                                         if (snapshot.hasData) {

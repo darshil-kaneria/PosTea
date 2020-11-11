@@ -14,9 +14,10 @@ class EditProfile extends StatefulWidget {
   bool privacy;
   var username;
   File profilePic;
+  var profile_id;
 
   EditProfile(
-      {@required this.nameText, this.biodata, this.privacy, this.username});
+      {@required this.nameText, this.biodata, this.privacy, this.username, this.profile_id});
 
   @override
   _EditProfileState createState() => _EditProfileState();
@@ -50,7 +51,7 @@ class _EditProfileState extends State<EditProfile> {
 
   Future uploadProfilePic(File file, String username) async {
     StorageReference storageReference =
-        FirebaseStorage.instance.ref().child("profile").child(username);
+        FirebaseStorage.instance.ref().child("profile").child(widget.profile_id.toString());
     print("before query");
     await storageReference.putFile(file).onComplete;
     print("after query");
