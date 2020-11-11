@@ -1,20 +1,42 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 
-class CustomNavBar extends StatefulWidget {
-  @override
-  _CustomNavBarState createState() => _CustomNavBarState();
-}
+class CustomNavBar {
 
-class _CustomNavBarState extends State<CustomNavBar> {
+  BuildContext context;
+  CustomNavBar(this.context);
   
-  @override
-  Widget build(BuildContext context) {
+  static getNavBar(context){
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
-    return Container(
-      height: screenHeight/10,
-      width: screenWidth/5,
-      color: Colors.black,
+
+    return Stack(
+      children: [
+        Positioned(
+          child: ClipRRect(
+            clipBehavior: Clip.antiAlias,
+            child: BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: 10,
+                sigmaY: 10
+              ),
+              child: Opacity(
+                opacity: 0.5,
+                child: Container(
+                  width: screenWidth,
+                  height: screenHeight/13,
+                  decoration: BoxDecoration(
+                    color: Colors.black12,
+                    borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
+                  ),
+                ),
+              ),
+            ),
+          ),
+        )
+      ],
     );
+
   }
 }

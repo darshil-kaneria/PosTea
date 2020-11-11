@@ -8,6 +8,7 @@ import './expandedPostTile.dart';
 import 'package:postea_frontend/customWidgets/expandedPostTile.dart';
 import '../pages/profile.dart';
 import 'package:badges/badges.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class PostTile extends StatefulWidget {
   var post_id;
@@ -116,7 +117,7 @@ class _PostTileState extends State<PostTile> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
       ),
-      margin: EdgeInsets.only(top: 10, left: 12, right: 12),
+      margin: EdgeInsets.only(top: 8, left: 12, right: 12),
       clipBehavior: Clip.antiAlias,
       child: Column(
         children: [
@@ -125,7 +126,7 @@ class _PostTileState extends State<PostTile> {
               topicId: topic_id,
               col1: Colors.purple[900],
               col2: Colors.purple[400],
-              height: screenheight/10,
+              height: screenheight/15,
               width: screenwidth/4,
               profileId: myPID,
               isOwner: false,
@@ -154,7 +155,7 @@ class _PostTileState extends State<PostTile> {
             ),
             title: Text(
               profile_id != -1?name:"Anonymous",
-              style: TextStyle(fontSize: 20),
+              style: TextStyle(fontSize: 16),
             ),
             subtitle: Row(
               children: [
@@ -163,13 +164,13 @@ class _PostTileState extends State<PostTile> {
                   size: 15,
                   color: Colors.grey,
                 ),
-                Text("with Darshil Kaneria")
+                Text("with Darshil Kaneria",style: TextStyle(fontSize: 12),)
               ],
             ),
           ),
           Container(
             margin: EdgeInsets.symmetric(horizontal: 16),
-            padding: EdgeInsets.only(top: 8),
+            padding: EdgeInsets.only(top: 2),
             decoration: BoxDecoration(
                 border: Border(
               top: BorderSide(width: 0.5, color: Colors.grey),
@@ -199,10 +200,10 @@ class _PostTileState extends State<PostTile> {
                     EdgeInsets.symmetric(vertical: 0, horizontal: 0),
                 title: Text(post_title,
                     style:
-                        TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+                        TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
                 subtitle: AutoSizeText(
                   post_description,
-                  style: TextStyle(fontSize: 15, color: Colors.black),
+                  style: TextStyle(fontSize: 13, color: Colors.black),
                 )),
           ),
           Row(
@@ -213,14 +214,14 @@ class _PostTileState extends State<PostTile> {
                     badgeColor: Colors.deepOrange[100],
                     showBadge: showLikeBadge,
                     animationType: BadgeAnimationType.fade,
-                    position: BadgePosition.topEnd(top: -1, end: -1),
-                    badgeContent: Text(post_likes.toString()),
+                    position: BadgePosition.topEnd(top: 1, end: 1),
+                    badgeContent: Text(post_likes.toString(), style: TextStyle(fontSize: 10),),
                     child: IconButton(
                       icon: Icon(
                         Icons.thumb_up,
                         color: like_color,
                       ),
-                      iconSize: 20,
+                      iconSize: 16,
                       onPressed: () {
                         like_or_dislike = "1";
                         setState(() {
@@ -259,9 +260,9 @@ class _PostTileState extends State<PostTile> {
                 ],
               ),
               Badge(
-                badgeContent: Container(child: Text(post_dislikes.toString())),
+                badgeContent: Container(child: Text(post_dislikes.toString(), style: TextStyle(fontSize: 10),)),
                 badgeColor: Colors.deepOrange[100],
-                position: BadgePosition.topEnd(top: -1, end: -1),
+                position: BadgePosition.topEnd(top: 1, end: 1),
                 animationType: BadgeAnimationType.fade,
                 showBadge: showDislikeBadge,
                 child: IconButton(
@@ -269,7 +270,7 @@ class _PostTileState extends State<PostTile> {
                     Icons.thumb_down,
                     color: dislike_color,
                   ),
-                  iconSize: 20,
+                  iconSize: 16,
                   onPressed: () {
                     setState(() {
                       like_or_dislike = "0";
@@ -303,12 +304,12 @@ class _PostTileState extends State<PostTile> {
               Badge(
                 showBadge: showCommentsBadge,
                 badgeColor: Colors.deepOrange[100],
-                position: BadgePosition.topEnd(top: -1, end: -1),
-                badgeContent: Text(post_comments.toString()),
+                position: BadgePosition.topEnd(top: 1, end: 1),
+                badgeContent: Text(post_comments.toString(), style: TextStyle(fontSize: 10),),
                 animationType: BadgeAnimationType.fade,
                 child: IconButton(
                   icon: Icon(Icons.comment),
-                  iconSize: 20,
+                  iconSize: 16,
                   onPressed: () {},
                 ),
               ),
@@ -318,7 +319,7 @@ class _PostTileState extends State<PostTile> {
                   alignment: Alignment.centerRight,
                   child: Text(
                     creation_date,
-                    style: TextStyle(color: Colors.grey),
+                    style: TextStyle(color: Colors.grey, fontSize: 13),
                   ),
                 ),
               )
@@ -329,3 +330,15 @@ class _PostTileState extends State<PostTile> {
     );
   }
 }
+
+class FirebaseStorageService extends ChangeNotifier {
+  FirebaseStorageService();
+  static Future<dynamic> getImage(BuildContext context, String image) async {
+    return await FirebaseStorage.instance
+        .ref()
+        .child("profile")
+        .child(image)
+        .getDownloadURL();
+  }
+}
+
