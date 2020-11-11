@@ -140,7 +140,7 @@ class _EditProfileState extends State<EditProfile> {
                                   )
                                 : FutureBuilder(
                                     future: FirebaseStorageService.getImage(
-                                        context, widget.username),
+                                        context, widget.profile_id.toString()),
                                     builder: (context,
                                         AsyncSnapshot<dynamic> snapshot) {
                                       if (snapshot.hasData) {
