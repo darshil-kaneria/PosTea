@@ -2,12 +2,15 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 
-class CustomNavBar {
+class CustomNavBar extends StatelessWidget{
 
   BuildContext context;
-  CustomNavBar(this.context);
+  final Function(int) onTap;
+  CustomNavBar(this.context, {this.onTap}){
+    
+  } 
   
-  static getNavBar(context){
+  Widget build(context){
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
 
@@ -34,6 +37,25 @@ class CustomNavBar {
               ),
             ),
           ),
+        ),
+        Row(
+          mainAxisSize: MainAxisSize.max,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            IconButton(icon: Icon(Icons.home, color: Colors.blueGrey[800]),onPressed: (){
+              onTap(0);
+              }),
+            IconButton(icon: Icon(Icons.create, color: Colors.blueGrey[800],), onPressed: (){
+              onTap(1);
+              }),
+            IconButton(icon: Icon(Icons.trending_up, color: Colors.blueGrey[800],), onPressed: (){
+              onTap(2);
+              }),
+            IconButton(icon: Icon(Icons.alternate_email, color: Colors.blueGrey[800],), onPressed: (){
+              onTap(3);
+              })
+          ],
         )
       ],
     );
