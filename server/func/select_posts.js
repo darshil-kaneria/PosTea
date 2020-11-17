@@ -9,11 +9,17 @@ process.on("message", message => {
           await getPosts(message.topicID, connection);
           connection.release();
           getEngagement(message.topic_id, connection).then((value)=> {
-                process.send(value, );
+                process.send(value);
                 connection.release();
                 process.exit();
         
-        }) 
+          }).catch((result) => {
+              process.send(result);
+              connection.release();
+              process.exit();
+
+
+          });
           
           
         });

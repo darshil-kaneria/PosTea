@@ -14,6 +14,11 @@ process.on("message", message => {
         process.send(answer);
       }
       process.exit();
+  }).catch(function(result) {
+    process.send(result);
+    process.exit();
+
+
   });
 });
 });

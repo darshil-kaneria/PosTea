@@ -14,7 +14,6 @@ process.on("message", message => {
     }
     console.log('Database connection established');
     getProfile(message.flag, getVar, connection).then(function (answer) {
-      connection.release();
       if (answer == "Account does not exist") {
         process.send({ "Error": "User does not exist" });
       } else {
@@ -33,7 +32,15 @@ process.on("message", message => {
         }
         process.send({ "message": profileInfoJson });
       }
+      connection.release();
       process.exit();
+
+    }).catch(function(result) {
+      process.send(result);
+      connection.release();
+      process.exit();
+
+
 
     });
   });
@@ -51,19 +58,16 @@ function getProfile(flag, user, connection) {
     connection.query(selectQuery, [user], function (err, result) {
       if (err) {
         console.log(err);
-        reject(result);
+        reject(err.message);
       }
-      try {
-        if (result.length == 0) {
-          resolve("Account does not exist");
-        } else {
-          resolve(result);
-        }
+      
+     if (result.length == 0) {
+        resolve("Account does not exist");
+      } else {
+        //console.log(result);
+        resolve(result);
       }
-      catch (error) {
-        reject(result);
-      }
-      return;
+      
     });
   })
 };
