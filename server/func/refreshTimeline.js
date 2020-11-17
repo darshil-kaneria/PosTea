@@ -82,7 +82,7 @@ refreshTimeline = async (profileID, offset, time, connection) => {
                     var numOccurances = result.substring(28, result.indexOf("}"));
                     if(isTimeNull){
 
-                        var query = "SELECT * FROM user_post WHERE profile_id in "+followingListString+" OR topic_id in "+topicFollowingListString+" ORDER BY creation_date DESC LIMIT " + String(offset) + ", 3"; // change if condition below if you change limit
+                        var query = "SELECT * FROM user_post WHERE profile_id in "+followingListString+" OR topic_id in "+topicFollowingListString+" ORDER BY creation_date DESC LIMIT " + String(offset) + ", 10"; // change if condition below if you change limit
                         await connection.query({sql: query, timeout: 7000}, (err, result) => {
                         if (err && err.code === 'PROTOCOL_SEQUENCE_TIMEOUT') {
                             var dict = {
@@ -154,7 +154,7 @@ refreshTimeline = async (profileID, offset, time, connection) => {
                     offset = parseInt(result[0].offs) + parseInt(offset);
                     // console.log(offset);
                      
-                    if (offset >= numOccurances - 2) { // change if you change limit
+                    if (offset >= numOccurances - 9) { // change if you change limit
                         var limit = numOccurances - offset;
                         var newquery = "SELECT * FROM user_post WHERE profile_id in " +followingListString+ " OR topic_id in "+topicFollowingListString+" ORDER BY creation_date DESC LIMIT " + String(offset) + ", " + String(limit); // change if condition below if you change limit
                         await connection.query({sql: newquery, timeout: 7000}, (err, result) => {
@@ -209,7 +209,7 @@ refreshTimeline = async (profileID, offset, time, connection) => {
                     }
                     else{
 
-                        var query = "SELECT * FROM user_post WHERE profile_id in "+followingListString+" OR topic_id in "+topicFollowingListString+" ORDER BY creation_date DESC LIMIT " + String(offset) + ", 3"; // change if condition below if you change limit
+                        var query = "SELECT * FROM user_post WHERE profile_id in "+followingListString+" OR topic_id in "+topicFollowingListString+" ORDER BY creation_date DESC LIMIT " + String(offset) + ", 10"; // change if condition below if you change limit
                     await connection.query({sql: query, timeout: 7000}, (err, result) => {
                     if (err && err.code === 'PROTOCOL_SEQUENCE_TIMEOUT') {
                         var dict = {
