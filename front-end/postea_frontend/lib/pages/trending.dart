@@ -76,7 +76,8 @@ class _TrendingState extends State<Trending> {
                               trending.postList.elementAt(index).post_comments,
                               trending.postList.elementAt(index).post_title,
                               trending.postList.elementAt(index).post_name,
-                              widget.profileId.toString());
+                              widget.profileId.toString(),
+                              0);
                         },
                       );
                     } else {

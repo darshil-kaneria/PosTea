@@ -559,7 +559,8 @@ class _HomePageState extends State<HomePage> {
                               timeLine.postList.elementAt(index).post_comments,
                               timeLine.postList.elementAt(index).post_title,
                               timeLine.postList.elementAt(index).post_name,
-                              widget.profileID.toString());
+                              widget.profileID.toString(),
+                              0);
                         });
                   } else
                     return Center(
