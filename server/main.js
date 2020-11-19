@@ -12,6 +12,7 @@ app.use(express.json({limit: '2mb'}));
 const PORT = process.env.PORT || 23556;
 const numCPUs = require('os').cpus().length;
 
+var lastWorkerPID = -1;
 
 if (cluster.isMaster) {
   console.log(`Master ${process.pid} is running`);
@@ -26,7 +27,6 @@ if (cluster.isMaster) {
   });
 }
 else {
-
   const fork = require("child_process").fork;
 app.get('/', (req, res)=>{
     
@@ -298,7 +298,7 @@ app.get("/refreshTopicTimeline", (req, res) => {
   });
 });
 
-app.listen(PORT, ()=>console.log("listening on port "+PORT));
+app.listen(PORT, ()=>console.log("listening on port "+PORT+", PID: "+process.pid));
 
 /**
  * Dev endpoints - use with caution.
@@ -328,9 +328,19 @@ app.get('/gettrending', (req, res) => {
 
 
 });
+if(cluster.worker.id == 2){
+  var trendingInterval = setInterval(() => {
+    console.log("retrieving trending posts...")
+    const trending = fork('./func/getTrending.js');
+    var data = {
+      "tempFlag": "tempVarcls"
+    };
+    trending.send(data);
+  },
+  1800000
+  );
 
-
-
+}
 }
 
 

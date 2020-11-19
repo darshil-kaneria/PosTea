@@ -44,9 +44,17 @@ refreshTimeline = async (profileID, offset, time, connection) => {
             for(var i = 0; i < result.length; i++){
                 followingList.push(parseInt(result[i].follower_id));
             }
+            if(followingList.length == 0){
+                followingListString = "(-1)";
+            }
+            else{
+
+                followingListString = followingList.join(',');
+                followingListString = "("+followingListString+")";
+
+            }
             // console.log(followingList);
-            followingListString = followingList.join(',');
-            followingListString = "("+followingListString+")";
+            
             // console.log(followingListString);
 
             if(time == null){
@@ -68,9 +76,13 @@ refreshTimeline = async (profileID, offset, time, connection) => {
                 for(var i = 0; i < result.length; i++){
                     topicFollowingList.push(parseInt(result[i].topic_id));
                 }
-
-                topicFollowingListString = topicFollowingList.join(',');
-                topicFollowingListString = "("+topicFollowingListString+")";
+                if(topicFollowingList.length == 0){
+                    topicFollowingListString = "(-1)";
+                }
+                else{
+                    topicFollowingListString = topicFollowingList.join(',');
+                    topicFollowingListString = "("+topicFollowingListString+")";
+                }
 
                 await connection.query(getNumPosts, async (err, result) => {
                     if (err) {
@@ -111,8 +123,8 @@ refreshTimeline = async (profileID, offset, time, connection) => {
                         // console.log(currentDate.getDay())
                         for(var i = 0; i < result.length; i++){
                             var postDate = new Date(result[i]['creation_date']);
-                            if(currentDate.getDay() - postDate.getDay() > 1){
-                                timeDiff = (currentDate.getDay() - postDate.getDay()) + " days ago";
+                            if(currentDate.getDate() - postDate.getDate() > 1){
+                                timeDiff = (currentDate.getDate() - postDate.getDate()) + " days ago";
                             }
                             else if(currentDate.getHours() - postDate.getHours() > 1){
                                 timeDiff = (currentDate.getHours() - postDate.getHours()) + " hours ago";
@@ -182,8 +194,8 @@ refreshTimeline = async (profileID, offset, time, connection) => {
                         // console.log(currentDate.getDay())
                         for(var i = 0; i < result.length; i++){
                             var postDate = new Date(result[i]['creation_date']);
-                            if(currentDate.getDay() - postDate.getDay() > 1){
-                                timeDiff = (currentDate.getDay() - postDate.getDay()) + " days ago";
+                            if(currentDate.getDate() - postDate.getDate() > 1){
+                                timeDiff = (currentDate.getDate() - postDate.getDate()) + " days ago";
                             }
                             else if(currentDate.getHours() - postDate.getHours() > 1){
                                 timeDiff = (currentDate.getHours() - postDate.getHours()) + " hours ago";
@@ -235,8 +247,8 @@ refreshTimeline = async (profileID, offset, time, connection) => {
                         // console.log(currentDate.getDay())
                         for(var i = 0; i < result.length; i++){
                             var postDate = new Date(result[i]['creation_date']);
-                            if(currentDate.getDay() - postDate.getDay() > 1){
-                                timeDiff = (currentDate.getDay() - postDate.getDay()) + " days ago";
+                            if(currentDate.getDate() - postDate.getDate() > 1){
+                                timeDiff = (currentDate.getDate() - postDate.getDate()) + " days ago";
                             }
                             else if(currentDate.getHours() - postDate.getHours() > 1){
                                 timeDiff = (currentDate.getHours() - postDate.getHours()) + " hours ago";

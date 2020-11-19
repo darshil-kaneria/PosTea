@@ -16,7 +16,8 @@ process.on("message", message => {
             dislikes: message.dislikes,
             comment: message.comment,
             anonymous: message.anonymous,
-            is_private: message.is_private
+            is_private: message.is_private,
+            post_id: message.postID
         }
         await addPost(dict, connection).then((answer) => {
             connection.release();
@@ -33,7 +34,7 @@ process.on("message", message => {
 });
 
 const addPost = async (dict, connection) => {
-    var id = Math.floor(Math.random() * 100000);
+    var id = dict.post_id;
     console.log(id)
     var userPostMessage = dict.post;
     var topic = dict.topic
@@ -44,13 +45,7 @@ const addPost = async (dict, connection) => {
     var addTopicContent = "INSERT INTO topic_content (topic_id, post_id) VALUES ?";
     var curr_date = new Date().toISOString().slice(0, 19).replace('T', ' ');
     var topicContentFields = [[dict.topicID, dict.profileID]];
-<<<<<<< HEAD
-    dict.likes = 0;
-    dict.dislikes = 0;
-    var fields = [[id, dict.profileID, userPostMessage, dict.topicID, dict.img, curr_date, dict.likes, dict.dislikes, dict.comment, dict.title]];
-=======
     var fields = [[id, dict.profileID, userPostMessage, dict.topicID, dict.img, curr_date, dict.likes, dict.dislikes, dict.comment, dict.title, dict.anonymous, dict.is_private]];
->>>>>>> 1c70f6c0dc25a2fa28a658b24bf61b20d6fbcb8f
 
     return new Promise(async (resolve, reject) => {
         await connection.query(queryTopicExists, async (err, result) => {
