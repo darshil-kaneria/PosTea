@@ -33,10 +33,12 @@ const getTopic = async(topic_id, connection) => {
                 reject("Topic does not exist");
             } else {
                 console.log("Topic retrieved");
-                console.log(result);
+                //console.log(result);
                 result = JSON.stringify(result);
                 result = JSON.parse(result);
+                console.log(result);
                 resolve(result);
+
                 // return result;  
             }
         });

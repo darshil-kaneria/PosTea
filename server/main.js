@@ -143,6 +143,16 @@ app.route("/topicfollowdata")
 })
 
 // User Follow data methods
+
+app.get("/search",(req, res) =>{
+  const handle = fork("./func/search.js");
+  var data = {
+    text: req.query.text
+  }
+  handle.send(data);
+  handle.on("message", message => res.send(message));
+  
+})
 app.route("/followdata")
   .get((req, res) => {
     const handle = fork("./func/get_follow_data.js");
