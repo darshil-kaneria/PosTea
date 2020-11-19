@@ -142,7 +142,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       child: Icon(Icons.wb_sunny),
                     ),
                     Text(
-                      "Dark Theme?",
+                      "Dark Theme",
                       style: TextStyle(fontSize: 18),
                     ),
                     Spacer(),

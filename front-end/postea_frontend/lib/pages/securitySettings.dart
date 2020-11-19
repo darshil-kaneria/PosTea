@@ -1,4 +1,6 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import './login.dart';
 
 class SecuritySettings extends StatefulWidget {
   @override
@@ -51,6 +53,7 @@ class _SecuritySettingsState extends State<SecuritySettings> {
                                     onWillPop: () async {
                                       passwordController.clear();
                                       newPasswordController.clear();
+                                      confirmNewPasswordController.clear();
                                       return true;
                                     },
                                     child: Dialog(
@@ -60,24 +63,10 @@ class _SecuritySettingsState extends State<SecuritySettings> {
                                         ),
                                       ),
                                       child: Container(
-                                        width: screenWidth / 3,
-                                        height: screenHeight / 2.75,
+                                        width: screenWidth / 3.5,
+                                        height: screenHeight / 3.5,
                                         child: Column(
                                           children: [
-                                            Padding(
-                                              padding: const EdgeInsets.only(
-                                                  left: 15, top: 10, right: 25),
-                                              child: TextField(
-                                                controller: passwordController,
-                                                textAlign: TextAlign.left,
-                                                decoration: InputDecoration(
-                                                    enabledBorder:
-                                                        UnderlineInputBorder(),
-                                                    border: InputBorder.none,
-                                                    hintText:
-                                                        "Enter current password"),
-                                              ),
-                                            ),
                                             Padding(
                                               padding: const EdgeInsets.only(
                                                   left: 15,
@@ -87,6 +76,9 @@ class _SecuritySettingsState extends State<SecuritySettings> {
                                               child: TextField(
                                                 controller:
                                                     newPasswordController,
+                                                obscureText: true,
+                                                autocorrect: false,
+                                                enableSuggestions: false,
                                                 textAlign: TextAlign.left,
                                                 decoration: InputDecoration(
                                                     enabledBorder:
@@ -106,6 +98,9 @@ class _SecuritySettingsState extends State<SecuritySettings> {
                                                 controller:
                                                     confirmNewPasswordController,
                                                 textAlign: TextAlign.left,
+                                                autocorrect: false,
+                                                enableSuggestions: false,
+                                                obscureText: true,
                                                 decoration: InputDecoration(
                                                     enabledBorder:
                                                         UnderlineInputBorder(),
@@ -122,15 +117,45 @@ class _SecuritySettingsState extends State<SecuritySettings> {
                                               child: RaisedButton(
                                                   child:
                                                       Text("Change Password"),
-                                                  onPressed: () {
-                                                    String currentPassword =
-                                                        passwordController.text;
+                                                  onPressed: () async {
                                                     String newPassword =
                                                         newPasswordController
                                                             .text;
                                                     String confirmNewPassword =
                                                         confirmNewPasswordController
                                                             .text;
+
+                                                    if (newPassword ==
+                                                        confirmNewPassword) {
+                                                      User user = FirebaseAuth
+                                                          .instance.currentUser;
+
+                                                      try {
+                                                        await user
+                                                            .updatePassword(
+                                                                newPassword);
+
+                                                        Scaffold.of(context)
+                                                            .showSnackBar(
+                                                                SnackBar(
+                                                          content: Text(
+                                                              "Password updated successfully!"),
+                                                        ));
+                                                      } catch (e) {
+                                                        print("e is " +
+                                                            e.toString());
+
+                                                        if (e.toString().contains(
+                                                            "[firebase_auth/requires-recent-login]")) {
+                                                          Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) =>
+                                                                          Login()));
+                                                        }
+                                                      }
+                                                    }
                                                   }),
                                             ),
                                           ],

@@ -174,6 +174,17 @@ class _HomePageState extends State<HomePage> {
               decoration: BoxDecoration(color: Colors.purple[900]),
             ),
             ListTile(
+              title: Text("Settings"),
+              leading: Icon(
+                Icons.settings,
+                color: Colors.black,
+              ),
+              onTap: () async {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SettingsPage()));
+              },
+            ),
+            ListTile(
               title: Text("Logout"),
               leading: Icon(
                 Icons.exit_to_app,
@@ -190,17 +201,6 @@ class _HomePageState extends State<HomePage> {
                 });
               },
             ),
-            ListTile(
-              title: Text("Settings"),
-              leading: Icon(
-                Icons.settings,
-                color: Colors.black,
-              ),
-              onTap: () async {
-                Navigator.push(context,
-                    MaterialPageRoute(builder: (context) => SettingsPage()));
-              },
-            )
           ],
         ),
       ),
