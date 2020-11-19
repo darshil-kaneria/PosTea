@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import './login.dart';
+import '../data_models/delete_user.dart';
 import 'package:postea_frontend/pages/securitySettings.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -12,6 +15,9 @@ class _SettingsPageState extends State<SettingsPage> {
   Color toggle = Colors.redAccent[100].withOpacity(0.5);
   bool darkModeToggle = false;
   Color darkModeToggleColor = Colors.redAccent[100].withOpacity(0.5);
+
+  var emailController = new TextEditingController();
+  var passwordController = new TextEditingController();
 
   toggleButton() {
     setState(() {
@@ -281,7 +287,125 @@ class _SettingsPageState extends State<SettingsPage> {
                     clipBehavior: Clip.antiAlias,
                     onPressed: () {},
                     color: Colors.redAccent,
-                    child: Text("Delete Account"),
+                    child: InkWell(
+                        onTap: () {
+                          showDialog(
+                            context: context,
+                            barrierDismissible: false,
+                            builder: (context) {
+                              return StatefulBuilder(
+                                builder: (context, setState) {
+                                  return WillPopScope(
+                                    onWillPop: () async {
+                                      emailController.clear();
+                                      passwordController.clear();
+                                      return true;
+                                    },
+                                    child: Dialog(
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(30),
+                                        ),
+                                      ),
+                                      child: Container(
+                                        width: screenWidth / 3.5,
+                                        height: screenHeight / 2.5,
+                                        child: Column(
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.all(10),
+                                              child: Text(
+                                                "We need to make sure it is indeed you!",
+                                                style: TextStyle(
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 20),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 15,
+                                                  top: 10,
+                                                  right: 25,
+                                                  bottom: 10),
+                                              child: TextField(
+                                                controller: emailController,
+                                                textAlign: TextAlign.left,
+                                                decoration: InputDecoration(
+                                                    enabledBorder:
+                                                        UnderlineInputBorder(),
+                                                    border: InputBorder.none,
+                                                    hintText:
+                                                        "Enter your email"),
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 15,
+                                                  top: 10,
+                                                  right: 25,
+                                                  bottom: 10),
+                                              child: TextField(
+                                                controller: passwordController,
+                                                textAlign: TextAlign.left,
+                                                autocorrect: false,
+                                                enableSuggestions: false,
+                                                obscureText: true,
+                                                decoration: InputDecoration(
+                                                    enabledBorder:
+                                                        UnderlineInputBorder(),
+                                                    border: InputBorder.none,
+                                                    hintText:
+                                                        "Enter your password"),
+                                              ),
+                                            ),
+                                            ButtonTheme(
+                                              shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          20)),
+                                              child: RaisedButton(
+                                                  child: Text("Delete Account"),
+                                                  onPressed: () async {
+                                                    String email =
+                                                        emailController.text;
+                                                    String password =
+                                                        passwordController.text;
+
+                                                    User user = FirebaseAuth
+                                                        .instance.currentUser;
+                                                    DeleteUser deleteUser =
+                                                        new DeleteUser(
+                                                            user: user,
+                                                            email: email,
+                                                            password: password);
+
+                                                    var result =
+                                                        await deleteUser
+                                                            .deleteUserData();
+
+                                                    print("result is " +
+                                                        result.toString());
+                                                    if (result == "success") {
+                                                      Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder:
+                                                                  (context) =>
+                                                                      Login()));
+                                                    }
+                                                  }),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                          );
+                        },
+                        child: Text("Delete Account")),
                   ),
                 ),
               ),
