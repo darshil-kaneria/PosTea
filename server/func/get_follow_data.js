@@ -54,8 +54,8 @@ process.on("message", message => {
 const getFollowing = async(user_id, connection) => {
     var profile_id = user_id;
     var query = "SELECT * FROM user_follower WHERE user_follower.profile_id = ?";
-    return new Promise(function(resolve, reject) {
-       connection.query(query,[profile_id],function(err, result)  {
+    return new Promise(async function(resolve, reject) {
+        await connection.query(query,[profile_id], async function(err, result)  {
             if (err) {
                 console.log("error:" + err.message);
                 reject(err.message);
@@ -65,8 +65,10 @@ const getFollowing = async(user_id, connection) => {
             } else {
                 result = JSON.stringify(result);
                 result = JSON.parse(result);
+                await convert_to_username("following", user_id, result, connection).then((value)=> {
+                    result = value;
+                });
                 console.log("Following retrieved");
-                console.log(result);
                 resolve(result);
                 // return result;  
             }
@@ -77,19 +79,59 @@ const getFollowing = async(user_id, connection) => {
 const getFollowers = async(user_id, connection) => {
     var follower_id = user_id;
     var query = "SELECT * FROM user_follower WHERE user_follower.follower_id = ?";
-    return new Promise(function(resolve, reject) {
-       connection.query(query,[follower_id],function(err, result)  {
+    return new Promise(async function(resolve, reject) {
+       await connection.query(query,[follower_id], async function(err, result)  {
             if (err) {
                 console.log("error exists");
                 //console.log("error:" + err.message);
                 reject(err.message);
             }
             if (result.length == 0) {
-                reject("does not exist");
-                //resolve(result);
+                reject("User followers record does not exist");
             } else {
+                result = JSON.stringify(result);
+                result = JSON.parse(result);
+                console.log(result);
+                await convert_to_username("followers", user_id, result, connection).then((value)=> {
+                    result = value;
+                });
                 console.log("Followers retrieved");
-                //console.log(result);
+                resolve(result);
+                // return result;  
+            }
+        });
+    });
+}
+
+const convert_to_username = async(flag, current_user, ids, connection) => {
+    var query1 = "SELECT username FROM profile WHERE";
+    var profile_ids = [];
+    if (flag == "following") {
+        for (var i = 0; i < ids.length; i++) {
+            if (current_user != ids[i].follower_id) {
+                profile_ids.push(ids[i].follower_id);
+                query1 = query1.concat(" profile.profile_id = ? OR");
+            }
+        }
+    } else if (flag == "followers") {
+        for (var i = 0; i < ids.length; i++) {
+            if (current_user != ids[i].profile_id) {
+                profile_ids.push(ids[i].profile_id);
+                query1 = query1.concat(" profile.profile_id = ? OR");
+            }
+        }
+    }
+    
+    query1 = query1.substr(0, query1.length-2);
+    console.log(query1);
+    console.log(profile_ids);
+    return new Promise(function(resolve, reject) {
+       connection.query(query1,profile_ids,function(err, result)  {
+            if (err) {
+                console.log("error exists");
+                reject(err.message);
+            }
+            else {
                 result = JSON.stringify(result);
                 result = JSON.parse(result);
                 resolve(result);
