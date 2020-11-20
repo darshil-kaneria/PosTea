@@ -11,6 +11,7 @@ app.use(express.static("dir"));
 app.use(express.json({limit: '2mb'}));
 const PORT = process.env.PORT || 23556;
 const numCPUs = require('os').cpus().length;
+var cors = require('cors');
 
 var lastWorkerPID = -1;
 
@@ -27,6 +28,10 @@ if (cluster.isMaster) {
   });
 }
 else {
+  app.use(cors({
+    origin: ["http://localhost:23556"],
+    credentials: true
+  }))
   const fork = require("child_process").fork;
 app.get('/', (req, res)=>{
     

@@ -18,8 +18,8 @@ process.on("message", message => {
 
 const getPost = async(postId, connection) => {
     var query = "SELECT * FROM user_post WHERE user_post.post_id = ?";
-    return new Promise(function(resolve, reject) {
-       connection.query(query,[postId],function(err, result)  {
+    return new Promise(async function(resolve, reject) {
+       await connection.query(query,[postId], async function(err, result)  {
             if (err) {
                 console.log("error:" + err.message);
                 reject(err.message);
@@ -30,7 +30,13 @@ const getPost = async(postId, connection) => {
                 console.log("Post retrieved");
                 if (result[0].is_anonymous == 1) {
                     result[0].profile_id = -1;
-                }
+                    result[0].username = "Anonymous";
+                } else {
+                await convert_to_username(result[0], connection).then((value)=> {
+                    console.log(value);
+                    result[0].username = value[0].username;
+                });
+            }
                 var timeDiff = "";
                 var currentDate = new Date();
                 // console.log(currentDate.getDay())
@@ -55,6 +61,25 @@ const getPost = async(postId, connection) => {
                     resolve(final_result);
                 }
                 // return result;  
+        });
+    });
+}
+
+const convert_to_username = async(id, connection) => {
+    var query1 = "SELECT username FROM profile WHERE profile.profile_id = ?";
+    return new Promise(function(resolve, reject) {
+       connection.query(query1,[id.profile_id],function(err, result)  {
+            if (err) {
+                console.log("error exists");
+                reject(err.message);
+            }
+            else {
+                result = JSON.stringify(result);
+                result = JSON.parse(result);
+                console.log(result)
+                resolve(result);
+                // return result;  
+            }
         });
     });
 }
