@@ -7,13 +7,15 @@ process.on("message", message => {
             return console.error("error: " + err.message);
         }
 
-        await search(message.text, connection).then((result) => {
-            connection.release();
+        search(message.text, connection).then((result) => {
+            console.log(result);
             process.send(result);
+            //connection.release();
             process.exit();
           }).catch((reject) => {
-            connection.release();
+            console.log("reject");
             process.send(reject);
+            //connection.release();
             process.exit();
           });
         // process.send({ "result": result });
@@ -22,10 +24,11 @@ process.on("message", message => {
     // process.exit()
 });
 
-const search = async(text, connection) => {
+const search = (text, connection) => {
     var string = text + "*";
+    console.log(string);
     var query1 = "SELECT profile_id, name FROM profile WHERE  MATCH(name) Against('"+string+"' in boolean mode)"
-    var query2 = "SELECT topic_id, topic_name FROM profile WHERE  MATCH(topic_name) Against('"+string+"' in boolean mode)"
+    var query2 = "SELECT topic_id, topic_name FROM topic_info WHERE  MATCH(topic_name) Against('"+string+"' in boolean mode)"
     var topics = [];
     var profiles = [];
     
@@ -35,34 +38,43 @@ const search = async(text, connection) => {
             if (err) {
                 reject(err.message);
             }
+            console.log("res");
+            //console.log(result);
+            
             if (result.length > 0) {
+                
                 for (var i = 0; i < result.length; i++) {
                     result[i].type = "profile";
 
                 }
                 var profiles = result;
+                console.log(profiles);
                 
 
             }
-
-        });
-        await connection.query(query2,  async function (err, result) {
-            if (err) {
-                reject(err.message);
-            }
-            if (result.length > 0) {
-                for (var i = 0; i < result.length; i++) {
-                    result[i].type = "topic";
-
+            await connection.query(query2,  function (err, result) {
+                if (err) {
+                    reject(err.message);
                 }
-                var topics = result;
-                
-
-            }
+                if (result.length > 0) {
+                    for (var i = 0; i < result.length; i++) {
+                        result[i].type = "topic";
+    
+                    }
+                    var topics = result;
+                    console.log(topics);
+                    
+    
+                }
+                var results = profiles.concat(topics);
+                resolve(results);
+    
+            });
+            
 
         });
-        var results = profiles.concat(topics);
-        resolve(results);
+        
+        
 
 
 
