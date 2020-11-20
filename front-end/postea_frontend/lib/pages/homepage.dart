@@ -18,6 +18,7 @@ import 'package:postea_frontend/main.dart';
 import 'package:postea_frontend/pages/create_topic.dart';
 import 'package:postea_frontend/pages/discoverTopics.dart';
 import 'package:postea_frontend/pages/profile.dart';
+import 'package:postea_frontend/pages/settingsPage.dart';
 import 'package:postea_frontend/pages/trending.dart';
 import 'package:provider/provider.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -27,6 +28,7 @@ import 'package:postea_frontend/data_models/process_timeline.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'login.dart';
 import 'topic.dart';
+import 'settingsPage.dart';
 
 class HomePage extends StatefulWidget {
   int profileID;
@@ -158,11 +160,36 @@ class _HomePageState extends State<HomePage> {
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              child: Text(""),
+              child: Container(
+                margin: EdgeInsets.only(top: 50),
+                child: Text(
+                  "Vidit Shah",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 30),
+                ),
+              ),
               decoration: BoxDecoration(color: Colors.purple[900]),
             ),
             ListTile(
+              title: Text("Settings"),
+              leading: Icon(
+                Icons.settings,
+                color: Colors.black,
+              ),
+              onTap: () async {
+                Navigator.push(context,
+                    MaterialPageRoute(builder: (context) => SettingsPage()));
+              },
+            ),
+            ListTile(
               title: Text("Logout"),
+              leading: Icon(
+                Icons.exit_to_app,
+                color: Colors.black,
+              ),
               onTap: () async {
                 SharedPreferences pref = await SharedPreferences.getInstance();
                 pref.clear().then((value) async {
@@ -173,7 +200,7 @@ class _HomePageState extends State<HomePage> {
                   }
                 });
               },
-            )
+            ),
           ],
         ),
       ),
