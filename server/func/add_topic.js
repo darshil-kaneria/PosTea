@@ -10,8 +10,7 @@ process.on("message", message => {
           var data = {
             topicText: message.topicText,
             topic_creator_id: message.topicCreatorID,
-            topic_description: message.topicDescription,
-            topic_id: message.topicID
+            topic_description: message.topicDescription
           }
           await addTopicInfo(data, connection).then((result) => {
             connection.release();
@@ -27,11 +26,12 @@ process.on("message", message => {
 
 const addTopicInfo = async function(data, connection) {
     console.log("data");
-    var top_id =  data.topic_id;
+    var top_id =  Math.floor(Math.random() * 100000);
     var addtopicinfoq = "INSERT INTO topic_info (topic_id, topic_creator_id, topic_name, topic_description, topic_img, creation_date) VALUES ?";
     var date = new Date().toISOString().slice(0, 19).replace('T', ' ');
     var vals = [[top_id, data.topic_creator_id, data.topicText, data.topic_description, "", date]];
     return new Promise(function(resolve, reject) {
+      connection.query()
       connection.query(addtopicinfoq,[vals], function(err, result) {
         if (err) {
             reject(err.message);
