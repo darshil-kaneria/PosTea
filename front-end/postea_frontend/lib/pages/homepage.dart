@@ -331,6 +331,13 @@ class _HomePageState extends State<HomePage> {
                                           setState(() {});
                                           print(isAnonymous);
                                         }),
+                                    IconButton(
+                                      icon: Icon(
+                                        CupertinoIcons.eye,
+                                        size: 35,
+                                      ),
+                                      onPressed: () {},
+                                    ),
                                     Expanded(
                                       child: Container(
                                         padding: EdgeInsets.only(right: 15),
