@@ -50,7 +50,7 @@ class _TopicState extends State<Topic> {
       if (!topic.isEnd && topic.postRetrieved)
         setState(() {
           print("SETSTATE CALLED");
-          offset = offset + 3;
+          offset = offset + 10;
           // updatePost();
         });
     }

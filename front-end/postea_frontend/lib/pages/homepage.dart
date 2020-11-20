@@ -57,24 +57,24 @@ class _HomePageState extends State<HomePage> {
   var offset = 0;
 
   _scrollListener() {
-    if (checkPosScrollController.offset <=
-            checkPosScrollController.position.minScrollExtent &&
-        !checkPosScrollController.position.outOfRange) {
-      setState(() {
-        offset = 0;
-        print("Timeline refreshed");
-        timeLine.clearTimeline();
-      });
-    }
+    // if (checkPosScrollController.offset <=
+    //         checkPosScrollController.position.minScrollExtent &&
+    //     !checkPosScrollController.position.outOfRange) {
+    //   setState(() {
+    //     offset = 0;
+    //     print("Timeline refreshed");
+    //     timeLine.clearTimeline();
+    //   });
+    // }
 
     if (checkPosScrollController.offset >=
-            checkPosScrollController.position.maxScrollExtent &&
+            checkPosScrollController.position.maxScrollExtent/2.0 &&
         !checkPosScrollController.position.outOfRange) {
       print("ISPOST" + timeLine.postRetrieved.toString());
       if (!timeLine.isEnd && timeLine.postRetrieved)
         setState(() {
           print("SETSTATE CALLED");
-          offset = offset + 3;
+          offset = offset + 10;
           // updatePost();
         });
     }
@@ -527,65 +527,81 @@ class _HomePageState extends State<HomePage> {
                 builder: (BuildContext context,
                     AsyncSnapshot<http.Response> snapshot) {
                   if (snapshot.hasData) {
-                    return ListView.builder(
-                        physics: BouncingScrollPhysics(),
-                        controller: checkPosScrollController,
-                        itemCount: timeLine.postList.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          // if(timeLine.isEnd == true){
-                          //   if(checkEnd)
-                          //   return ListTile(
-                          //     leading: Icon(Icons.error_outline),
-                          //     title: Text("You have reached the end, my friend.", style: TextStyle(color: Colors.grey, fontSize: 15),),
-                          //   );
-                          //   if(index == timeLine.postList.length-1){
-                          //     checkEnd = true;
-                          //   }
+                    return RefreshIndicator(
+                      onRefresh: _handleRefresh,
+                                            child: ListView.builder(
+                                                physics: BouncingScrollPhysics(),
+                                                controller: checkPosScrollController,
+                                                itemCount: timeLine.postList.length,
+                                                itemBuilder: (BuildContext context, int index) {
+                                                  // if(timeLine.isEnd == true){
+                                                  //   if(checkEnd)
+                                                  //   return ListTile(
+                                                  //     leading: Icon(Icons.error_outline),
+                                                  //     title: Text("You have reached the end, my friend.", style: TextStyle(color: Colors.grey, fontSize: 15),),
+                                                  //   );
+                                                  //   if(index == timeLine.postList.length-1){
+                                                  //     checkEnd = true;
+                                                  //   }
+                      
+                                                  // }
+                                                  print("LIKES ARE: " +
+                                                      timeLine.postList.elementAt(index).post_likes);
+                                                  return PostTile(
+                                                      timeLine.postList.elementAt(index).post_id,
+                                                      timeLine.postList.elementAt(index).profile_id,
+                                                      timeLine.postList
+                                                          .elementAt(index)
+                                                          .post_description,
+                                                      timeLine.postList.elementAt(index).topic_id,
+                                                      timeLine.postList.elementAt(index).post_img,
+                                                      timeLine.postList.elementAt(index).creation_date,
+                                                      timeLine.postList.elementAt(index).post_likes,
+                                                      timeLine.postList.elementAt(index).post_dislikes,
+                                                      timeLine.postList.elementAt(index).post_comments,
+                                                      timeLine.postList.elementAt(index).post_title,
+                                                      timeLine.postList.elementAt(index).post_name,
+                                                      widget.profileID.toString(),
+                                                      0);
+                                                }),
+                                          );
+                                        } else
+                                          return Center(
+                                              child: CircularProgressIndicator(
+                                            valueColor: AlwaysStoppedAnimation(bgGradEnd),
+                                          ));
+                                        // else return null;
+                                      }),
+                                )
+                              ],
+                      
+                              // child: Column(
+                              //   mainAxisSize: MainAxisSize.min,
+                              //   children: [
+                              //     Text("This timer is changing"),
+                              //     Consumer<TimerCount>(builder: (context, data, child){
+                              //       return AutoSizeText(
+                              //         data.getTime().toString(),
+                              //         style: TextStyle(fontSize: 15),
+                              //         );
+                              //     })
+                              //   ],
+                      
+                              // )
+                            ),
+                          );
+                        }
+                      
+  Future<void> _handleRefresh() {
 
-                          // }
-                          print("LIKES ARE: " +
-                              timeLine.postList.elementAt(index).post_likes);
-                          return PostTile(
-                              timeLine.postList.elementAt(index).post_id,
-                              timeLine.postList.elementAt(index).profile_id,
-                              timeLine.postList
-                                  .elementAt(index)
-                                  .post_description,
-                              timeLine.postList.elementAt(index).topic_id,
-                              timeLine.postList.elementAt(index).post_img,
-                              timeLine.postList.elementAt(index).creation_date,
-                              timeLine.postList.elementAt(index).post_likes,
-                              timeLine.postList.elementAt(index).post_dislikes,
-                              timeLine.postList.elementAt(index).post_comments,
-                              timeLine.postList.elementAt(index).post_title,
-                              timeLine.postList.elementAt(index).post_name,
-                              widget.profileID.toString(),
-                              0);
-                        });
-                  } else
-                    return Center(
-                        child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation(bgGradEnd),
-                    ));
-                  // else return null;
-                }),
-          )
-        ],
+    Completer<Null> completer = new Completer<Null>();
+    setState(() {
+        offset = 0;
+        print("Timeline refreshed");
+        timeLine.clearTimeline();
+      });
+    completer.complete();
+    return completer.future;
 
-        // child: Column(
-        //   mainAxisSize: MainAxisSize.min,
-        //   children: [
-        //     Text("This timer is changing"),
-        //     Consumer<TimerCount>(builder: (context, data, child){
-        //       return AutoSizeText(
-        //         data.getTime().toString(),
-        //         style: TextStyle(fontSize: 15),
-        //         );
-        //     })
-        //   ],
-
-        // )
-      ),
-    );
   }
 }

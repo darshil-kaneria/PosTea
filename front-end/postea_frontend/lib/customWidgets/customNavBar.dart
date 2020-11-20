@@ -28,7 +28,7 @@ class CustomNavBar extends StatelessWidget{
                 opacity: 0.5,
                 child: Container(
                   width: screenWidth,
-                  height: screenHeight/13,
+                  height: screenHeight/14,
                   decoration: BoxDecoration(
                     color: Colors.black12,
                     borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20))
