@@ -55,15 +55,8 @@ class _TopicPillState extends State<TopicPill> {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
 
-    return Container(
-      margin: EdgeInsets.only(top: 5, left: 5, right: 5),
-      height: widget.height,
-      width: widget.width,
-      decoration: BoxDecoration(
-          gradient: LinearGradient(colors: [widget.col1, widget.col2]),
-          borderRadius: BorderRadius.all(Radius.circular(50))),
-      child: GestureDetector(
-        onTap: () {
+    return GestureDetector(
+      onTap: () {
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -73,6 +66,13 @@ class _TopicPillState extends State<TopicPill> {
                         topicId: widget.topicId,
                       )));
         },
+          child: Container(
+        margin: EdgeInsets.only(top: 5, left: 5, right: 5),
+        height: widget.height,
+        width: widget.width,
+        decoration: BoxDecoration(
+            gradient: LinearGradient(colors: [widget.col1, widget.col2]),
+            borderRadius: BorderRadius.all(Radius.circular(50))),
         child: Center(
             child: ValueListenableBuilder(
               valueListenable: pillText,

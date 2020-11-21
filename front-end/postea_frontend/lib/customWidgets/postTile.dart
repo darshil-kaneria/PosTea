@@ -132,7 +132,7 @@ class _PostTileState extends State<PostTile> {
           topicId: topic_id,
           col1: Colors.purple[900],
           col2: Colors.purple[400],
-          height: screenheight/15,
+          height: screenheight/20,
           width: screenwidth/4,
           profileId: myPID,
           isOwner: false,
@@ -226,16 +226,38 @@ class _PostTileState extends State<PostTile> {
             )),
       ),
       Container(
-        child: isExpanded == 1 ? 
+        child:  
         FutureBuilder(
           future: FirebaseStorageService.getImagePost(context, post_id.toString()),
           builder: (context, snapshot) {
             if(snapshot.hasData){
-              return Image.network(snapshot.data);
+              return isExpanded == 1 ? Image.network(
+                snapshot.data,
+                width: screenwidth,
+                fit: BoxFit.fitWidth,
+                loadingBuilder: (context, child, loadingProgress) {
+                  return loadingProgress == null ? child : LinearProgressIndicator();
+                },
+                ) : ClipRect(
+                  child: Container(
+                    child: Align(
+                      heightFactor: 0.3,
+                      widthFactor: 1.0,
+                      child: Image.network(
+                snapshot.data,
+                width: screenwidth,
+                fit: BoxFit.fitWidth,
+                loadingBuilder: (context, child, loadingProgress) {
+                  return loadingProgress == null ? child : LinearProgressIndicator();
+                },
+                ),
+                    ),
+                  ),
+                );
             }
             else return Container();
           },
-        ) : Container()
+        )
       ),
       Row(
         children: [

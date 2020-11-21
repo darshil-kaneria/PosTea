@@ -17,3 +17,5 @@ Color bg3 = Color(0xFFd6e0f0);
 Color barrier = Color(0xFF200f21);
 Color onboardingStart = Color(0xFFda4453);
 Color onboardingEnd = Color(0xFF89216b);
+Color bgColorTemp = Color(0xFFEEE8D5);
+Color postBlockColorTemp = Color(0xFFfdf6e3);

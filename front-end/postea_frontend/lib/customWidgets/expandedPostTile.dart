@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:postea_frontend/colors.dart';
 import 'package:postea_frontend/customWidgets/postTile.dart';
 import 'package:postea_frontend/pages/profile.dart';
 import './comments.dart';
@@ -53,7 +54,7 @@ class ExpandedPostTile extends StatefulWidget {
       this.myPID);
 }
 
-class _ExpandedPostTileState extends State<ExpandedPostTile> {
+class _ExpandedPostTileState extends State<ExpandedPostTile> with SingleTickerProviderStateMixin {
   var post_id;
   var profile_id;
   var post_description;
@@ -82,16 +83,9 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
     var url = "http://postea-server.herokuapp.com/engagement?post_id=" +
         post_id.toString();
     resp = await http.get(url);
-    // print(resp.body);
     return resp;
   }
 
-  // commentsInfo() async {
-  //   Comments comments = new Comments(post_id);
-  //   await comments.getComments();
-  //   print("please print comments");
-  //   print(comments.comments);
-  // }
     var commentController = TextEditingController();
   _ExpandedPostTileState(
       this.post_id,
@@ -114,83 +108,93 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
     // commentsInfo();
 
     double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+    final slideController = AnimationController(vsync: this, duration: Duration(milliseconds: 2000));
+    final slideAnimation = Tween(begin: Offset(0, 0), end: Offset(1, 0)).animate(slideController);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: new AppBar(),
+      appBar: new AppBar(backgroundColor: Colors.white,elevation: 0, iconTheme: IconThemeData(color: Colors.black),),
+      floatingActionButton: FloatingActionButton.extended(
+        backgroundColor: barrier,
+        icon: Icon(Icons.add),
+        label: Text("Add comment"),
+        onPressed: (){}
+        ),
+        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: Container(
         color: Colors.white,
-        child: Column(
+        child: ListView(
+          scrollDirection: Axis.vertical,
           children: [
-            Expanded(
-                flex: 4,
-                child: PostTile(
-                    post_id,
-                    profile_id,
-                    post_description,
-                    topic_id,
-                    post_img,
-                    creation_date,
-                    post_likes,
-                    post_dislikes,
-                    post_comments,
-                    post_title,
-                    name,
-                    myPID,
-                    1))
+            SlideTransition(
+              position: slideAnimation,
+              
+              child: PostTile(
+                  post_id,
+                  profile_id,
+                  post_description,
+                  topic_id,
+                  post_img,
+                  creation_date,
+                  post_likes,
+                  post_dislikes,
+                  post_comments,
+                  post_title,
+                  name,
+                  myPID,
+                  1),
+            )
             ,
-            Expanded(
-              flex: 4,
+            Container(
+              height: screenHeight/1.5,
+              width: screenWidth,
               child: PageView(children: [
-                Card(
-                    margin: EdgeInsets.only(top: 15, left: 15),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)),
-                    child: FutureBuilder(
-                      future: engagementInfo(),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<dynamic> snapshot) {
-                            comments = [];
-                        if (snapshot.hasData) {
-                          bool myComm = false;
-                          var myCommId = 0;
-                          print("response");
-                          var engagements = jsonDecode(snapshot.data.body);
-                          print(engagements[0]['comment']);
+                FutureBuilder(
+                  future: engagementInfo(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<dynamic> snapshot) {
+                        comments = [];
+                    if (snapshot.hasData && snapshot.data.body != "Post does not exist") {
+                      bool myComm = false;
+                      var myCommId = 0;
+                      print("response");
+                      print(snapshot.data.body);
+                      var engagements = jsonDecode(snapshot.data.body);
+                      print(engagements[0]);
 
-                          for (int i = 0; i < engagements.length; i++) {
-                            if (engagements[i]['comment'] == null) {
-                              continue;
-                            }
-                            print(engagements[i]['comment'].toString() != null && engagements[i]['profile_id'].toString() == myPID.toString());
-                            if(engagements[i]['comment'].toString() != null && engagements[i]['profile_id'].toString() == myPID.toString()){
-                              print("IN HERE");
-
-                              commentController.text = engagements[i]['comment'];
-                              comment_string.value = "Edit comment";
-                            }
-                            comments.add(engagements[i]['comment'].toString());
-                          }
-
-                          if (comments.length == 0 || comments == null) {
-                            return Container();
-                          }
-
-                          return ListView.builder(
-                              itemCount: comments.length,
-                              shrinkWrap: true,
-                              itemBuilder: (BuildContext context, int index) {
-                                print('in list view builder');
-                                print(comments.elementAt(index));
-                                return Comments(
-                                    comments.elementAt(index), "Darshil");
-                              });
-                        } else {
-                          return Container();
+                      for (int i = 0; i < engagements.length; i++) {
+                        if (engagements[i]['comment'] == null) {
+                          continue;
                         }
-                      },
-                    )
-                    ),
+                        print(engagements[i]['comment'].toString() != null && engagements[i]['profile_id'].toString() == myPID.toString());
+                        if(engagements[i]['comment'].toString() != null && engagements[i]['profile_id'].toString() == myPID.toString()){
+                          print("IN HERE");
+
+                          commentController.text = engagements[i]['comment'];
+                          comment_string.value = "Edit comment";
+                        }
+                        comments.add(engagements[i]['comment'].toString());
+                      }
+
+                      if (comments.length == 0 || comments == null) {
+                        return Container();
+                      }
+
+                      return ListView.builder(
+                          itemCount: comments.length,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            print('in list view builder');
+                            print(comments.elementAt(index));
+                            return Comments(
+                                comments.elementAt(index), "Darshil");
+                          });
+                    } else {
+                      return Container();
+                    }
+                  },
+                ),
                 Container(
                   margin: EdgeInsets.only(left: 15, right: 15),
                   child: TextField(
@@ -200,43 +204,38 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
                 )
               ]),
             ),
-            Expanded(
-                flex: 1,
-                child: ButtonTheme(
-                  child: Container(
-                    width: MediaQuery.of(context).size.width / 2.6,
-                    height: MediaQuery.of(context).size.height / 2,
-                    child: RaisedButton(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                      child: ValueListenableBuilder(
-                        valueListenable: comment_string,
-                        builder: (_, value, __) => Text(
-                          value.toString(),
-                          style: TextStyle(fontSize: 15),
-                        ),
-                      ),
-                      onPressed: () async {
-                        var reqBody = {
-                          "engagement_post_id": post_id,
-                          "engagement_profile_id": myPID,
-                          "like_dislike": null,
-                          "comment": commentController.text == "" ? null: commentController.text
-                        };
-
-                        var reqBodyJson = jsonEncode(reqBody);
-                        http.post(
-                          "http://postea-server.herokuapp.com/engagement",
-                          headers: {"Content-Type": "application/json"},
-                          body: reqBodyJson
-                        ).then((value) => print(value.body));
-                      },
-                    ),
+            ButtonTheme(
+              child: RaisedButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20)),
+                child: ValueListenableBuilder(
+                  valueListenable: comment_string,
+                  builder: (_, value, __) => Text(
+                    value.toString(),
+                    style: TextStyle(fontSize: 15),
                   ),
-                ))
+                ),
+                onPressed: () async {
+                  var reqBody = {
+                    "engagement_post_id": post_id,
+                    "engagement_profile_id": myPID,
+                    "like_dislike": null,
+                    "comment": commentController.text == "" ? null: commentController.text
+                  };
+
+                  var reqBodyJson = jsonEncode(reqBody);
+                  http.post(
+                    "http://postea-server.herokuapp.com/engagement",
+                    headers: {"Content-Type": "application/json"},
+                    body: reqBodyJson
+                  ).then((value) => print(value.body));
+                },
+              ),
+            )
           ],
         ),
       ),
+      
     );
   }
 }
