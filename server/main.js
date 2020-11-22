@@ -145,19 +145,9 @@ app.route("/topicfollowdata")
   const handle = fork("./func/delete_topic_follower.js");
   handle.send(req.body);
   handle.on("message", message => res.send(message));
-})
+});
 
 // User Follow data methods
-
-app.get("/search",(req, res) =>{
-  const handle = fork("./func/search.js");
-  var data = {
-    text: req.query.text
-  }
-  handle.send(data);
-  handle.on("message", message => res.send(message));
-  
-})
 app.route("/followdata")
   .get((req, res) => {
     const handle = fork("./func/get_follow_data.js");
@@ -197,7 +187,14 @@ app.route("/topic")
     const handtopic = fork('./func/delete_topic.js');
     handtopic.send(req.body);
     handtopic.on("message", message => res.send(message));
-  })
+  });
+
+app.route("/profileMode")
+    .post((req, res) => {
+      const handleProfileMode = fork('./func/update_profile_mode.js');
+      handleProfileMode.send(req.body);
+      handleProfileMode.on("message", message => res.send(message));
+    });
 
 /**
  * Individual end points
@@ -211,6 +208,14 @@ app.get('/selectposts', (req, res) => {
     select.on("message", message => res.send(message));
   });
 
+app.get("/search",(req, res) =>{
+  const handle = fork("./func/search.js");
+  var data = {
+    text: req.query.text
+  }
+  handle.send(data);
+  handle.on("message", message => res.send(message));
+});
 // Add new user
 app.post('/adduser', (req, res) => {
   const handlePosts = fork('./func/add_user.js');
