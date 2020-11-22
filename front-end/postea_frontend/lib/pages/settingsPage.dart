@@ -19,30 +19,38 @@ class _SettingsPageState extends State<SettingsPage> {
   var emailController = new TextEditingController();
   var passwordController = new TextEditingController();
 
+  ValueNotifier<bool> profileToggle = new ValueNotifier(false);
+  ValueNotifier<bool> themeToggle = new ValueNotifier(false);
+
   toggleButton() {
-    setState(() {
-      if (toggleColor) {
-        toggleColor = false;
-        toggle = Colors.redAccent[100].withOpacity(0.5);
-      } else {
-        toggleColor = true;
-        toggle = Colors.greenAccent[100];
-      }
-    });
+    if (profileToggle.value) {
+      toggle = Colors.redAccent.withOpacity(0.5);
+      profileToggle.value = false;
+    } else {
+      toggle = Colors.greenAccent;
+      profileToggle.value = true;
+    }
   }
 
   darkModetoggleButton() {
-    setState(() {
-      if (darkModeToggle) {
-        darkModeToggle = false;
-        // darkModeToggleColor = Colors.redAccent[100].withOpacity(0.5);
-        darkModeToggleColor = Colors.greenAccent[100];
-      } else {
-        darkModeToggle = true;
-        darkModeToggleColor = Colors.redAccent[100].withOpacity(0.5);
-        // darkModeToggleColor = Colors.greenAccent[100];
-      }
-    });
+    if (themeToggle.value) {
+      darkModeToggleColor = Colors.redAccent.withOpacity(0.5);
+      profileToggle.value = false;
+    } else {
+      darkModeToggleColor = Colors.greenAccent;
+      themeToggle.value = true;
+    }
+    // setState(() {
+    //   if (darkModeToggle) {
+    //     darkModeToggle = false;
+    //     // darkModeToggleColor = Colors.redAccent[100].withOpacity(0.5);
+    //     darkModeToggleColor = Colors.greenAccent[100];
+    //   } else {
+    //     darkModeToggle = true;
+    //     darkModeToggleColor = Colors.redAccent[100].withOpacity(0.5);
+    //     // darkModeToggleColor = Colors.greenAccent[100];
+    //   }
+    // });
   }
 
   @override
@@ -83,48 +91,56 @@ class _SettingsPageState extends State<SettingsPage> {
                       style: TextStyle(fontSize: 18),
                     ),
                     Spacer(),
-                    AnimatedContainer(
-                      duration: Duration(milliseconds: 1000),
-                      height: 20,
-                      width: 50,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: toggle),
-                      child: Stack(
-                        children: [
-                          AnimatedPositioned(
-                              child: InkWell(
-                                onTap: toggleButton,
-                                child: AnimatedSwitcher(
-                                    duration: Duration(milliseconds: 1000),
-                                    transitionBuilder: (Widget child,
-                                        Animation<double> animation) {
-                                      return ScaleTransition(
-                                        child: child,
-                                        scale: animation,
-                                      );
+                    ValueListenableBuilder(
+                      valueListenable: profileToggle,
+                      builder: (context, value, child) {
+                        return AnimatedContainer(
+                          duration: Duration(milliseconds: 200),
+                          height: 20,
+                          width: 50,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: toggle),
+                          child: Stack(
+                            children: [
+                              AnimatedPositioned(
+                                  child: InkWell(
+                                    onTap: () {
+                                      toggleButton();
                                     },
-                                    child: toggleColor
-                                        ? Icon(
-                                            Icons.check_circle,
-                                            color: Colors.green,
-                                            size: 15,
-                                            key: UniqueKey(),
-                                          )
-                                        : Icon(
-                                            Icons.remove_circle_outline,
-                                            color: Colors.red,
-                                            size: 15,
-                                            key: UniqueKey(),
-                                          )),
-                              ),
-                              duration: Duration(milliseconds: 1000),
-                              curve: Curves.easeIn,
-                              top: 3,
-                              left: toggleColor ? 30 : 0,
-                              right: toggleColor ? 0 : 30)
-                        ],
-                      ),
+                                    child: AnimatedSwitcher(
+                                      duration: Duration(milliseconds: 200),
+                                      transitionBuilder: (Widget child,
+                                          Animation<double> animation) {
+                                        return ScaleTransition(
+                                          child: child,
+                                          scale: animation,
+                                        );
+                                      },
+                                      child: value
+                                          ? Icon(
+                                              Icons.check_circle,
+                                              color: Colors.green,
+                                              size: 15,
+                                              key: UniqueKey(),
+                                            )
+                                          : Icon(
+                                              Icons.remove_circle_outline,
+                                              color: Colors.red,
+                                              size: 15,
+                                              key: UniqueKey(),
+                                            ),
+                                    ),
+                                  ),
+                                  duration: Duration(milliseconds: 200),
+                                  curve: Curves.easeIn,
+                                  top: 3,
+                                  left: value ? 30 : 0,
+                                  right: value ? 0 : 30),
+                            ],
+                          ),
+                        );
+                      },
                     )
                   ],
                 ),
@@ -152,48 +168,63 @@ class _SettingsPageState extends State<SettingsPage> {
                       style: TextStyle(fontSize: 18),
                     ),
                     Spacer(),
-                    AnimatedContainer(
-                      duration: Duration(milliseconds: 1000),
-                      height: 20,
-                      width: 50,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(20),
-                          color: darkModeToggleColor),
-                      child: Stack(
-                        children: [
-                          AnimatedPositioned(
-                              child: InkWell(
-                                onTap: darkModetoggleButton(),
-                                child: AnimatedSwitcher(
-                                    duration: Duration(milliseconds: 1000),
-                                    transitionBuilder: (Widget child,
-                                        Animation<double> animation) {
-                                      return ScaleTransition(
-                                        child: child,
-                                        scale: animation,
-                                      );
+                    ValueListenableBuilder(
+                      valueListenable: themeToggle,
+                      builder: (context, value, child) {
+                        return AnimatedContainer(
+                          duration: Duration(milliseconds: 200),
+                          height: 20,
+                          width: 50,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              color: darkModeToggleColor),
+                          child: Stack(
+                            children: [
+                              AnimatedPositioned(
+                                  child: InkWell(
+                                    onTap: () {
+                                      if (themeToggle.value) {
+                                        darkModeToggleColor =
+                                            Colors.redAccent.withOpacity(0.5);
+                                        themeToggle.value = false;
+                                      } else {
+                                        darkModeToggleColor =
+                                            Colors.greenAccent;
+                                        themeToggle.value = true;
+                                      }
                                     },
-                                    child: darkModeToggle
-                                        ? Icon(
-                                            Icons.check_circle,
-                                            color: Colors.green,
-                                            size: 15,
-                                            key: UniqueKey(),
-                                          )
-                                        : Icon(
-                                            Icons.remove_circle_outline,
-                                            color: Colors.red,
-                                            size: 15,
-                                            key: UniqueKey(),
-                                          )),
-                              ),
-                              duration: Duration(milliseconds: 1000),
-                              curve: Curves.easeIn,
-                              top: 3,
-                              left: darkModeToggle ? 30 : 0,
-                              right: darkModeToggle ? 0 : 30)
-                        ],
-                      ),
+                                    child: AnimatedSwitcher(
+                                        duration: Duration(milliseconds: 200),
+                                        transitionBuilder: (Widget child,
+                                            Animation<double> animation) {
+                                          return ScaleTransition(
+                                            child: child,
+                                            scale: animation,
+                                          );
+                                        },
+                                        child: value
+                                            ? Icon(
+                                                Icons.check_circle,
+                                                color: Colors.green,
+                                                size: 15,
+                                                key: UniqueKey(),
+                                              )
+                                            : Icon(
+                                                Icons.remove_circle_outline,
+                                                color: Colors.red,
+                                                size: 15,
+                                                key: UniqueKey(),
+                                              )),
+                                  ),
+                                  duration: Duration(milliseconds: 200),
+                                  curve: Curves.easeIn,
+                                  top: 3,
+                                  left: value ? 30 : 0,
+                                  right: value ? 0 : 30)
+                            ],
+                          ),
+                        );
+                      },
                     ),
                   ],
                 ),
