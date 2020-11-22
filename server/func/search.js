@@ -47,7 +47,7 @@ const search = (text, connection) => {
                     result[i].type = "profile";
 
                 }
-                var profiles = result;
+                profiles.push(result);
                 console.log(profiles);
                 
 
@@ -66,8 +66,8 @@ const search = (text, connection) => {
                     
     
                 }
-                var results = profiles.concat(topics);
-                resolve(results);
+                profiles.push(topics);
+                resolve(profiles);
     
             });
             
