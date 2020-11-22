@@ -45,9 +45,10 @@ const search = (text, connection) => {
                 
                 for (var i = 0; i < result.length; i++) {
                     result[i].type = "profile";
+                    profiles.push(result[i]);
 
                 }
-                profiles.push(result);
+                
                 console.log(profiles);
                 
 
@@ -59,6 +60,7 @@ const search = (text, connection) => {
                 if (result.length > 0) {
                     for (var i = 0; i < result.length; i++) {
                         result[i].type = "topic";
+                        profiles.push(result[i]);
     
                     }
                     var topics = result;
@@ -66,7 +68,7 @@ const search = (text, connection) => {
                     
     
                 }
-                profiles.push(topics);
+                
                 resolve(profiles);
     
             });
