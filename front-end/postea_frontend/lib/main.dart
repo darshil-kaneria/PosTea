@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:postea_frontend/colors.dart';
 import 'package:postea_frontend/pages/homepage.dart';
 import 'package:postea_frontend/pages/loggedIn.dart';
 import 'package:provider/provider.dart';
@@ -62,6 +63,16 @@ class _PosTeaState extends State<PosTea> {
     return ChangeNotifierProvider(
         create: (context) => TimerCount(),
         child: MaterialApp(
+          theme: ThemeData(
+            primaryColorLight: bgColor,
+            cardColor: postTileDark,
+            primaryColorDark: bgColorDark,
+            textTheme: TextTheme(
+              headline1: TextStyle(fontSize: 16, color: Colors.white),
+              headline2: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+              headline3: TextStyle(fontSize: 13, color: Colors.white)
+            )
+          ),
           debugShowCheckedModeBanner: false,
           title: "PosTea app",
           initialRoute: firstScreen,

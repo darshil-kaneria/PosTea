@@ -70,7 +70,7 @@ class _HomePageState extends State<HomePage> {
     // }
 
     if (checkPosScrollController.offset >=
-            checkPosScrollController.position.maxScrollExtent/2.0 &&
+            checkPosScrollController.position.maxScrollExtent &&
         !checkPosScrollController.position.outOfRange) {
       print("ISPOST" + timeLine.postRetrieved.toString());
       if (!timeLine.isEnd && timeLine.postRetrieved)

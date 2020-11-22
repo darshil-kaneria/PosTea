@@ -19,3 +19,5 @@ Color onboardingStart = Color(0xFFda4453);
 Color onboardingEnd = Color(0xFF89216b);
 Color bgColorTemp = Color(0xFFEEE8D5);
 Color postBlockColorTemp = Color(0xFFfdf6e3);
+Color bgColorDark = Color(0xFF222831);
+Color postTileDark = Color(0xFF2d132c);
