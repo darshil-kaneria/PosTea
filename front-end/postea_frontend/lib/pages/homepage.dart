@@ -60,6 +60,8 @@ class _HomePageState extends State<HomePage> {
   var is_private = 0;
   var postID;
   var offset = 0;
+
+  SharedPreferences pref;
   // var searchResults = [];
 
   ValueNotifier<int> searchNow = ValueNotifier<int>(0);
@@ -174,12 +176,18 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
+  initializeSharedPref() async {
+    pref = await SharedPreferences.getInstance();
+  }
+
   @override
   Widget build(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
 
     PageController pageController = new PageController(initialPage: 0);
+
+    initializeSharedPref();
 
     return PageView(
       controller: pageController,
@@ -223,8 +231,6 @@ class _HomePageState extends State<HomePage> {
                     color: Colors.black,
                   ),
                   onTap: () async {
-                    SharedPreferences pref =
-                        await SharedPreferences.getInstance();
                     pref.clear().then((value) async {
                       if (value == true) {
                         await FirebaseAuth.instance.signOut();
