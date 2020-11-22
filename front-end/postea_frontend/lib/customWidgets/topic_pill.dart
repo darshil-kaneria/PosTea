@@ -4,6 +4,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:postea_frontend/colors.dart';
 import '../pages/topic.dart';
 
 class TopicPill extends StatefulWidget {
@@ -71,6 +72,7 @@ class _TopicPillState extends State<TopicPill> {
         height: widget.height,
         width: widget.width,
         decoration: BoxDecoration(
+          // border: Border.all(color: bgColor),
             gradient: LinearGradient(colors: [widget.col1, widget.col2]),
             borderRadius: BorderRadius.all(Radius.circular(50))),
         child: Center(
