@@ -178,10 +178,11 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
-
+    isAnonColor = Theme.of(context).hintColor;
     PageController pageController = new PageController(initialPage: 0);
 
     return PageView(
+      physics: NeverScrollableScrollPhysics(),
       controller: pageController,
       children: [
         Scaffold(
@@ -204,10 +205,11 @@ class _HomePageState extends State<HomePage> {
                   decoration: BoxDecoration(color: Colors.purple[900]),
                 ),
                 ListTile(
-                  title: Text("Settings"),
+                  title: Text("Settings", style: TextStyle(color: Theme.of(context).buttonColor),),
                   leading: Icon(
                     Icons.settings,
-                    color: Colors.black,
+                    size: 20,
+                    color: Theme.of(context).buttonColor,
                   ),
                   onTap: () async {
                     Navigator.push(
@@ -217,10 +219,10 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
                 ListTile(
-                  title: Text("Logout"),
+                  title: Text("Logout", style: TextStyle(color: Theme.of(context).buttonColor)),
                   leading: Icon(
                     Icons.exit_to_app,
-                    color: Colors.black,
+                    color: Theme.of(context).buttonColor,
                   ),
                   onTap: () async {
                     SharedPreferences pref =
@@ -279,6 +281,7 @@ class _HomePageState extends State<HomePage> {
                           return true;
                         },
                         child: Dialog(
+                          backgroundColor: Theme.of(context).accentColor,
                           shape: RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(20))),
@@ -296,6 +299,7 @@ class _HomePageState extends State<HomePage> {
                                         left: 18, right: 18, top: 15),
                                     color: Colors.transparent,
                                     child: TextField(
+                                      cursorColor: Colors.black,
                                       decoration: InputDecoration(
                                         border: InputBorder.none,
                                         hintText: "Title",
@@ -313,11 +317,12 @@ class _HomePageState extends State<HomePage> {
                                         EdgeInsets.symmetric(horizontal: 18),
                                     scrollDirection: Axis.vertical,
                                     child: TextField(
+                                      cursorColor: Colors.black,
                                       maxLines: null,
                                       keyboardType: TextInputType.multiline,
                                       decoration: InputDecoration(
                                           border: InputBorder.none,
-                                          hintText: "Post description"),
+                                          hintText: "Post description",),
                                       controller: postTextController,
                                     ),
                                   ),
@@ -333,7 +338,7 @@ class _HomePageState extends State<HomePage> {
                                         IconButton(
                                             icon: Icon(
                                               Icons.image,
-                                              color: Colors.grey,
+                                              color: Theme.of(context).hintColor,
                                             ),
                                             onPressed: () async {
                                               await pickImage();
@@ -349,7 +354,7 @@ class _HomePageState extends State<HomePage> {
                                         IconButton(
                                             icon: Icon(
                                               Icons.attachment,
-                                              color: Colors.grey,
+                                              color: Theme.of(context).hintColor,
                                             ),
                                             onPressed: () {}),
                                         IconButton(
@@ -364,7 +369,7 @@ class _HomePageState extends State<HomePage> {
                                                     Colors.deepOrange[100];
                                               } else if (isAnonymous == 1) {
                                                 isAnonymous = 0;
-                                                isAnonColor = Colors.grey;
+                                                isAnonColor = Theme.of(context).hintColor;
                                               }
                                               setState(() {});
                                               print(isAnonymous);
@@ -372,7 +377,8 @@ class _HomePageState extends State<HomePage> {
                                         IconButton(
                                           icon: Icon(
                                             CupertinoIcons.eye,
-                                            size: 35,
+                                            color: Theme.of(context).hintColor,
+                                            size: 30,
                                           ),
                                           onPressed: () {},
                                         ),
@@ -516,7 +522,7 @@ class _HomePageState extends State<HomePage> {
             backgroundColor: Colors.transparent,
             // leading: Icon(Icons.menu),
             elevation: 0,
-            iconTheme: IconThemeData(color: Colors.black),
+            iconTheme: IconThemeData(color: Theme.of(context).buttonColor,),
             actions: <Widget>[
               IconButton(
                 icon: Icon(
@@ -549,7 +555,7 @@ class _HomePageState extends State<HomePage> {
                   }),
             ],
           ),
-          backgroundColor: bgColor,
+          backgroundColor: Theme.of(context).canvasColor,
           body: Column(
             children: [
               Container(
@@ -561,8 +567,8 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     TopicPill(
                       topicId: 2,
-                      col1: Colors.purple[900],
-                      col2: Colors.purple[400],
+                      col1: Theme.of(context).primaryColorLight,
+                      col2: Theme.of(context).primaryColorDark,
                       height: screenHeight / 15,
                       width: screenWidth / 4,
                       profileId: widget.profileID,
@@ -570,8 +576,8 @@ class _HomePageState extends State<HomePage> {
                     ),
                     TopicPill(
                       topicId: 26894,
-                      col1: Colors.green[700],
-                      col2: Colors.lightGreen[400],
+                      col1: Theme.of(context).primaryColorLight,
+                      col2: Theme.of(context).primaryColorDark,
                       height: screenHeight / 15,
                       width: screenWidth / 4,
                       profileId: widget.profileID,
@@ -579,8 +585,8 @@ class _HomePageState extends State<HomePage> {
                     ),
                     TopicPill(
                       topicId: 51561,
-                      col1: Colors.blue[700],
-                      col2: Colors.lightBlueAccent[200],
+                      col1: Theme.of(context).primaryColorLight,
+                      col2: Theme.of(context).primaryColorDark,
                       height: screenHeight / 15,
                       width: screenWidth / 4,
                       profileId: widget.profileID,
@@ -588,8 +594,8 @@ class _HomePageState extends State<HomePage> {
                     ),
                     TopicPill(
                       topicId: 99841,
-                      col1: Colors.red[700],
-                      col2: Colors.pink[400],
+                      col1: Theme.of(context).primaryColorLight,
+                      col2: Theme.of(context).primaryColorDark,
                       height: screenHeight / 15,
                       width: screenWidth / 4,
                       profileId: widget.profileID,
@@ -684,221 +690,236 @@ class _HomePageState extends State<HomePage> {
             // )
           ),
         ),
-        Container(
-          color: bgColor,
+        SafeArea(
           child: Container(
-            margin: EdgeInsets.only(top: 40, left: 10, right: 10),
-            child: Column(
-              children: [
-                Material(
-                  color: Colors.white,
-                  elevation: 2,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30)),
-                  child: Row(
-                    children: [
-                      IconButton(
-                          icon: Icon(
-                            Icons.arrow_back_ios,
-                            size: 20,
-                          ),
-                          onPressed: () {
-                            pageController.animateToPage(0,
-                                duration: Duration(milliseconds: 100),
-                                curve: Curves.bounceInOut);
+            color: Theme.of(context).canvasColor,
+            child: Container(
+              margin: EdgeInsets.only(top: screenHeight/25),
+              child: Column(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 10),
+                      child: Material(
+                        type: MaterialType.card,
+                        clipBehavior: Clip.antiAlias,
+                        color: Theme.of(context).bottomAppBarColor,
+                        elevation: 2,
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(30)),
+                        child: Row(
+                          children: [
+                            IconButton(
+                                icon: Icon(
+                                  Icons.arrow_back_ios,
+                                  size: 20,
+                                ),
+                                onPressed: () {
+                                  pageController.animateToPage(0,
+                                      duration: Duration(milliseconds: 100),
+                                      curve: Curves.bounceInOut);
 
-                            searchTextController.clear();
-                          }),
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          left: 7,
-                          right: 18,
-                        ),
-                        child: Container(
-                          width: screenWidth / 1.7,
-                          height: screenHeight / 15,
-                          child: TextField(
-                            controller: searchTextController,
-                            decoration: InputDecoration(
-                                hintText: "Search", border: InputBorder.none),
-                          ),
+                                  searchTextController.clear();
+                                }),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                left: 7,
+                                right: 18,
+                              ),
+                              child: Container(
+                                width: screenWidth / 1.7,
+                                height: screenHeight / 15,
+                                child: TextField(
+                                  controller: searchTextController,
+                                  decoration: InputDecoration(
+                                      hintText: "Search", border: InputBorder.none),
+                                ),
+                              ),
+                            ),
+                            Spacer(),
+                            Padding(
+                              padding: const EdgeInsets.only(right: 10),
+                              child: IconButton(
+                                icon: Icon(Icons.search),
+                                onPressed: () {
+                                  searchNow.value += 1;
+                                },
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      Spacer(),
-                      Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: IconButton(
-                          icon: Icon(Icons.search),
-                          onPressed: () {
-                            searchNow.value += 1;
-                          },
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-                Container(
-                  height: screenHeight / 1.2,
-                  margin: EdgeInsets.only(top: 10),
-                  child: ValueListenableBuilder(
-                      valueListenable: searchNow,
-                      builder: (_, value, __) {
-                        if (value > 0) {
-                          return FutureBuilder(
-                              future:
-                                  getSearchResults(searchTextController.text),
-                              builder: (BuildContext context,
-                                  AsyncSnapshot<http.Response> snapshot) {
-                                if (snapshot.hasData) {
-                                  List searchResults =
-                                      jsonDecode(snapshot.data.body);
+                  Expanded(
+                    flex: 13,
+                    child: Container(
+                      // height: screenHeight / 1.2,
+                      margin: EdgeInsets.only(top: 10),
+                      child: ValueListenableBuilder(
+                          valueListenable: searchNow,
+                          builder: (_, value, __) {
+                            if (value > 0) {
+                              return FutureBuilder(
+                                  future:
+                                      getSearchResults(searchTextController.text),
+                                  builder: (BuildContext context,
+                                      AsyncSnapshot<http.Response> snapshot) {
+                                    if (snapshot.hasData) {
+                                      List searchResults =
+                                          jsonDecode(snapshot.data.body);
 
-                                  print(searchResults);
-                                  print("len of search results is " +
-                                      searchResults.length.toString());
-                                  return Material(
-                                    child: ListView.builder(
-                                      itemCount: searchResults.length,
-                                      itemBuilder: (context, index) {
-                                        print("index is " + index.toString());
-                                        print("dict at index is " +
-                                            searchResults[index].toString());
-                                        if (searchResults[index] != null) {
-                                          if (searchResults[index]['type'] ==
-                                              "profile") {
-                                            return ListTile(
-                                              onTap: () {
-                                                if (searchResults[index]
-                                                        ['profile_id'] ==
-                                                    widget.profileID) {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          Profile(
-                                                        profileId:
-                                                            searchResults[index]
-                                                                ['profile_id'],
-                                                        isOwner: true,
-                                                      ),
-                                                    ),
-                                                  );
-                                                } else {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          Profile(
-                                                        profileId:
-                                                            searchResults[index]
-                                                                ['profile_id'],
-                                                        isOwner: false,
-                                                      ),
-                                                    ),
-                                                  );
-                                                }
-                                              },
-                                              leading: CircleAvatar(
-                                                backgroundImage: NetworkImage(
-                                                    "https://picsum.photos/250?image=18"),
-                                              ),
-                                              title: Text(searchResults[index]
-                                                      ['name']
-                                                  .toString()),
-                                              subtitle: Text(
-                                                  searchResults[index]['type']
-                                                      .toString()),
-                                            );
-                                          } else {
-                                            return ListTile(
-                                              onTap: () {
-                                                if (true) {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          Topic(
-                                                        profileId:
-                                                            widget.profileID,
-                                                        topicId:
-                                                            searchResults[index]
-                                                                ['topic_id'],
-                                                        isOwner: true,
-                                                      ),
-                                                    ),
-                                                  );
-                                                } else {
-                                                  Navigator.push(
-                                                    context,
-                                                    MaterialPageRoute(
-                                                      builder: (context) =>
-                                                          Topic(
-                                                        profileId:
-                                                            widget.profileID,
-                                                        topicId:
-                                                            searchResults[index]
-                                                                ['topic_id'],
-                                                        isOwner: false,
-                                                      ),
-                                                    ),
-                                                  );
-                                                }
-                                              },
-                                              leading: CircleAvatar(
-                                                backgroundImage: NetworkImage(
-                                                    "https://picsum.photos/250?image=18"),
-                                              ),
-                                              title: Text(searchResults[index]
-                                                      ['topic_name']
-                                                  .toString()),
-                                              subtitle: Text(
-                                                  searchResults[index]['type']
-                                                      .toString()),
-                                            );
-                                          }
-                                        } else {
-                                          return Container();
-                                        }
-                                      },
-                                    ),
-                                  );
-                                } else {
-                                  if (searchTextController.text.isNotEmpty) {
-                                    return Center(
-                                      child: CircularProgressIndicator(
-                                        valueColor:
-                                            AlwaysStoppedAnimation(bgGradEnd),
-                                      ),
-                                    );
-                                  } else {
-                                    return Container();
-                                  }
-                                }
-                              });
-                        } else {
-                          return Container();
-                        }
-                      }),
-                  // ValueListenableBuilder(
-                  //   valueListenable: searchNow,
-                  //   builder: (_, value, __) {
-                  //     return Container(
-                  //       child: ListView.builder(
-                  //           itemCount: searchResults.length,
-                  //           itemBuilder: (context, index) {
-                  //             return ListTile(
-                  //               leading: Image(
-                  //                   image: NetworkImage(
-                  //                       "https://picsum.photos/250?image=18")),
-                  //               title: searchResults[index]['name'],
-                  //               subtitle: searchResults[index]['type'],
-                  //             );
-                  //           }),
-                  //     );
-                  //   },
-                  // ),
-                ),
-              ],
+                                      print(searchResults);
+                                      print("len of search results is " +
+                                          searchResults.length.toString());
+                                      return Material(
+                                        color: Theme.of(context).canvasColor,
+                                        child: ListView.builder(
+                                          physics: BouncingScrollPhysics(),
+                                          itemCount: searchResults.length,
+                                          itemBuilder: (context, index) {
+                                            print("index is " + index.toString());
+                                            print("dict at index is " +
+                                                searchResults[index].toString());
+                                            if (searchResults[index] != null) {
+                                              if (searchResults[index]['type'] ==
+                                                  "profile") {
+                                                return ListTile(
+                                                  onTap: () {
+                                                    if (searchResults[index]
+                                                            ['profile_id'] ==
+                                                        widget.profileID) {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              Profile(
+                                                            profileId:
+                                                                searchResults[index]
+                                                                    ['profile_id'],
+                                                            isOwner: true,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    } else {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              Profile(
+                                                            profileId:
+                                                                searchResults[index]
+                                                                    ['profile_id'],
+                                                            isOwner: false,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }
+                                                  },
+                                                  leading: CircleAvatar(
+                                                    backgroundImage: NetworkImage(
+                                                        "https://picsum.photos/250?image=18"),
+                                                  ),
+                                                  title: Text(searchResults[index]
+                                                          ['name']
+                                                      .toString(), style: Theme.of(context).textTheme.headline1,),
+                                                  subtitle: Text(
+                                                      searchResults[index]['type']
+                                                          .toString(), style: Theme.of(context).textTheme.headline3),
+                                                );
+                                              } else {
+                                                return ListTile(
+                                                  onTap: () {
+                                                    if (true) {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              Topic(
+                                                            profileId:
+                                                                widget.profileID,
+                                                            topicId:
+                                                                searchResults[index]
+                                                                    ['topic_id'],
+                                                            isOwner: true,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    } else {
+                                                      Navigator.push(
+                                                        context,
+                                                        MaterialPageRoute(
+                                                          builder: (context) =>
+                                                              Topic(
+                                                            profileId:
+                                                                widget.profileID,
+                                                            topicId:
+                                                                searchResults[index]
+                                                                    ['topic_id'],
+                                                            isOwner: false,
+                                                          ),
+                                                        ),
+                                                      );
+                                                    }
+                                                  },
+                                                  leading: CircleAvatar(
+                                                    backgroundImage: NetworkImage(
+                                                        "https://picsum.photos/250?image=18"),
+                                                  ),
+                                                  title: Text(searchResults[index]
+                                                          ['topic_name']
+                                                      .toString(), style: Theme.of(context).textTheme.headline1),
+                                                  subtitle: Text(
+                                                      searchResults[index]['type']
+                                                          .toString(), style: Theme.of(context).textTheme.headline3),
+                                                );
+                                              }
+                                            } else {
+                                              return Container();
+                                            }
+                                          },
+                                        ),
+                                      );
+                                    } else {
+                                      if (searchTextController.text.isNotEmpty) {
+                                        return Center(
+                                          child: CircularProgressIndicator(
+                                            valueColor:
+                                                AlwaysStoppedAnimation(bgGradEnd),
+                                          ),
+                                        );
+                                      } else {
+                                        return Container();
+                                      }
+                                    }
+                                  });
+                            } else {
+                              return Container();
+                            }
+                          }),
+                      // ValueListenableBuilder(
+                      //   valueListenable: searchNow,
+                      //   builder: (_, value, __) {
+                      //     return Container(
+                      //       child: ListView.builder(
+                      //           itemCount: searchResults.length,
+                      //           itemBuilder: (context, index) {
+                      //             return ListTile(
+                      //               leading: Image(
+                      //                   image: NetworkImage(
+                      //                       "https://picsum.photos/250?image=18")),
+                      //               title: searchResults[index]['name'],
+                      //               subtitle: searchResults[index]['type'],
+                      //             );
+                      //           }),
+                      //     );
+                      //   },
+                      // ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         )

@@ -130,8 +130,10 @@ class _PostTileState extends State<PostTile> {
       ListTile(
         trailing: TopicPill(
           topicId: topic_id,
-          col1: Colors.purple[900],
-          col2: Colors.purple[400],
+          // col1: Colors.purple[900],
+          // col2: Colors.purple[400],
+          col1: Theme.of(context).primaryColorLight,
+          col2: Theme.of(context).primaryColorDark,
           height: screenheight/20,
           width: screenwidth/4,
           profileId: myPID,
@@ -176,7 +178,7 @@ class _PostTileState extends State<PostTile> {
         ),
         title: Text(
           profile_id != -1?name:"Anonymous",
-          style: TextStyle(fontSize: 16),
+          style: Theme.of(context).textTheme.headline1,
         ),
         // subtitle: Row(
         //   children: [
@@ -219,10 +221,10 @@ class _PostTileState extends State<PostTile> {
                 EdgeInsets.symmetric(vertical: 0, horizontal: 0),
             title: Text(post_title,
                 style:
-                    TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                    Theme.of(context).textTheme.headline2),
             subtitle: AutoSizeText(
               post_description,
-              style: TextStyle(fontSize: 13, color: Colors.black),
+              style: Theme.of(context).textTheme.headline3,
             )),
       ),
       Container(
@@ -272,7 +274,7 @@ class _PostTileState extends State<PostTile> {
                 child: IconButton(
                   icon: Icon(
                     Icons.thumb_up,
-                    color: like_color,
+                    color: Theme.of(context).buttonColor,
                   ),
                   iconSize: 16,
                   onPressed: () {
@@ -321,7 +323,7 @@ class _PostTileState extends State<PostTile> {
             child: IconButton(
               icon: Icon(
                 Icons.thumb_down,
-                color: dislike_color,
+                color: Theme.of(context).buttonColor,
               ),
               iconSize: 16,
               onPressed: () {
@@ -361,7 +363,7 @@ class _PostTileState extends State<PostTile> {
             badgeContent: Text(post_comments.toString(), style: TextStyle(fontSize: 10),),
             animationType: BadgeAnimationType.fade,
             child: IconButton(
-              icon: Icon(Icons.comment),
+              icon: Icon(Icons.comment, color: Theme.of(context).buttonColor,),
               iconSize: 16,
               onPressed: () {},
             ),

@@ -43,16 +43,16 @@ class CustomNavBar extends StatelessWidget{
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            IconButton(icon: Icon(Icons.home, color: Colors.blueGrey[800]),onPressed: (){
+            IconButton(icon: Icon(Icons.home, color: Theme.of(context).buttonColor),onPressed: (){
               onTap(0);
               }),
-            IconButton(icon: Icon(Icons.create, color: Colors.blueGrey[800],), onPressed: (){
+            IconButton(icon: Icon(Icons.create, color: Theme.of(context).buttonColor), onPressed: (){
               onTap(1);
               }),
-            IconButton(icon: Icon(Icons.trending_up, color: Colors.blueGrey[800],), onPressed: (){
+            IconButton(icon: Icon(Icons.trending_up, color: Theme.of(context).buttonColor), onPressed: (){
               onTap(2);
               }),
-            IconButton(icon: Icon(Icons.alternate_email, color: Colors.blueGrey[800],), onPressed: (){
+            IconButton(icon: Icon(Icons.alternate_email, color: Theme.of(context).buttonColor), onPressed: (){
               onTap(3);
               })
           ],
