@@ -1,9 +1,13 @@
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import './login.dart';
 import '../data_models/delete_user.dart';
 import 'package:postea_frontend/pages/securitySettings.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -14,28 +18,68 @@ class _SettingsPageState extends State<SettingsPage> {
   bool toggleColor = false;
   Color toggle = Colors.redAccent[100].withOpacity(0.5);
   bool darkModeToggle = false;
+  bool profileMode = false;
   Color darkModeToggleColor = Colors.redAccent[100].withOpacity(0.5);
 
   var emailController = new TextEditingController();
   var passwordController = new TextEditingController();
 
-  ValueNotifier<bool> profileToggle = new ValueNotifier(false);
+  isPrivate() async {
+    prefs = await SharedPreferences.getInstance();
+    var queryString;
+
+    // print("Not here");
+    queryString = "http://postea-server.herokuapp.com/profile/" +
+        prefs.getInt('profileID').toString();
+
+    http.Response resp = await http.get(queryString);
+    var profile = jsonDecode(resp.body);
+    profileMode =
+        profile["message"]["privacy"].toString().toLowerCase() == "true";
+  }
+
   ValueNotifier<bool> themeToggle = new ValueNotifier(false);
 
-  toggleButton() {
-    if (profileToggle.value) {
-      toggle = Colors.redAccent.withOpacity(0.5);
-      profileToggle.value = false;
-    } else {
-      toggle = Colors.greenAccent;
-      profileToggle.value = true;
-    }
+  SharedPreferences prefs;
+
+  initializeSharedPref() async {
+    prefs = await SharedPreferences.getInstance();
   }
+
+  updateProfileMode(int isPrivate) async {
+    var url = "http://postea-server.herokuapp.com/profileMode";
+
+    var sendAnswer = JsonEncoder().convert({
+      "profileID": prefs.getInt('profileID'),
+      "isPrivate": isPrivate,
+    });
+
+    http.Response resp = await http.post(url,
+        headers: {'Content-Type': 'application/json'}, body: sendAnswer);
+    print(resp.body);
+    if (resp.statusCode == 200)
+      print("success");
+    else
+      print("Some error");
+  }
+
+  // isPrivate() async {
+  //   prefs = await SharedPreferences.getInstance();
+  //   var queryString;
+
+  //   // print("Not here");
+  //   queryString = "http://postea-server.herokuapp.com/profile/" +
+  //       prefs.getInt('profileID').toString();
+
+  //   http.Response resp = await http.get(queryString);
+  //   var profile = jsonDecode(resp.body);
+  //   return profile["message"]["privacy"].toString().toLowerCase() == "true";
+  // }
 
   darkModetoggleButton() {
     if (themeToggle.value) {
       darkModeToggleColor = Colors.redAccent.withOpacity(0.5);
-      profileToggle.value = false;
+      themeToggle.value = false;
     } else {
       darkModeToggleColor = Colors.greenAccent;
       themeToggle.value = true;
@@ -57,6 +101,10 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+
+    isPrivate();
+    ValueNotifier<bool> profileToggle = new ValueNotifier(profileMode);
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: new AppBar(
@@ -106,7 +154,17 @@ class _SettingsPageState extends State<SettingsPage> {
                               AnimatedPositioned(
                                   child: InkWell(
                                     onTap: () {
-                                      toggleButton();
+                                      if (profileToggle.value) {
+                                        updateProfileMode(0);
+                                        toggle =
+                                            Colors.redAccent.withOpacity(0.5);
+                                        profileToggle.value = false;
+                                      } else {
+                                        updateProfileMode(1);
+                                        toggle = Colors.greenAccent;
+                                        profileToggle.value = true;
+                                      }
+                                      // toggleButton();
                                     },
                                     child: AnimatedSwitcher(
                                       duration: Duration(milliseconds: 200),
