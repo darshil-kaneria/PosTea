@@ -47,18 +47,20 @@ class _CommentsState extends State<Comments> {
                     child: AutoSizeText(
                       this.personName,
                       style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                          Theme.of(context).textTheme.headline2,
                     ),
                   ),
                   AutoSizeText(
                     this.comment,
                     // "{\"post retrieved\": \"success\"}",
-                    style: TextStyle(fontSize: 15),
+                    style: Theme.of(context).textTheme.headline3,
                   ),
                 ],
               ),
               Spacer(),
-              Icon(Icons.thumb_up)
+              Icon(Icons.thumb_up,
+              color: Theme.of(context).buttonColor,
+              size: 17,)
             ],
           ),
         ],

@@ -124,10 +124,10 @@ class ProcessTopic {
 
   processPosts() async {
     for (int i = 0; i < posts['result'].length; i++) {
-      http.Response resp = await http.get(
-          "http://postea-server.herokuapp.com/profile/" +
-              posts['result'][i]['profile_id'].toString());
-      Map<String, dynamic> profileJson = jsonDecode(resp.body);
+      // http.Response resp = await http.get(
+      //     "http://postea-server.herokuapp.com/profile/" +
+      //         posts['result'][i]['profile_id'].toString());
+      // Map<String, dynamic> profileJson = jsonDecode(resp.body);
       // print(profileJson['message']['name']);
       Post newPost = Post(
           posts['result'][i]['post_id'].toString(),
@@ -140,7 +140,7 @@ class ProcessTopic {
           posts['result'][i]['post_dislikes'].toString(),
           posts['result'][i]['post_comments'].toString(),
           posts['result'][i]['post_title'].toString(),
-          profileJson['message']['name']
+          posts['result'][i]['name'].toString()
           // "Darshil Kaneria"
           );
       print(posts['result'][i]['post_id']);

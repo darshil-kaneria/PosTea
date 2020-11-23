@@ -54,7 +54,7 @@ class ExpandedPostTile extends StatefulWidget {
       this.myPID);
 }
 
-class _ExpandedPostTileState extends State<ExpandedPostTile> with SingleTickerProviderStateMixin {
+class _ExpandedPostTileState extends State<ExpandedPostTile> with TickerProviderStateMixin {
   var post_id;
   var profile_id;
   var post_description;
@@ -71,9 +71,10 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> with SingleTickerPr
   var myPID;
   var num_likes;
   var num_dislikes;
+  PageController pg = PageController();
   List<String> comments = [];
   ValueNotifier<String> comment_string = ValueNotifier<String>("Add comment");
-
+  var checkCommVal = false;
   Color like_color = Colors.black;
   Color dislike_color = Colors.black;
 
@@ -100,10 +101,10 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> with SingleTickerPr
       this.post_title,
       this.name,
       this.myPID);
-
+  
   @override
   Widget build(BuildContext context) {
-    engagementInfo();
+    // engagementInfo();
 
     // commentsInfo();
 
@@ -111,19 +112,56 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> with SingleTickerPr
     double screenHeight = MediaQuery.of(context).size.height;
     final slideController = AnimationController(vsync: this, duration: Duration(milliseconds: 2000));
     final slideAnimation = Tween(begin: Offset(0, 0), end: Offset(1, 0)).animate(slideController);
-
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if(checkCommVal == true)
+      comment_string.value = "Edit Comment";
+    });
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: new AppBar(backgroundColor: Colors.white,elevation: 0, iconTheme: IconThemeData(color: Colors.black),),
+      appBar: new AppBar(
+        backgroundColor: Theme.of(context).canvasColor,
+        elevation: 0, 
+        iconTheme: IconThemeData(color: Theme.of(context).buttonColor),),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: barrier,
         icon: Icon(Icons.add),
-        label: Text("Add comment"),
-        onPressed: (){}
+        label: ValueListenableBuilder(
+                  valueListenable: comment_string,
+                  builder: (_, value, __) => Text(
+                    value.toString(),
+                    style: TextStyle(fontSize: 15),
+                  ),
+                ),
+        onPressed: () async {
+          if(pg.page == 0.0)
+          {
+            pg.animateToPage(1, duration: Duration(milliseconds: 100), curve: Curves.easeInQuad);
+            if(checkCommVal == true)
+            comment_string.value = "Edit Comment";
+          }
+          else{
+
+            var reqBody = {
+                    "engagement_post_id": post_id,
+                    "engagement_profile_id": myPID,
+                    "like_dislike": null,
+                    "comment": commentController.text == "" ? null: commentController.text
+                  };
+
+            var reqBodyJson = jsonEncode(reqBody);
+            http.post(
+              "http://postea-server.herokuapp.com/engagement",
+              headers: {"Content-Type": "application/json"},
+              body: reqBodyJson
+            ).then((value) => print(value.body));
+
+          }
+          
+        }
         ),
         floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: Container(
-        color: Colors.white,
+        color: Theme.of(context).canvasColor,
         child: ListView(
           scrollDirection: Axis.vertical,
           children: [
@@ -149,7 +187,11 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> with SingleTickerPr
             Container(
               height: screenHeight/1.5,
               width: screenWidth,
-              child: PageView(children: [
+              margin: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+              child: PageView(
+                physics: NeverScrollableScrollPhysics(),
+                controller: pg,
+                children: [
                 FutureBuilder(
                   future: engagementInfo(),
                   builder: (BuildContext context,
@@ -161,7 +203,6 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> with SingleTickerPr
                       print("response");
                       print(snapshot.data.body);
                       var engagements = jsonDecode(snapshot.data.body);
-                      print(engagements[0]);
 
                       for (int i = 0; i < engagements.length; i++) {
                         if (engagements[i]['comment'] == null) {
@@ -172,7 +213,8 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> with SingleTickerPr
                           print("IN HERE");
 
                           commentController.text = engagements[i]['comment'];
-                          comment_string.value = "Edit comment";
+                          // comment_string.value = "Edit comment";
+                          checkCommVal = true;
                         }
                         comments.add(engagements[i]['comment'].toString());
                       }
@@ -188,7 +230,7 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> with SingleTickerPr
                             print('in list view builder');
                             print(comments.elementAt(index));
                             return Comments(
-                                comments.elementAt(index), "Darshil");
+                                comments.elementAt(index), engagements[index]['name']);
                           });
                     } else {
                       return Container();
@@ -198,40 +240,42 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> with SingleTickerPr
                 Container(
                   margin: EdgeInsets.only(left: 15, right: 15),
                   child: TextField(
+                    cursorColor: Theme.of(context).accentColor,
+                    style: Theme.of(context).textTheme.headline2,
                     controller: commentController,
-                    decoration: InputDecoration(labelText: "Your comment:"),
+                    decoration: InputDecoration(labelText: "Your comment:", labelStyle: Theme.of(context).textTheme.headline1),
                   ),
                 )
               ]),
             ),
-            ButtonTheme(
-              child: RaisedButton(
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20)),
-                child: ValueListenableBuilder(
-                  valueListenable: comment_string,
-                  builder: (_, value, __) => Text(
-                    value.toString(),
-                    style: TextStyle(fontSize: 15),
-                  ),
-                ),
-                onPressed: () async {
-                  var reqBody = {
-                    "engagement_post_id": post_id,
-                    "engagement_profile_id": myPID,
-                    "like_dislike": null,
-                    "comment": commentController.text == "" ? null: commentController.text
-                  };
+            // ButtonTheme(
+            //   child: RaisedButton(
+            //     shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(20)),
+            //     child: ValueListenableBuilder(
+            //       valueListenable: comment_string,
+            //       builder: (_, value, __) => Text(
+            //         value.toString(),
+            //         style: TextStyle(fontSize: 15),
+            //       ),
+            //     ),
+            //     onPressed: () async {
+            //       var reqBody = {
+            //         "engagement_post_id": post_id,
+            //         "engagement_profile_id": myPID,
+            //         "like_dislike": null,
+            //         "comment": commentController.text == "" ? null: commentController.text
+            //       };
 
-                  var reqBodyJson = jsonEncode(reqBody);
-                  http.post(
-                    "http://postea-server.herokuapp.com/engagement",
-                    headers: {"Content-Type": "application/json"},
-                    body: reqBodyJson
-                  ).then((value) => print(value.body));
-                },
-              ),
-            )
+            //       var reqBodyJson = jsonEncode(reqBody);
+            //       http.post(
+            //         "http://postea-server.herokuapp.com/engagement",
+            //         headers: {"Content-Type": "application/json"},
+            //         body: reqBodyJson
+            //       ).then((value) => print(value.body));
+            //     },
+            //   ),
+            // )
           ],
         ),
       ),

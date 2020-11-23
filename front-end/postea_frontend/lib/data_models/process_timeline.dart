@@ -89,9 +89,10 @@ class ProcessTimeline{
       }
       else{
 
-        http.Response resp = await http.get("http://postea-server.herokuapp.com/profile/"+posts['result'][i]['profile_id'].toString());
-        Map<String, dynamic> profileJson = jsonDecode(resp.body);
-        name = profileJson['message']['name'];
+        // http.Response resp = await http.get("http://postea-server.herokuapp.com/profile/"+posts['result'][i]['profile_id'].toString());
+        // Map<String, dynamic> profileJson = jsonDecode(resp.body);
+        // name = profileJson['message']['name'];
+        name = posts['result'][i]['name'].toString();
 
       }
       
