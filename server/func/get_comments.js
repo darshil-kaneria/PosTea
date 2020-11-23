@@ -15,7 +15,7 @@ process.on("message", message => {
 });
 
  function getComments(post_id, connection) {
-    var selectQuery = "SELECT comment FROM engagement WHERE post_id = " + post_id + " ORDER BY creation_date DESC";
+    var selectQuery = "SELECT * FROM engagement as e, profile as p WHERE e.post_id = " + post_id + " and e.profile_id = p.profile_id ORDER BY creation_date DESC";
     return new Promise(async function(resolve, reject) {
       await connection.query(selectQuery, function (err, result) {
         if (err) {

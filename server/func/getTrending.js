@@ -120,7 +120,7 @@ getTrending = async (message, connection) => {
                 resolve("No_trending");
             }
             
-            var query = `SELECT * FROM user_post WHERE post_id in (${finalListString} ORDER BY FIELD(post_id, ${finalListString}`;
+            var query = `SELECT * FROM user_post as up, profile as p WHERE up.post_id in (${finalListString} and up.profile_id = p.profile_id ORDER BY FIELD(up.post_id, ${finalListString}`;
             await connection.query({sql: query, timeout: 120000}, (err, result) => {
 
                 if(err){
