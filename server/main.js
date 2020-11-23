@@ -12,12 +12,15 @@ app.use(express.json({limit: '2mb'}));
 const PORT = process.env.PORT || 23556;
 const numCPUs = require('os').cpus().length;
 var cors = require('cors');
+const ws = require('ws');
 
 var lastWorkerPID = -1;
 
+
+
 if (cluster.isMaster) {
   console.log(`Master ${process.pid} is running`);
-
+  
   // Fork workers.
   for (let i = 0; i < numCPUs; i++) {
     cluster.fork();
@@ -28,19 +31,30 @@ if (cluster.isMaster) {
   });
 }
 else {
+
+  const server = app.listen(PORT, ()=>console.log("listening on port "+PORT+", PID: "+process.pid));
+
   app.use(cors({
     origin: ["http://localhost:23556"],
     credentials: true
-  }))
-  const fork = require("child_process").fork;
-app.get('/', (req, res)=>{
-    
-    console.log("request received on home");
-    const child = fork('./test_concurrency_one.js');
-    child.send({"number": parseInt(req.query.number)});
-    child.on("message", message => res.send(message));
+  }));
 
-});
+  const fork = require("child_process").fork;
+
+  // Setup websocket for notifications and activity tab
+
+  const wsServer = new ws.Server({ noServer: true });
+  wsServer.on('connection', (ws, socket) => {
+    console.log("Websocket initiated by: "+ws._socket.remoteAddress);
+    socket.on('message', message => console.log(message));
+  });
+
+  
+  server.on('upgrade', (request, socket, head) => {
+    wsServer.handleUpgrade(request, socket, head, socket => {
+      wsServer.emit('connection', socket, request);
+    });
+  });
 
 /**
  * User endpoints
@@ -318,7 +332,6 @@ app.get("/refreshTopicTimeline", (req, res) => {
   });
 });
 
-app.listen(PORT, ()=>console.log("listening on port "+PORT+", PID: "+process.pid));
 
 /**
  * Dev endpoints - use with caution.
@@ -345,9 +358,8 @@ app.get('/gettrending', (req, res) => {
     trending.send(data);
     trending.on("message", message => res.send(message));
 
-
-
 });
+
 if(cluster.worker.id == 2){
   var trendingInterval = setInterval(() => {
     console.log("retrieving trending posts...")

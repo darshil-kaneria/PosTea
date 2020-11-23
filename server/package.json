@@ -15,7 +15,8 @@
     "redis": "^3.0.2",
     "redis-cloud": "^1.0.2",
     "sql": "^0.78.0",
-    "throng": "^5.0.0"
+    "throng": "^5.0.0",
+    "ws": "^7.4.0"
   },
   "devDependencies": {
     "prettier": "2.1.2"
