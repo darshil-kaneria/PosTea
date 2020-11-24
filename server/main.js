@@ -339,9 +339,16 @@ app.get("/getUserInfo", (req, res) => {
   };
   handleGetUserInfo.send(data);
   handleGetUserInfo.on("message", message => res.send(message));
-})
+});
 
-
+app.get("/getAllUserPosts", (req, res) => {
+  const handleGetAllUserPosts = fork("./func/getAllUserPosts.js");
+  var data = {
+    profile_id: req.query.profile_id
+  }
+  handleGetAllUserPosts.send(data);
+  handleGetAllUserPosts.on("message", message => res.send(message));
+});
 /**
  * Dev endpoints - use with caution.
  */
