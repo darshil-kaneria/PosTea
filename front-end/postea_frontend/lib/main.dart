@@ -34,7 +34,7 @@ class _PosTeaState extends State<PosTea> {
 
   void checkUserLoggedIn() async {
     User user = FirebaseAuth.instance.currentUser;
-    print("UID IS: "+user.uid);
+    print("UID IS: " + user.uid);
 
     if (user != null) {
       setState(() {
@@ -67,13 +67,14 @@ class _PosTeaState extends State<PosTea> {
       primaryColorLight: topicPillLight1,
       primaryColorDark: topicPillLight2,
       buttonColor: Colors.blueGrey[800],
-      bottomAppBarColor: Colors.grey[400],
+      bottomAppBarColor: Colors.grey[300],
       accentColor: Colors.white,
       textTheme: TextTheme(
-              headline1: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.normal),
-              headline2: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),
-              headline3: TextStyle(fontSize: 13, color: Colors.black)
-      ), 
+          headline1: TextStyle(
+              fontSize: 16, color: Colors.black, fontWeight: FontWeight.normal),
+          headline2: TextStyle(
+              fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),
+          headline3: TextStyle(fontSize: 13, color: Colors.black)),
     );
 
     ThemeData darkTheme = ThemeData(
@@ -86,17 +87,17 @@ class _PosTeaState extends State<PosTea> {
       accentColor: topicPillDark1,
       hintColor: Colors.grey[800],
       textTheme: TextTheme(
-              headline1: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
-              headline2: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
-              headline3: TextStyle(fontSize: 13, color: Colors.white)
-      ),
-      
+          headline1: TextStyle(
+              fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+          headline2: TextStyle(
+              fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
+          headline3: TextStyle(fontSize: 13, color: Colors.white)),
     );
     return ChangeNotifierProvider(
         create: (context) => TimerCount(),
         child: MaterialApp(
           darkTheme: darkTheme,
-          theme: darkTheme,
+          theme: lightTheme,
           debugShowCheckedModeBanner: false,
           title: "PosTea app",
           initialRoute: firstScreen,

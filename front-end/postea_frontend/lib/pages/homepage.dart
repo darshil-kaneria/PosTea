@@ -213,7 +213,10 @@ class _HomePageState extends State<HomePage> {
                   decoration: BoxDecoration(color: Colors.purple[900]),
                 ),
                 ListTile(
-                  title: Text("Settings", style: TextStyle(color: Theme.of(context).buttonColor),),
+                  title: Text(
+                    "Settings",
+                    style: TextStyle(color: Theme.of(context).buttonColor),
+                  ),
                   leading: Icon(
                     Icons.settings,
                     size: 20,
@@ -227,7 +230,8 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
                 ListTile(
-                  title: Text("Logout", style: TextStyle(color: Theme.of(context).buttonColor)),
+                  title: Text("Logout",
+                      style: TextStyle(color: Theme.of(context).buttonColor)),
                   leading: Icon(
                     Icons.exit_to_app,
                     color: Theme.of(context).buttonColor,
@@ -327,8 +331,9 @@ class _HomePageState extends State<HomePage> {
                                       maxLines: null,
                                       keyboardType: TextInputType.multiline,
                                       decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          hintText: "Post description",),
+                                        border: InputBorder.none,
+                                        hintText: "Post description",
+                                      ),
                                       controller: postTextController,
                                     ),
                                   ),
@@ -344,7 +349,8 @@ class _HomePageState extends State<HomePage> {
                                         IconButton(
                                             icon: Icon(
                                               Icons.image,
-                                              color: Theme.of(context).hintColor,
+                                              color:
+                                                  Theme.of(context).hintColor,
                                             ),
                                             onPressed: () async {
                                               await pickImage();
@@ -360,7 +366,8 @@ class _HomePageState extends State<HomePage> {
                                         IconButton(
                                             icon: Icon(
                                               Icons.attachment,
-                                              color: Theme.of(context).hintColor,
+                                              color:
+                                                  Theme.of(context).hintColor,
                                             ),
                                             onPressed: () {}),
                                         IconButton(
@@ -375,7 +382,8 @@ class _HomePageState extends State<HomePage> {
                                                     Colors.deepOrange[100];
                                               } else if (isAnonymous == 1) {
                                                 isAnonymous = 0;
-                                                isAnonColor = Theme.of(context).hintColor;
+                                                isAnonColor =
+                                                    Theme.of(context).hintColor;
                                               }
                                               setState(() {});
                                               print(isAnonymous);
@@ -528,7 +536,9 @@ class _HomePageState extends State<HomePage> {
             backgroundColor: Colors.transparent,
             // leading: Icon(Icons.menu),
             elevation: 0,
-            iconTheme: IconThemeData(color: Theme.of(context).buttonColor,),
+            iconTheme: IconThemeData(
+              color: Theme.of(context).buttonColor,
+            ),
             actions: <Widget>[
               IconButton(
                 icon: Icon(
@@ -546,7 +556,11 @@ class _HomePageState extends State<HomePage> {
                     Icons.notifications,
                     size: 20,
                   ),
-                  onPressed: () {}),
+                  onPressed: () {
+                    pageController.animateToPage(2,
+                        duration: Duration(milliseconds: 200),
+                        curve: Curves.bounceInOut);
+                  }),
               IconButton(
                   icon: Icon(
                     Icons.account_circle,
@@ -700,7 +714,7 @@ class _HomePageState extends State<HomePage> {
           child: Container(
             color: Theme.of(context).canvasColor,
             child: Container(
-              margin: EdgeInsets.only(top: screenHeight/25),
+              margin: EdgeInsets.only(top: screenHeight / 25),
               child: Column(
                 children: [
                   Expanded(
@@ -739,7 +753,8 @@ class _HomePageState extends State<HomePage> {
                                 child: TextField(
                                   controller: searchTextController,
                                   decoration: InputDecoration(
-                                      hintText: "Search", border: InputBorder.none),
+                                      hintText: "Search",
+                                      border: InputBorder.none),
                                 ),
                               ),
                             ),
@@ -768,8 +783,8 @@ class _HomePageState extends State<HomePage> {
                           builder: (_, value, __) {
                             if (value > 0) {
                               return FutureBuilder(
-                                  future:
-                                      getSearchResults(searchTextController.text),
+                                  future: getSearchResults(
+                                      searchTextController.text),
                                   builder: (BuildContext context,
                                       AsyncSnapshot<http.Response> snapshot) {
                                     if (snapshot.hasData) {
@@ -785,11 +800,14 @@ class _HomePageState extends State<HomePage> {
                                           physics: BouncingScrollPhysics(),
                                           itemCount: searchResults.length,
                                           itemBuilder: (context, index) {
-                                            print("index is " + index.toString());
+                                            print(
+                                                "index is " + index.toString());
                                             print("dict at index is " +
-                                                searchResults[index].toString());
+                                                searchResults[index]
+                                                    .toString());
                                             if (searchResults[index] != null) {
-                                              if (searchResults[index]['type'] ==
+                                              if (searchResults[index]
+                                                      ['type'] ==
                                                   "profile") {
                                                 return ListTile(
                                                   onTap: () {
@@ -802,8 +820,9 @@ class _HomePageState extends State<HomePage> {
                                                           builder: (context) =>
                                                               Profile(
                                                             profileId:
-                                                                searchResults[index]
-                                                                    ['profile_id'],
+                                                                searchResults[
+                                                                        index][
+                                                                    'profile_id'],
                                                             isOwner: true,
                                                           ),
                                                         ),
@@ -815,8 +834,9 @@ class _HomePageState extends State<HomePage> {
                                                           builder: (context) =>
                                                               Profile(
                                                             profileId:
-                                                                searchResults[index]
-                                                                    ['profile_id'],
+                                                                searchResults[
+                                                                        index][
+                                                                    'profile_id'],
                                                             isOwner: false,
                                                           ),
                                                         ),
@@ -827,12 +847,20 @@ class _HomePageState extends State<HomePage> {
                                                     backgroundImage: NetworkImage(
                                                         "https://picsum.photos/250?image=18"),
                                                   ),
-                                                  title: Text(searchResults[index]
-                                                          ['name']
-                                                      .toString(), style: Theme.of(context).textTheme.headline1,),
+                                                  title: Text(
+                                                    searchResults[index]['name']
+                                                        .toString(),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .headline1,
+                                                  ),
                                                   subtitle: Text(
-                                                      searchResults[index]['type']
-                                                          .toString(), style: Theme.of(context).textTheme.headline3),
+                                                      searchResults[index]
+                                                              ['type']
+                                                          .toString(),
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .headline3),
                                                 );
                                               } else {
                                                 return ListTile(
@@ -843,11 +871,12 @@ class _HomePageState extends State<HomePage> {
                                                         MaterialPageRoute(
                                                           builder: (context) =>
                                                               Topic(
-                                                            profileId:
-                                                                widget.profileID,
+                                                            profileId: widget
+                                                                .profileID,
                                                             topicId:
-                                                                searchResults[index]
-                                                                    ['topic_id'],
+                                                                searchResults[
+                                                                        index][
+                                                                    'topic_id'],
                                                             isOwner: true,
                                                           ),
                                                         ),
@@ -858,11 +887,12 @@ class _HomePageState extends State<HomePage> {
                                                         MaterialPageRoute(
                                                           builder: (context) =>
                                                               Topic(
-                                                            profileId:
-                                                                widget.profileID,
+                                                            profileId: widget
+                                                                .profileID,
                                                             topicId:
-                                                                searchResults[index]
-                                                                    ['topic_id'],
+                                                                searchResults[
+                                                                        index][
+                                                                    'topic_id'],
                                                             isOwner: false,
                                                           ),
                                                         ),
@@ -873,12 +903,20 @@ class _HomePageState extends State<HomePage> {
                                                     backgroundImage: NetworkImage(
                                                         "https://picsum.photos/250?image=18"),
                                                   ),
-                                                  title: Text(searchResults[index]
-                                                          ['topic_name']
-                                                      .toString(), style: Theme.of(context).textTheme.headline1),
+                                                  title: Text(
+                                                      searchResults[index]
+                                                              ['topic_name']
+                                                          .toString(),
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .headline1),
                                                   subtitle: Text(
-                                                      searchResults[index]['type']
-                                                          .toString(), style: Theme.of(context).textTheme.headline3),
+                                                      searchResults[index]
+                                                              ['type']
+                                                          .toString(),
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .headline3),
                                                 );
                                               }
                                             } else {
@@ -888,11 +926,12 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       );
                                     } else {
-                                      if (searchTextController.text.isNotEmpty) {
+                                      if (searchTextController
+                                          .text.isNotEmpty) {
                                         return Center(
                                           child: CircularProgressIndicator(
-                                            valueColor:
-                                                AlwaysStoppedAnimation(bgGradEnd),
+                                            valueColor: AlwaysStoppedAnimation(
+                                                bgGradEnd),
                                           ),
                                         );
                                       } else {
@@ -928,7 +967,202 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-        )
+        ),
+        Container(
+          width: screenWidth,
+          height: screenHeight,
+          color: Theme.of(context).canvasColor,
+          child: Column(
+            children: [
+              Container(
+                margin: EdgeInsets.only(top: 30, left: 10, right: 10),
+                child: Material(
+                  child: Row(
+                    children: [
+                      IconButton(
+                          icon: Icon(Icons.arrow_back_ios),
+                          onPressed: () {
+                            pageController.animateToPage(0,
+                                duration: Duration(milliseconds: 200),
+                                curve: Curves.bounceInOut);
+                          }),
+                      Text(
+                        "Notifications",
+                        style: TextStyle(
+                            fontSize: 30, fontWeight: FontWeight.bold),
+                      ),
+                      Spacer(),
+                      Icon(Icons.notifications)
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                width: screenWidth,
+                height: screenHeight / 1.129,
+                child: ListView(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Material(
+                        clipBehavior: Clip.antiAlias,
+                        child: Row(
+                          children: [
+                            Container(
+                              width: screenWidth / 1.4,
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      "https://picsum.photos/250?image=18"),
+                                ),
+                                title: Text("Darshil Kaneria"),
+                                subtitle: Text("commented on your post"),
+                              ),
+                            ),
+                            Spacer(),
+                            Text("3s ago")
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Material(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: screenWidth / 1.4,
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      "https://picsum.photos/250?image=18"),
+                                ),
+                                title: Text("Darshil Kaneria"),
+                                subtitle: Text("commented on your post"),
+                              ),
+                            ),
+                            Spacer(),
+                            Text("3s ago")
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Material(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: screenWidth / 1.4,
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      "https://picsum.photos/250?image=18"),
+                                ),
+                                title: Text("Darshil Kaneria"),
+                                subtitle: Text("commented on your post"),
+                              ),
+                            ),
+                            Spacer(),
+                            Text("3s ago")
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Material(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: screenWidth / 1.4,
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      "https://picsum.photos/250?image=18"),
+                                ),
+                                title: Text("Darshil Kaneria"),
+                                subtitle: Text("commented on your post"),
+                              ),
+                            ),
+                            Spacer(),
+                            Text("3s ago")
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Material(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: screenWidth / 1.4,
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      "https://picsum.photos/250?image=18"),
+                                ),
+                                title: Text("Darshil Kaneria"),
+                                subtitle: Text("commented on your post"),
+                              ),
+                            ),
+                            Spacer(),
+                            Text("3s ago")
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Material(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: screenWidth / 1.4,
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      "https://picsum.photos/250?image=18"),
+                                ),
+                                title: Text("Darshil Kaneria"),
+                                subtitle: Text("commented on your post"),
+                              ),
+                            ),
+                            Spacer(),
+                            Text("3s ago")
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Material(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: screenWidth / 1.4,
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      "https://picsum.photos/250?image=18"),
+                                ),
+                                title: Text("Darshil Kaneria"),
+                                subtitle: Text("commented on your post"),
+                              ),
+                            ),
+                            Spacer(),
+                            Text("3s ago")
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
