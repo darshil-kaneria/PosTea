@@ -3,6 +3,8 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:postea_frontend/data_models/process_theme.dart';
+import 'package:provider/provider.dart';
 import './login.dart';
 import '../data_models/delete_user.dart';
 import 'package:postea_frontend/pages/securitySettings.dart';
@@ -10,6 +12,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsPage extends StatefulWidget {
+
+  ValueNotifier<bool> themeToggle = new ValueNotifier(false);
   @override
   _SettingsPageState createState() => _SettingsPageState();
 }
@@ -20,7 +24,7 @@ class _SettingsPageState extends State<SettingsPage> {
   bool darkModeToggle = false;
   bool profileMode = false;
   Color darkModeToggleColor = Colors.redAccent[100].withOpacity(0.5);
-
+  final theme = ProcessTheme();
   var emailController = new TextEditingController();
   var passwordController = new TextEditingController();
 
@@ -38,7 +42,7 @@ class _SettingsPageState extends State<SettingsPage> {
         profile["message"]["privacy"].toString().toLowerCase() == "true";
   }
 
-  ValueNotifier<bool> themeToggle = new ValueNotifier(false);
+  // ValueNotifier<bool> themeToggle = new ValueNotifier(false);
 
   SharedPreferences prefs;
 
@@ -77,12 +81,13 @@ class _SettingsPageState extends State<SettingsPage> {
   // }
 
   darkModetoggleButton() {
-    if (themeToggle.value) {
+    if (widget.themeToggle.value) {
       darkModeToggleColor = Colors.redAccent.withOpacity(0.5);
-      themeToggle.value = false;
+      widget.themeToggle.value = false;
+
     } else {
       darkModeToggleColor = Colors.greenAccent;
-      themeToggle.value = true;
+      widget.themeToggle.value = true;
     }
     // setState(() {
     //   if (darkModeToggle) {
@@ -98,10 +103,18 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    theme.addListener(() {
+      print("Something changed: "+theme.themeData.toString());
+    });
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
     isPrivate();
     ValueNotifier<bool> profileToggle = new ValueNotifier(profileMode);
 
@@ -109,8 +122,8 @@ class _SettingsPageState extends State<SettingsPage> {
       extendBodyBehindAppBar: true,
       appBar: new AppBar(
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.black),
-        title: Text("Settings", style: TextStyle(color: Colors.black)),
+        iconTheme: IconThemeData(color: Theme.of(context).buttonColor),
+        title: Text("Settings", style: Theme.of(context).textTheme.headline4),
         backgroundColor: Colors.transparent,
       ),
       body: Container(
@@ -121,10 +134,7 @@ class _SettingsPageState extends State<SettingsPage> {
             children: [
               Text(
                 "Profile",
-                style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 25),
+                style: Theme.of(context).textTheme.headline4,
               ),
               Container(
                 margin: EdgeInsets.only(top: 10),
@@ -132,11 +142,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(right: 10),
-                      child: Icon(CupertinoIcons.profile_circled),
+                      child: Icon(CupertinoIcons.profile_circled, color: Theme.of(context).buttonColor,),
                     ),
                     Text(
                       "Private Account?",
-                      style: TextStyle(fontSize: 18),
+                      style: Theme.of(context).textTheme.headline5,
                     ),
                     Spacer(),
                     ValueListenableBuilder(
@@ -207,10 +217,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 margin: EdgeInsets.only(top: 20),
                 child: Text(
                   "General",
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 25),
+                  style: Theme.of(context).textTheme.headline4,
                 ),
               ),
               Container(
@@ -219,15 +226,15 @@ class _SettingsPageState extends State<SettingsPage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(right: 10),
-                      child: Icon(Icons.wb_sunny),
+                      child: Icon(Icons.wb_sunny, color: Theme.of(context).buttonColor,),
                     ),
                     Text(
                       "Dark Theme",
-                      style: TextStyle(fontSize: 18),
+                      style: Theme.of(context).textTheme.headline5,
                     ),
                     Spacer(),
                     ValueListenableBuilder(
-                      valueListenable: themeToggle,
+                      valueListenable: widget.themeToggle,
                       builder: (context, value, child) {
                         return AnimatedContainer(
                           duration: Duration(milliseconds: 200),
@@ -241,15 +248,22 @@ class _SettingsPageState extends State<SettingsPage> {
                               AnimatedPositioned(
                                   child: InkWell(
                                     onTap: () {
-                                      if (themeToggle.value) {
+                                      // theme.addListener(() { 
+                                      //   if(widget.themeToggle.value == 
+                                      // });
+                                      if (widget.themeToggle.value) {
+                                        print("HI true");
                                         darkModeToggleColor =
                                             Colors.redAccent.withOpacity(0.5);
-                                        themeToggle.value = false;
-                                      } else {
+                                        widget.themeToggle.value = false;
+                                        Provider.of<ProcessTheme>(context, listen: false).changeTheme();
+                                      } else {print("HI false");
                                         darkModeToggleColor =
                                             Colors.greenAccent;
-                                        themeToggle.value = true;
+                                        widget.themeToggle.value = true;
+                                        Provider.of<ProcessTheme>(context, listen: false).changeTheme();
                                       }
+                                      
                                     },
                                     child: AnimatedSwitcher(
                                         duration: Duration(milliseconds: 200),
@@ -293,11 +307,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(right: 10),
-                      child: Icon(Icons.accessibility),
+                      child: Icon(Icons.accessibility, color: Theme.of(context).buttonColor),
                     ),
-                    Text("Accessibility", style: TextStyle(fontSize: 20)),
+                    Text("Accessibility", style: Theme.of(context).textTheme.headline5),
                     Spacer(),
-                    Icon(Icons.arrow_forward_ios)
+                    Icon(Icons.arrow_forward_ios, color: Theme.of(context).buttonColor)
                   ],
                 ),
               ),
@@ -314,11 +328,11 @@ class _SettingsPageState extends State<SettingsPage> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(right: 10),
-                        child: Icon(Icons.security),
+                        child: Icon(Icons.security, color: Theme.of(context).buttonColor),
                       ),
-                      Text("Security", style: TextStyle(fontSize: 20)),
+                      Text("Security", style: Theme.of(context).textTheme.headline5),
                       Spacer(),
-                      Icon(Icons.arrow_forward_ios)
+                      Icon(Icons.arrow_forward_ios, color: Theme.of(context).buttonColor)
                     ],
                   ),
                 ),
@@ -329,11 +343,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(right: 10),
-                      child: Icon(Icons.notifications),
+                      child: Icon(Icons.notifications, color: Theme.of(context).buttonColor),
                     ),
-                    Text("Notifications", style: TextStyle(fontSize: 20)),
+                    Text("Notifications", style: Theme.of(context).textTheme.headline5),
                     Spacer(),
-                    Icon(Icons.arrow_forward_ios)
+                    Icon(Icons.arrow_forward_ios, color: Theme.of(context).buttonColor)
                   ],
                 ),
               ),
@@ -343,11 +357,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(right: 10),
-                      child: Icon(Icons.info),
+                      child: Icon(Icons.info, color: Theme.of(context).buttonColor),
                     ),
-                    Text("About", style: TextStyle(fontSize: 20)),
+                    Text("About", style: Theme.of(context).textTheme.headline5),
                     Spacer(),
-                    Icon(Icons.arrow_forward_ios)
+                    Icon(Icons.arrow_forward_ios, color: Theme.of(context).buttonColor)
                   ],
                 ),
               ),
@@ -357,11 +371,11 @@ class _SettingsPageState extends State<SettingsPage> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(right: 10),
-                      child: Icon(Icons.help),
+                      child: Icon(Icons.help, color: Theme.of(context).buttonColor),
                     ),
-                    Text("Help", style: TextStyle(fontSize: 20)),
+                    Text("Help", style: Theme.of(context).textTheme.headline5),
                     Spacer(),
-                    Icon(Icons.arrow_forward_ios)
+                    Icon(Icons.arrow_forward_ios, color: Theme.of(context).buttonColor)
                   ],
                 ),
               ),

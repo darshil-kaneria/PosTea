@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/colors.dart';
+import 'package:postea_frontend/data_models/process_theme.dart';
 import 'package:postea_frontend/pages/homepage.dart';
 import 'package:postea_frontend/pages/loggedIn.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +22,13 @@ Future<void> main() async {
   profileId = prefs.getInt('profileID') ?? 0;
   await Firebase.initializeApp();
   print(profileId);
-  runApp(PosTea());
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (context) => ProcessTheme(), lazy: false,
+        )
+    ],
+    child: PosTea()));
 }
 
 class PosTea extends StatefulWidget {
@@ -56,6 +63,8 @@ class _PosTeaState extends State<PosTea> {
 
   @override
   Widget build(BuildContext context) {
+
+
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
@@ -72,7 +81,9 @@ class _PosTeaState extends State<PosTea> {
       textTheme: TextTheme(
               headline1: TextStyle(fontSize: 16, color: Colors.black, fontWeight: FontWeight.normal),
               headline2: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),
-              headline3: TextStyle(fontSize: 13, color: Colors.black)
+              headline3: TextStyle(fontSize: 13, color: Colors.black),
+              headline4: TextStyle(fontSize: 18, color: Colors.black),
+              headline5: TextStyle(fontSize: 16, color: Colors.black)
       ), 
     );
 
@@ -88,25 +99,32 @@ class _PosTeaState extends State<PosTea> {
       textTheme: TextTheme(
               headline1: TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
               headline2: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
-              headline3: TextStyle(fontSize: 13, color: Colors.white)
+              headline3: TextStyle(fontSize: 13, color: Colors.white),
+              headline4: TextStyle(fontSize: 18, color: Colors.white),
+              headline5: TextStyle(fontSize: 16, color: Colors.white)
       ),
       
     );
-    return ChangeNotifierProvider(
-        create: (context) => TimerCount(),
-        child: MaterialApp(
-          darkTheme: darkTheme,
-          theme: darkTheme,
-          debugShowCheckedModeBanner: false,
-          title: "PosTea app",
-          initialRoute: firstScreen,
-          onGenerateRoute: Router.generateRoute,
-          onGenerateInitialRoutes: (initialRoute) {
-            return [
-              Router.generateRoute(RouteSettings(
-                  name: firstScreen, arguments: HomePage(profileID: profileId)))
-            ];
+
+
+        return Consumer<ProcessTheme>(
+          builder: (context, value, child) {
+            print("Value is: "+value.themeData.toString());
+            return MaterialApp(
+            darkTheme: darkTheme,
+            theme: value.themeData == 1 ? lightTheme : darkTheme,
+            debugShowCheckedModeBanner: false,
+            title: "PosTea app",
+            initialRoute: firstScreen,
+            onGenerateRoute: Router.generateRoute,
+            onGenerateInitialRoutes: (initialRoute) {
+              return [
+                Router.generateRoute(RouteSettings(
+                    name: firstScreen, arguments: HomePage(profileID: profileId)))
+              ];
+            },
+          );
           },
-        ));
+        );
   }
 }

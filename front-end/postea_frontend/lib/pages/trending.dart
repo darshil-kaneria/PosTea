@@ -32,9 +32,10 @@ class _TrendingState extends State<Trending> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: new AppBar(
-        title: Text("Trending"),
+        title: Text("Trending", style: Theme.of(context).textTheme.headline4,),
         elevation: 0,
-        backgroundColor: Colors.brown[100],
+        backgroundColor: Colors.transparent,
+        iconTheme: IconThemeData(color: Theme.of(context).buttonColor),
       ),
       extendBodyBehindAppBar: false,
       body: Container(
@@ -42,15 +43,15 @@ class _TrendingState extends State<Trending> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Expanded(
-              flex: 1,
-              child: Container(
-                margin: EdgeInsets.only(top: 15, left: 15),
-                child: Text("Discover...",
-                    style:
-                        TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
-              ),
-            ),
+            // Expanded(
+            //   flex: 1,
+            //   child: Container(
+            //     margin: EdgeInsets.only(top: 15, left: 15),
+            //     child: Text("Discover...",
+            //         style:
+            //             TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+            //   ),
+            // ),
             Expanded(
               flex: 10,
               child: Container(

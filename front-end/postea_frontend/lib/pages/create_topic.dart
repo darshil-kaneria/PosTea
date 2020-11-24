@@ -79,10 +79,13 @@ class _CreateTopicState extends State<CreateTopic> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: new AppBar(
-        title: Text("Create a New Topic"),
+        title: Text("Create a New Topic", style: Theme.of(context).textTheme.headline4,),
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        iconTheme: IconThemeData(color: Theme.of(context).buttonColor),
       ),
       body: Container(
-        color: bgColor,
+        color: Theme.of(context).canvasColor,
         width: screenWidth,
         height: screenHeight,
         child: Column(
@@ -107,8 +110,7 @@ class _CreateTopicState extends State<CreateTopic> {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       "Click to choose image",
-                      style: TextStyle(
-                          fontSize: 15, decoration: TextDecoration.underline),
+                      style: Theme.of(context).textTheme.headline3,
                     ),
                   )
                 ],
@@ -117,11 +119,12 @@ class _CreateTopicState extends State<CreateTopic> {
             Container(
               margin: EdgeInsets.symmetric(horizontal: 20),
               child: TextField(
-                style: TextStyle(fontSize: 22.7, fontWeight: FontWeight.bold),
+                style: Theme.of(context).textTheme.headline1,
                 textAlign: TextAlign.center,
                 controller: topicNameController,
                 decoration: InputDecoration(
-                    labelText: "What topic would you like to create?"),
+                    labelText: "What topic would you like to create?",
+                    labelStyle: Theme.of(context).textTheme.headline1),
               ),
             ),
             Container(
@@ -130,6 +133,7 @@ class _CreateTopicState extends State<CreateTopic> {
               width: screenWidth,
               height: screenHeight / 4,
               child: Card(
+                color: Theme.of(context).accentColor,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20)),
                 child: Padding(
@@ -139,7 +143,8 @@ class _CreateTopicState extends State<CreateTopic> {
                     textAlign: TextAlign.left,
                     controller: topidDescController,
                     decoration: InputDecoration.collapsed(
-                        hintText: "Enter Description"),
+                        hintText: "Enter Description",
+                        hintStyle: Theme.of(context).textTheme.headline3),
                   ),
                 ),
               ),
@@ -151,10 +156,10 @@ class _CreateTopicState extends State<CreateTopic> {
                 padding: const EdgeInsets.all(8.0),
                 child: ButtonTheme(
                   child: RaisedButton(
-                      color: bottomGrad,
+                      color: Theme.of(context).bottomAppBarColor,
                       child: Text(
                         "Create Topic",
-                        style: TextStyle(fontSize: 20),
+                        style: Theme.of(context).textTheme.headline2,
                       ),
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20)),
