@@ -26,7 +26,7 @@ Future<void> main() async {
     providers: [
       ChangeNotifierProvider(
         create: (context) => ProcessTheme(), lazy: false,
-        )
+        ),
     ],
     child: PosTea()));
 }
@@ -109,7 +109,6 @@ class _PosTeaState extends State<PosTea> {
 
         return Consumer<ProcessTheme>(
           builder: (context, value, child) {
-            print("Value is: "+value.themeData.toString());
             return MaterialApp(
             darkTheme: darkTheme,
             theme: value.themeData == 1 ? lightTheme : darkTheme,

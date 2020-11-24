@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'post.dart';
@@ -14,6 +15,7 @@ class ProcessTimeline{
   bool isEnd = false;
   bool postRetrieved = true;
   Map<String, dynamic> posts;
+  ValueNotifier<int> isLoaded = ValueNotifier<int>(0);
 
   ProcessTimeline(this.profile_id);
 
@@ -116,6 +118,8 @@ class ProcessTimeline{
       postList.add(newPost);
 
     }
+    isLoaded.value = isLoaded.value+1;
+
     print(postList.length);
     
   }
@@ -128,10 +132,11 @@ class ProcessTimeline{
 
   clearTimeline(){
     postList.clear();
-    this.offset = 0;
+    this.offset= 0;
     this.isEnd = false;
     firstPostTime = null;
     print("DONE");
+    isLoaded.value = isLoaded.value + 1;
   }
 
 }
