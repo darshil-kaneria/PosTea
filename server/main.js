@@ -325,12 +325,21 @@ app.get("/refreshTopicTimeline", (req, res) => {
     topicID: req.query.topic_id,
     offset: req.query.post_offset,
     time: req.query.post_time
-  }
+  };
   handleTopicRefreshTimeline.send(data);
   handleTopicRefreshTimeline.on("message", message => {
     res.send(message);
   });
 });
+
+app.get("/getUserInfo", (req, res) => {
+  const handleGetUserInfo = fork("./func/getUserInfo.js");
+  var data = {
+    profile_id: req.query.profile_id
+  };
+  handleGetUserInfo.send(data);
+  handleGetUserInfo.on("message", message => res.send(message));
+})
 
 
 /**
