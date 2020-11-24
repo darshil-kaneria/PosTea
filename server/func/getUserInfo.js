@@ -57,8 +57,8 @@ const getUserInfo = async(profile_id, connection) => {
                     result2 = JSON.stringify(result2);
                     result2 = JSON.parse(result2);
                     var postIDList = [];
-                    for (var i = 0; i < result.length; i++) {
-                        postIDList.push(result[i]['topic_id'])
+                    for (var i = 0; i < result2.length; i++) {
+                        postIDList.push(result2[i]['post_id'])
                     }
 
                     console.log("postIDs are " + String(result2));
