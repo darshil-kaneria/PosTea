@@ -10,6 +10,8 @@ import 'package:postea_frontend/customWidgets/expandedPostTile.dart';
 import '../pages/profile.dart';
 import 'package:badges/badges.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import '../data_models/process_save_post.dart';
+import 'package:linkwell/linkwell.dart';
 
 class PostTile extends StatefulWidget {
   var post_id;
@@ -115,188 +117,248 @@ class _PostTileState extends State<PostTile> {
     bool showLikeBadge = post_likes > 0;
     bool showDislikeBadge = post_dislikes > 0;
     bool showCommentsBadge = post_comments > 0;
-    var profilePicName = name == "Anonymous" ? "default-big.png" : profile_id.toString();
+    var profilePicName =
+        name == "Anonymous" ? "default-big.png" : profile_id.toString();
     var screenheight = MediaQuery.of(context).size.height;
     var screenwidth = MediaQuery.of(context).size.width;
 
     return Card(
-        shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(20),
-        ),
-        margin: EdgeInsets.only(top: 8, left: 12, right: 12),
-        clipBehavior: Clip.antiAlias,
-        child: Column(
-    children: [
-      ListTile(
-        trailing: TopicPill(
-          topicId: topic_id,
-          // col1: Colors.purple[900],
-          // col2: Colors.purple[400],
-          col1: Theme.of(context).primaryColorLight,
-          col2: Theme.of(context).primaryColorDark,
-          height: screenheight/20,
-          width: screenwidth/4,
-          profileId: myPID,
-          isOwner: false,
-        ),
-        onTap: () => {
-          if (myPID != widget.profile_id)
-            {
-              Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (context) => Profile(
-                        profileId: int.parse(profile_id),
-                        isOwner: false,
-                      )))
-            }
-          else
-            {
-              Navigator.of(context).push(new MaterialPageRoute(
-                  builder: (context) => Profile(
-                        profileId: int.parse(profile_id),
-                        isOwner: true,
-                      )))
-            },
-        },
-        leading: FutureBuilder(
-          future: FirebaseStorageService.getImage(context, profilePicName),
-          builder: (context, snapshot) {
-            if(snapshot.hasData){
-              return CircleAvatar(
-            backgroundImage: NetworkImage(snapshot.data),
-            backgroundColor: Colors.deepPurpleAccent[50],
-          );
-            }
-            else{
-              return CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        backgroundColor: bgColor,
-                                        valueColor: AlwaysStoppedAnimation(
-                                            loginButtonEnd),
-                                      );
-            } 
-          },
-        ),
-        title: Text(
-          profile_id != -1?name:"Anonymous",
-          style: Theme.of(context).textTheme.headline1,
-        ),
-        // subtitle: Row(
-        //   children: [
-        //     Icon(
-        //       Icons.location_on,
-        //       size: 15,
-        //       color: Colors.grey,
-        //     ),
-        //     Text("with Darshil Kaneria",style: TextStyle(fontSize: 12),)
-        //   ],
-        // ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
       ),
-      Container(
-        margin: EdgeInsets.symmetric(horizontal: 16),
-        padding: EdgeInsets.only(top: 2),
-        decoration: BoxDecoration(
-            border: Border(
-          top: BorderSide(width: 0.5, color: Colors.grey),
-        )),
-        child: ListTile(
+      margin: EdgeInsets.only(top: 8, left: 12, right: 12),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        children: [
+          ListTile(
+            trailing: TopicPill(
+              topicId: topic_id,
+              // col1: Colors.purple[900],
+              // col2: Colors.purple[400],
+              col1: Theme.of(context).primaryColorLight,
+              col2: Theme.of(context).primaryColorDark,
+              height: screenheight / 20,
+              width: screenwidth / 4,
+              profileId: myPID,
+              isOwner: false,
+            ),
             onTap: () => {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => ExpandedPostTile(
-                              post_id,
-                              profile_id,
-                              post_description,
-                              topic_id,
-                              post_img,
-                              creation_date,
-                              post_likes.toString(),
-                              post_dislikes.toString(),
-                              post_comments.toString(),
-                              post_title,
-                              name,
-                              myPID)))
+              if (myPID != widget.profile_id)
+                {
+                  Navigator.of(context).push(new MaterialPageRoute(
+                      builder: (context) => Profile(
+                            profileId: int.parse(profile_id),
+                            isOwner: false,
+                          )))
+                }
+              else
+                {
+                  Navigator.of(context).push(new MaterialPageRoute(
+                      builder: (context) => Profile(
+                            profileId: int.parse(profile_id),
+                            isOwner: true,
+                          )))
                 },
-            contentPadding:
-                EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-            title: Text(post_title,
-                style:
-                    Theme.of(context).textTheme.headline2),
-            subtitle: AutoSizeText(
-              post_description,
-              style: Theme.of(context).textTheme.headline3,
+            },
+            leading: FutureBuilder(
+              future: FirebaseStorageService.getImage(context, profilePicName),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return CircleAvatar(
+                    backgroundImage: NetworkImage(snapshot.data),
+                    backgroundColor: Colors.deepPurpleAccent[50],
+                  );
+                } else {
+                  return CircularProgressIndicator(
+                    strokeWidth: 2,
+                    backgroundColor: bgColor,
+                    valueColor: AlwaysStoppedAnimation(loginButtonEnd),
+                  );
+                }
+              },
+            ),
+            title: Text(
+              profile_id != -1 ? name : "Anonymous",
+              style: Theme.of(context).textTheme.headline1,
+            ),
+            // subtitle: Row(
+            //   children: [
+            //     Icon(
+            //       Icons.location_on,
+            //       size: 15,
+            //       color: Colors.grey,
+            //     ),
+            //     Text("with Darshil Kaneria",style: TextStyle(fontSize: 12),)
+            //   ],
+            // ),
+          ),
+          Container(
+            margin: EdgeInsets.symmetric(horizontal: 16),
+            padding: EdgeInsets.only(top: 2),
+            decoration: BoxDecoration(
+                border: Border(
+              top: BorderSide(width: 0.5, color: Colors.grey),
             )),
-      ),
-      Container(
-        child:  
-        FutureBuilder(
-          future: FirebaseStorageService.getImagePost(context, post_id.toString()),
-          builder: (context, snapshot) {
-            if(snapshot.hasData){
-              return isExpanded == 1 ? Image.network(
-                snapshot.data,
-                width: screenwidth,
-                fit: BoxFit.fitWidth,
-                loadingBuilder: (context, child, loadingProgress) {
-                  return loadingProgress == null ? child : LinearProgressIndicator();
-                },
-                ) : ClipRect(
-                  child: Container(
-                    child: Align(
-                      heightFactor: 0.3,
-                      widthFactor: 1.0,
-                      child: Image.network(
-                snapshot.data,
-                width: screenwidth,
-                fit: BoxFit.fitWidth,
-                loadingBuilder: (context, child, loadingProgress) {
-                  return loadingProgress == null ? child : LinearProgressIndicator();
-                },
-                ),
+            child: ListTile(
+              onTap: () => {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ExpandedPostTile(
+                            post_id,
+                            profile_id,
+                            post_description,
+                            topic_id,
+                            post_img,
+                            creation_date,
+                            post_likes.toString(),
+                            post_dislikes.toString(),
+                            post_comments.toString(),
+                            post_title,
+                            name,
+                            myPID)))
+              },
+              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+              title: Text(post_title,
+                  style: Theme.of(context).textTheme.headline2),
+              subtitle: LinkWell(
+                post_description,
+                style: Theme.of(context).textTheme.headline3,
+              ),
+              // subtitle: AutoSizeText(
+              //   post_description,
+              //   style: Theme.of(context).textTheme.headline3,
+              // ),
+            ),
+          ),
+          Container(
+              child: FutureBuilder(
+            future: FirebaseStorageService.getImagePost(
+                context, post_id.toString()),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return isExpanded == 1
+                    ? Image.network(
+                        snapshot.data,
+                        width: screenwidth,
+                        fit: BoxFit.fitWidth,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          return loadingProgress == null
+                              ? child
+                              : LinearProgressIndicator();
+                        },
+                      )
+                    : ClipRect(
+                        child: Container(
+                          child: Align(
+                            heightFactor: 0.3,
+                            widthFactor: 1.0,
+                            child: Image.network(
+                              snapshot.data,
+                              width: screenwidth,
+                              fit: BoxFit.fitWidth,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                return loadingProgress == null
+                                    ? child
+                                    : LinearProgressIndicator();
+                              },
+                            ),
+                          ),
+                        ),
+                      );
+              } else
+                return Container();
+            },
+          )),
+          Row(
+            children: [
+              Column(
+                children: [
+                  Badge(
+                    badgeColor: Colors.deepOrange[100],
+                    showBadge: showLikeBadge,
+                    animationType: BadgeAnimationType.fade,
+                    position: BadgePosition.topEnd(top: 1, end: 1),
+                    badgeContent: Text(
+                      post_likes.toString(),
+                      style: TextStyle(fontSize: 10),
+                    ),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.thumb_up,
+                        color: Theme.of(context).buttonColor,
+                      ),
+                      iconSize: 16,
+                      onPressed: () {
+                        like_or_dislike = "1";
+                        setState(() {
+                          if (dislike_color == Colors.deepOrange[200]) {
+                            dislike_color = Colors.black;
+                            post_likes++;
+                            post_dislikes--;
+                          }
+                          if (like_color == Colors.deepOrange[200]) {
+                            like_color = Colors.black;
+                            post_likes--;
+                          } else {
+                            like_color = Colors.deepOrange[200];
+                            post_likes++;
+                          }
+                        });
+                        print(post_id);
+                        print(profile_id);
+                        print(like_or_dislike);
+                        print(comment);
+                        var data = {
+                          "engagement_post_id": post_id,
+                          "engagement_profile_id": myPID,
+                          "like_dislike": like_or_dislike,
+                          "comment": comment
+                        };
+                        var sendAnswer = JsonEncoder().convert(data);
+                        print(sendAnswer);
+                        Future<http.Response> resp = http.post(
+                            'http://postea-server.herokuapp.com/engagement',
+                            headers: {'Content-Type': 'application/json'},
+                            body: sendAnswer);
+                      },
                     ),
                   ),
-                );
-            }
-            else return Container();
-          },
-        )
-      ),
-      Row(
-        children: [
-          Column(
-            children: [
+                ],
+              ),
               Badge(
+                badgeContent: Container(
+                    child: Text(
+                  post_dislikes.toString(),
+                  style: TextStyle(fontSize: 10),
+                )),
                 badgeColor: Colors.deepOrange[100],
-                showBadge: showLikeBadge,
-                animationType: BadgeAnimationType.fade,
                 position: BadgePosition.topEnd(top: 1, end: 1),
-                badgeContent: Text(post_likes.toString(), style: TextStyle(fontSize: 10),),
+                animationType: BadgeAnimationType.fade,
+                showBadge: showDislikeBadge,
                 child: IconButton(
                   icon: Icon(
-                    Icons.thumb_up,
+                    Icons.thumb_down,
                     color: Theme.of(context).buttonColor,
                   ),
                   iconSize: 16,
                   onPressed: () {
-                    like_or_dislike = "1";
                     setState(() {
-                      if (dislike_color == Colors.deepOrange[200]) {
-                        dislike_color = Colors.black;
-                        post_likes++;
-                        post_dislikes--;
-                      }
+                      like_or_dislike = "0";
                       if (like_color == Colors.deepOrange[200]) {
                         like_color = Colors.black;
                         post_likes--;
-                      } else {
-                        like_color = Colors.deepOrange[200];
-                        post_likes++;
+                        post_dislikes++;
                       }
+                      if (dislike_color == Colors.deepOrange[200]) {
+                        dislike_color = Colors.black;
+                        post_dislikes--;
+                      } else
+                        dislike_color = Colors.deepOrange[200];
+                      post_dislikes++;
                     });
-                    print(post_id);
-                    print(profile_id);
-                    print(like_or_dislike);
-                    print(comment);
+
                     var data = {
                       "engagement_post_id": post_id,
                       "engagement_profile_id": myPID,
@@ -304,7 +366,6 @@ class _PostTileState extends State<PostTile> {
                       "comment": comment
                     };
                     var sendAnswer = JsonEncoder().convert(data);
-                    print(sendAnswer);
                     Future<http.Response> resp = http.post(
                         'http://postea-server.herokuapp.com/engagement',
                         headers: {'Content-Type': 'application/json'},
@@ -312,77 +373,57 @@ class _PostTileState extends State<PostTile> {
                   },
                 ),
               ),
+              Badge(
+                showBadge: showCommentsBadge,
+                badgeColor: Colors.deepOrange[100],
+                position: BadgePosition.topEnd(top: 1, end: 1),
+                badgeContent: Text(
+                  post_comments.toString(),
+                  style: TextStyle(fontSize: 10),
+                ),
+                animationType: BadgeAnimationType.fade,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.comment,
+                    color: Theme.of(context).buttonColor,
+                  ),
+                  iconSize: 16,
+                  onPressed: () {},
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.file_download),
+                onPressed: () {
+                  ProcessSavePost processSavePost = new ProcessSavePost(
+                      post_title: post_title,
+                      post_description: post_description,
+                      post_id: post_id,
+                      profile_id: widget.profile_id,
+                      topic_id: topic_id,
+                      name: name,
+                      post_comments: post_comments.toString(),
+                      post_likes: post_likes.toString(),
+                      post_dislikes: post_dislikes.toString(),
+                      post_img: post_img,
+                      creation_date: creation_date);
+                  processSavePost.savePost();
+                },
+              ),
+              Expanded(
+                child: Container(
+                  padding: EdgeInsets.only(right: 15),
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    creation_date,
+                    style: TextStyle(color: Colors.grey, fontSize: 13),
+                  ),
+                ),
+              )
             ],
-          ),
-          Badge(
-            badgeContent: Container(child: Text(post_dislikes.toString(), style: TextStyle(fontSize: 10),)),
-            badgeColor: Colors.deepOrange[100],
-            position: BadgePosition.topEnd(top: 1, end: 1),
-            animationType: BadgeAnimationType.fade,
-            showBadge: showDislikeBadge,
-            child: IconButton(
-              icon: Icon(
-                Icons.thumb_down,
-                color: Theme.of(context).buttonColor,
-              ),
-              iconSize: 16,
-              onPressed: () {
-                setState(() {
-                  like_or_dislike = "0";
-                  if (like_color == Colors.deepOrange[200]) {
-                    like_color = Colors.black;
-                    post_likes--;
-                    post_dislikes++;
-                  }
-                  if (dislike_color == Colors.deepOrange[200]) {
-                    dislike_color = Colors.black;
-                    post_dislikes--;
-                  } else
-                    dislike_color = Colors.deepOrange[200];
-                  post_dislikes++;
-                });
-
-                var data = {
-                  "engagement_post_id": post_id,
-                  "engagement_profile_id": myPID,
-                  "like_dislike": like_or_dislike,
-                  "comment": comment
-                };
-                var sendAnswer = JsonEncoder().convert(data);
-                Future<http.Response> resp = http.post(
-                    'http://postea-server.herokuapp.com/engagement',
-                    headers: {'Content-Type': 'application/json'},
-                    body: sendAnswer);
-              },
-            ),
-          ),
-          Badge(
-            showBadge: showCommentsBadge,
-            badgeColor: Colors.deepOrange[100],
-            position: BadgePosition.topEnd(top: 1, end: 1),
-            badgeContent: Text(post_comments.toString(), style: TextStyle(fontSize: 10),),
-            animationType: BadgeAnimationType.fade,
-            child: IconButton(
-              icon: Icon(Icons.comment, color: Theme.of(context).buttonColor,),
-              iconSize: 16,
-              onPressed: () {},
-            ),
-          ),
-          Expanded(
-            child: Container(
-              padding: EdgeInsets.only(right: 15),
-              alignment: Alignment.centerRight,
-              child: Text(
-                creation_date,
-                style: TextStyle(color: Colors.grey, fontSize: 13),
-              ),
-            ),
           )
         ],
-      )
-    ],
-        ),
-      );
+      ),
+    );
   }
 }
 
@@ -395,7 +436,9 @@ class FirebaseStorageService extends ChangeNotifier {
         .child(image)
         .getDownloadURL();
   }
-  static Future<dynamic> getImagePost(BuildContext context, String image) async {
+
+  static Future<dynamic> getImagePost(
+      BuildContext context, String image) async {
     return await FirebaseStorage.instance
         .ref()
         .child("post")
@@ -403,4 +446,3 @@ class FirebaseStorageService extends ChangeNotifier {
         .getDownloadURL();
   }
 }
-

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/colors.dart';
+import 'package:postea_frontend/customWidgets/postTile.dart';
 import 'package:postea_frontend/data_models/process_profile.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -12,6 +13,7 @@ import 'package:postea_frontend/main.dart';
 import 'package:postea_frontend/pages/edit_profile.dart';
 import 'package:postea_frontend/pages/followingList.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../data_models/process_save_post.dart';
 
 import 'followerList.dart';
 
@@ -35,6 +37,7 @@ class _ProfileState extends State<Profile> {
 
   var _nameController = TextEditingController();
   var _biodataController = TextEditingController();
+  int itemCount = 0;
   int _value;
   PageController controller = PageController(initialPage: 0);
 
@@ -174,6 +177,17 @@ class _ProfileState extends State<Profile> {
     });
   }
 
+  Future getSavedPosts() async {
+    ProcessSavePost processSavePost =
+        new ProcessSavePost(profile_id: widget.myPID.toString());
+
+    var postInfo = await processSavePost.retrievePost();
+
+    print("postInfo is " + postInfo.toString());
+
+    return postInfo;
+  }
+
   @override
   Widget build(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
@@ -227,12 +241,11 @@ class _ProfileState extends State<Profile> {
                               Animation<double> animation,
                               Animation<double> secAnimation) {
                             return EditProfile(
-                              nameText: name,
-                              biodata: bio_data,
-                              privacy: isPrivate,
-                              username: username,
-                              profile_id: widget.myPID
-                            );
+                                nameText: name,
+                                biodata: bio_data,
+                                privacy: isPrivate,
+                                username: username,
+                                profile_id: widget.myPID);
                           },
                         ));
                   },
@@ -747,82 +760,42 @@ class _ProfileState extends State<Profile> {
                   ),
                   Expanded(
                     child: Container(
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.vertical,
-                        child: Column(
-                          children: [
-                            Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                margin: EdgeInsets.only(
-                                    top: 10, left: 12, right: 12),
-                                elevation: 1,
-                                clipBehavior: Clip.antiAlias,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: Container(
-                                    child: Text(bio_data),
-                                  ),
-                                )),
-                            Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                margin: EdgeInsets.only(
-                                    top: 10, left: 12, right: 12),
-                                elevation: 1,
-                                clipBehavior: Clip.antiAlias,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: Container(
-                                    child: Text(bio_data),
-                                  ),
-                                )),
-                            Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                margin: EdgeInsets.only(
-                                    top: 10, left: 12, right: 12),
-                                elevation: 1,
-                                clipBehavior: Clip.antiAlias,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: Container(
-                                    child: Text(bio_data),
-                                  ),
-                                )),
-                            Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                margin: EdgeInsets.only(
-                                    top: 10, left: 12, right: 12),
-                                elevation: 1,
-                                clipBehavior: Clip.antiAlias,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: Container(
-                                    child: Text(bio_data),
-                                  ),
-                                )),
-                            Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                margin: EdgeInsets.only(
-                                    top: 10, left: 12, right: 12),
-                                elevation: 1,
-                                clipBehavior: Clip.antiAlias,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(20.0),
-                                  child: Container(
-                                    child: Text(bio_data),
-                                  ),
-                                ))
-                          ],
-                        ),
+                      child: FutureBuilder(
+                        future: getSavedPosts(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasData) {
+                            var postInfo = snapshot.data;
+                            print("snapshot length is " +
+                                snapshot.data.length.toString());
+                            print("post info is " + postInfo.toString());
+                            var postInfoString = postInfo.toString();
+                            List postMap = json.decode(postInfoString);
+
+                            print("postMap[0]['post_id'] is " +
+                                postMap[0]['post_id'].toString());
+                            return ListView.builder(
+                              itemCount: postMap.length,
+                              itemBuilder: (context, index) {
+                                return PostTile(
+                                    postMap[index]['post_id'].toString(),
+                                    postMap[index]['profile_id'].toString(),
+                                    postMap[index]['description'].toString(),
+                                    postMap[index]['topic_id'].toString(),
+                                    postMap[index]['post_img'].toString(),
+                                    postMap[index]['creation_date'].toString(),
+                                    postMap[index]['post_likes'].toString(),
+                                    postMap[index]['post_dislikes'].toString(),
+                                    postMap[index]['post_comments'].toString(),
+                                    postMap[index]['title'].toString(),
+                                    postMap[index]['name'].toString(),
+                                    widget.myPID.toString(),
+                                    false);
+                              },
+                            );
+                          } else {
+                            return Container();
+                          }
+                        },
                       ),
                     ),
                   )
