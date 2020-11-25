@@ -12,6 +12,7 @@ import '../pages/profile.dart';
 import 'package:badges/badges.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import '../data_models/process_save_post.dart';
 import 'package:linkwell/linkwell.dart';
 
 class PostTile extends StatefulWidget {

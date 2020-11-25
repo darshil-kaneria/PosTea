@@ -31,6 +31,7 @@ import 'login.dart';
 import 'topic.dart';
 import 'settingsPage.dart';
 import '../data_models/process_search.dart';
+import 'package:linkwell/linkwell.dart';
 
 class HomePage extends StatefulWidget {
   int profileID;
@@ -68,18 +69,20 @@ class _HomePageState extends State<HomePage> {
   // var searchResults = [];
 
   getUserData() async {
-
-    http.get("http://postea-server.herokuapp.com/getUserInfo?profile_id="+widget.profileID.toString()).then((result){
+    http
+        .get("http://postea-server.herokuapp.com/getUserInfo?profile_id=" +
+            widget.profileID.toString())
+        .then((result) {
       var results = jsonDecode(result.body);
       // List<int> post_id_list = results['postIDs'].cast<int>();
-      
-       engagementInfo = results['engagementInfo'];
-      
-      for(var i = 0; i < results['postIDs'].cast<int>().length; i++){
+
+      engagementInfo = results['engagementInfo'];
+
+      for (var i = 0; i < results['postIDs'].cast<int>().length; i++) {
         post_id_list.add(results['postIDs'][i].toString());
       }
-      
-      for(var i = 0; i < results['topicIDs'].cast<int>().length; i++){
+
+      for (var i = 0; i < results['topicIDs'].cast<int>().length; i++) {
         topic_id_list.add(results['topicIDs'][i].toString());
       }
 
@@ -112,10 +115,10 @@ class _HomePageState extends State<HomePage> {
       print("ISPOST" + timeLine.postRetrieved.toString());
       if (!timeLine.isEnd && timeLine.postRetrieved)
         // setState(() {
-          print("SETSTATE CALLED");
-          offset.value = offset.value + 10;
-          updatePost();
-        // });
+        print("SETSTATE CALLED");
+      offset.value = offset.value + 10;
+      updatePost();
+      // });
     }
   }
 
@@ -242,7 +245,10 @@ class _HomePageState extends State<HomePage> {
                   decoration: BoxDecoration(color: Colors.purple[900]),
                 ),
                 ListTile(
-                  title: Text("Settings", style: TextStyle(color: Theme.of(context).buttonColor),),
+                  title: Text(
+                    "Settings",
+                    style: TextStyle(color: Theme.of(context).buttonColor),
+                  ),
                   leading: Icon(
                     Icons.settings,
                     size: 20,
@@ -256,7 +262,8 @@ class _HomePageState extends State<HomePage> {
                   },
                 ),
                 ListTile(
-                  title: Text("Logout", style: TextStyle(color: Theme.of(context).buttonColor)),
+                  title: Text("Logout",
+                      style: TextStyle(color: Theme.of(context).buttonColor)),
                   leading: Icon(
                     Icons.exit_to_app,
                     color: Theme.of(context).buttonColor,
@@ -356,8 +363,9 @@ class _HomePageState extends State<HomePage> {
                                       maxLines: null,
                                       keyboardType: TextInputType.multiline,
                                       decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          hintText: "Post description",),
+                                        border: InputBorder.none,
+                                        hintText: "Post description",
+                                      ),
                                       controller: postTextController,
                                     ),
                                   ),
@@ -373,7 +381,8 @@ class _HomePageState extends State<HomePage> {
                                         IconButton(
                                             icon: Icon(
                                               Icons.image,
-                                              color: Theme.of(context).hintColor,
+                                              color:
+                                                  Theme.of(context).hintColor,
                                             ),
                                             onPressed: () async {
                                               await pickImage();
@@ -389,29 +398,34 @@ class _HomePageState extends State<HomePage> {
                                         IconButton(
                                             icon: Icon(
                                               Icons.attachment,
-                                              color: Theme.of(context).hintColor,
+                                              color:
+                                                  Theme.of(context).hintColor,
                                             ),
                                             onPressed: () {}),
                                         ValueListenableBuilder(
                                           valueListenable: isAnonymous,
                                           builder: (context, value, child) {
                                             return IconButton(
-                                              icon: Icon(
-                                                Icons.fingerprint,
-                                                color: isAnonColor.value,
-                                              ),
-                                              onPressed: () {
-                                                if (isAnonymous.value == 0) {
-                                                  isAnonymous.value = 1;
-                                                  isAnonColor.value =
-                                                      Colors.deepOrange[100];
-                                                } else if (isAnonymous.value == 1) {
-                                                  isAnonymous.value = 0;
-                                                  isAnonColor.value = Theme.of(context).hintColor;
-                                                }
-                                                // setState(() {});
-                                                print(isAnonymous.value);
-                                              });
+                                                icon: Icon(
+                                                  Icons.fingerprint,
+                                                  color: isAnonColor.value,
+                                                ),
+                                                onPressed: () {
+                                                  if (isAnonymous.value == 0) {
+                                                    isAnonymous.value = 1;
+                                                    isAnonColor.value =
+                                                        Colors.deepOrange[100];
+                                                  } else if (isAnonymous
+                                                          .value ==
+                                                      1) {
+                                                    isAnonymous.value = 0;
+                                                    isAnonColor.value =
+                                                        Theme.of(context)
+                                                            .hintColor;
+                                                  }
+                                                  // setState(() {});
+                                                  print(isAnonymous.value);
+                                                });
                                           },
                                         ),
                                         IconButton(
@@ -490,8 +504,9 @@ class _HomePageState extends State<HomePage> {
                                                                           child: Text("Choose Topic"),
                                                                           onPressed: () {
                                                                             // setState(() {
-                                                                              topicButtonText.value = topicEditingController.text;
-                                                                              print(topicEditingController.text);
+                                                                            topicButtonText.value =
+                                                                                topicEditingController.text;
+                                                                            print(topicEditingController.text);
                                                                             // });
                                                                             Navigator.of(context, rootNavigator: true).pop();
                                                                           }),
@@ -562,7 +577,9 @@ class _HomePageState extends State<HomePage> {
             backgroundColor: Colors.transparent,
             // leading: Icon(Icons.menu),
             elevation: 0,
-            iconTheme: IconThemeData(color: Theme.of(context).buttonColor,),
+            iconTheme: IconThemeData(
+              color: Theme.of(context).buttonColor,
+            ),
             actions: <Widget>[
               IconButton(
                 icon: Icon(
@@ -580,7 +597,11 @@ class _HomePageState extends State<HomePage> {
                     Icons.notifications,
                     size: 20,
                   ),
-                  onPressed: () {}),
+                  onPressed: () {
+                    pageController.animateToPage(2,
+                        duration: Duration(milliseconds: 200),
+                        curve: Curves.bounceInOut);
+                  }),
               IconButton(
                   icon: Icon(
                     Icons.account_circle,
@@ -649,72 +670,63 @@ class _HomePageState extends State<HomePage> {
                 child: ValueListenableBuilder(
                   valueListenable: timeLine.isLoaded,
                   builder: (context, value, child) {
-                    print("ISLOADED: "+ timeLine.isLoaded.toString());
+                    print("ISLOADED: " + timeLine.isLoaded.toString());
                     // return FutureBuilder(
-                      // future: updatePost(),
-                      // builder: (BuildContext context,
-                          // AsyncSnapshot<http.Response> snapshot) {
-                        // if (snapshot.hasData) {
-                          return RefreshIndicator(
-                            onRefresh: _handleRefresh,
-                            child: ListView.builder(
-                                physics: BouncingScrollPhysics(),
-                                controller: checkPosScrollController,
-                                itemCount: timeLine.postList.length+1,
-                                itemBuilder: (BuildContext context, int index) {
-                                  if(index == timeLine.postList.length && timeLine.postList.length != 1 ){
-                                    // print("SIZE IS: "+snapshot.data.contentLength.toString());
-                                    return Container(
-                                      margin: EdgeInsets.all(10),
-                                      child: Center(
-                                          child: CircularProgressIndicator(
-                                        valueColor: AlwaysStoppedAnimation(bgGradEnd),
-                                      )),
-                                    );
-                                  }
-                                  print("LIKES ARE: " +
-                                      timeLine.postList
-                                          .elementAt(index)
-                                          .post_likes);
-                                  return PostTile(
-                                      timeLine.postList.elementAt(index).post_id,
-                                      timeLine.postList
-                                          .elementAt(index)
-                                          .profile_id,
-                                      timeLine.postList
-                                          .elementAt(index)
-                                          .post_description,
-                                      timeLine.postList.elementAt(index).topic_id,
-                                      timeLine.postList.elementAt(index).post_img,
-                                      timeLine.postList
-                                          .elementAt(index)
-                                          .creation_date,
-                                      timeLine.postList
-                                          .elementAt(index)
-                                          .post_likes,
-                                      timeLine.postList
-                                          .elementAt(index)
-                                          .post_dislikes,
-                                      timeLine.postList
-                                          .elementAt(index)
-                                          .post_comments,
-                                      timeLine.postList
-                                          .elementAt(index)
-                                          .post_title,
-                                      timeLine.postList
-                                          .elementAt(index)
-                                          .post_name,
-                                      widget.profileID.toString(),
-                                      0);
-                                }),
-                          );
-                        // } else
-                        //   return Center(
-                        //       child: CircularProgressIndicator(
-                        //     valueColor: AlwaysStoppedAnimation(bgGradEnd),
-                        //   ));
-                        // else return null;
-                      // });
+                    // future: updatePost(),
+                    // builder: (BuildContext context,
+                    // AsyncSnapshot<http.Response> snapshot) {
+                    // if (snapshot.hasData) {
+                    return RefreshIndicator(
+                      onRefresh: _handleRefresh,
+                      child: ListView.builder(
+                          physics: BouncingScrollPhysics(),
+                          controller: checkPosScrollController,
+                          itemCount: timeLine.postList.length + 1,
+                          itemBuilder: (BuildContext context, int index) {
+                            if (index == timeLine.postList.length &&
+                                timeLine.postList.length != 1) {
+                              // print("SIZE IS: "+snapshot.data.contentLength.toString());
+                              return Container(
+                                margin: EdgeInsets.all(10),
+                                child: Center(
+                                    child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation(bgGradEnd),
+                                )),
+                              );
+                            }
+                            print("LIKES ARE: " +
+                                timeLine.postList.elementAt(index).post_likes);
+                            return PostTile(
+                                timeLine.postList.elementAt(index).post_id,
+                                timeLine.postList.elementAt(index).profile_id,
+                                timeLine.postList
+                                    .elementAt(index)
+                                    .post_description,
+                                timeLine.postList.elementAt(index).topic_id,
+                                timeLine.postList.elementAt(index).post_img,
+                                timeLine.postList
+                                    .elementAt(index)
+                                    .creation_date,
+                                timeLine.postList.elementAt(index).post_likes,
+                                timeLine.postList
+                                    .elementAt(index)
+                                    .post_dislikes,
+                                timeLine.postList
+                                    .elementAt(index)
+                                    .post_comments,
+                                timeLine.postList.elementAt(index).post_title,
+                                timeLine.postList.elementAt(index).post_name,
+                                widget.profileID.toString(),
+                                0);
+                          }),
+                    );
+                    // } else
+                    //   return Center(
+                    //       child: CircularProgressIndicator(
+                    //     valueColor: AlwaysStoppedAnimation(bgGradEnd),
+                    //   ));
+                    // else return null;
+                    // });
                   },
                   // child: ,
                 ),
@@ -740,7 +752,7 @@ class _HomePageState extends State<HomePage> {
           child: Container(
             color: Theme.of(context).canvasColor,
             child: Container(
-              margin: EdgeInsets.only(top: screenHeight/25),
+              margin: EdgeInsets.only(top: screenHeight / 25),
               child: Column(
                 children: [
                   Expanded(
@@ -779,7 +791,8 @@ class _HomePageState extends State<HomePage> {
                                 child: TextField(
                                   controller: searchTextController,
                                   decoration: InputDecoration(
-                                      hintText: "Search", border: InputBorder.none),
+                                      hintText: "Search",
+                                      border: InputBorder.none),
                                 ),
                               ),
                             ),
@@ -808,8 +821,8 @@ class _HomePageState extends State<HomePage> {
                           builder: (_, value, __) {
                             if (value > 0) {
                               return FutureBuilder(
-                                  future:
-                                      getSearchResults(searchTextController.text),
+                                  future: getSearchResults(
+                                      searchTextController.text),
                                   builder: (BuildContext context,
                                       AsyncSnapshot<http.Response> snapshot) {
                                     if (snapshot.hasData) {
@@ -825,11 +838,14 @@ class _HomePageState extends State<HomePage> {
                                           physics: BouncingScrollPhysics(),
                                           itemCount: searchResults.length,
                                           itemBuilder: (context, index) {
-                                            print("index is " + index.toString());
+                                            print(
+                                                "index is " + index.toString());
                                             print("dict at index is " +
-                                                searchResults[index].toString());
+                                                searchResults[index]
+                                                    .toString());
                                             if (searchResults[index] != null) {
-                                              if (searchResults[index]['type'] ==
+                                              if (searchResults[index]
+                                                      ['type'] ==
                                                   "profile") {
                                                 return ListTile(
                                                   onTap: () {
@@ -842,8 +858,9 @@ class _HomePageState extends State<HomePage> {
                                                           builder: (context) =>
                                                               Profile(
                                                             profileId:
-                                                                searchResults[index]
-                                                                    ['profile_id'],
+                                                                searchResults[
+                                                                        index][
+                                                                    'profile_id'],
                                                             isOwner: true,
                                                           ),
                                                         ),
@@ -855,8 +872,9 @@ class _HomePageState extends State<HomePage> {
                                                           builder: (context) =>
                                                               Profile(
                                                             profileId:
-                                                                searchResults[index]
-                                                                    ['profile_id'],
+                                                                searchResults[
+                                                                        index][
+                                                                    'profile_id'],
                                                             isOwner: false,
                                                           ),
                                                         ),
@@ -864,44 +882,71 @@ class _HomePageState extends State<HomePage> {
                                                     }
                                                   },
                                                   leading: FutureBuilder(
-                                                    future: FirebaseStorageService.getImage(context, searchResults[index]['profile_id'].toString()),
-                                                    builder: (context, snapshot) {
-                                                      if(snapshot.hasData){
+                                                    future: FirebaseStorageService
+                                                        .getImage(
+                                                            context,
+                                                            searchResults[index]
+                                                                    [
+                                                                    'profile_id']
+                                                                .toString()),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      if (snapshot.hasData) {
                                                         return CircleAvatar(
-                                                          backgroundImage: NetworkImage(snapshot.data),
+                                                          backgroundImage:
+                                                              NetworkImage(
+                                                                  snapshot
+                                                                      .data),
                                                         );
-                                                      }
-                                                      else{
-                                                        return CircularProgressIndicator(strokeWidth: 2,
-                                        backgroundColor: Theme.of(context).buttonColor,
-                                        valueColor: AlwaysStoppedAnimation(
-                                            loginButtonEnd));
+                                                      } else {
+                                                        return CircularProgressIndicator(
+                                                            strokeWidth: 2,
+                                                            backgroundColor:
+                                                                Theme.of(
+                                                                        context)
+                                                                    .buttonColor,
+                                                            valueColor:
+                                                                AlwaysStoppedAnimation(
+                                                                    loginButtonEnd));
                                                       }
                                                     },
                                                   ),
-                                                  title: Text(searchResults[index]
-                                                          ['name']
-                                                      .toString(), style: Theme.of(context).textTheme.headline1,),
+                                                  title: Text(
+                                                    searchResults[index]['name']
+                                                        .toString(),
+                                                    style: Theme.of(context)
+                                                        .textTheme
+                                                        .headline1,
+                                                  ),
                                                   subtitle: Text(
-                                                      searchResults[index]['type']
-                                                          .toString(), style: Theme.of(context).textTheme.headline3),
+                                                      searchResults[index]
+                                                              ['type']
+                                                          .toString(),
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .headline3),
                                                 );
                                               } else {
                                                 return ListTile(
                                                   onTap: () {
-
-                                                    var topicIDList = pref.getStringList('topicIDList');
-                                                    if (topicIDList.contains(searchResults[index]['topic_id'].toString())) {
+                                                    var topicIDList =
+                                                        pref.getStringList(
+                                                            'topicIDList');
+                                                    if (topicIDList.contains(
+                                                        searchResults[index]
+                                                                ['topic_id']
+                                                            .toString())) {
                                                       Navigator.push(
                                                         context,
                                                         MaterialPageRoute(
                                                           builder: (context) =>
                                                               Topic(
-                                                            profileId:
-                                                                widget.profileID,
+                                                            profileId: widget
+                                                                .profileID,
                                                             topicId:
-                                                                searchResults[index]
-                                                                    ['topic_id'],
+                                                                searchResults[
+                                                                        index][
+                                                                    'topic_id'],
                                                             isOwner: true,
                                                           ),
                                                         ),
@@ -912,11 +957,12 @@ class _HomePageState extends State<HomePage> {
                                                         MaterialPageRoute(
                                                           builder: (context) =>
                                                               Topic(
-                                                            profileId:
-                                                                widget.profileID,
+                                                            profileId: widget
+                                                                .profileID,
                                                             topicId:
-                                                                searchResults[index]
-                                                                    ['topic_id'],
+                                                                searchResults[
+                                                                        index][
+                                                                    'topic_id'],
                                                             isOwner: false,
                                                           ),
                                                         ),
@@ -924,27 +970,48 @@ class _HomePageState extends State<HomePage> {
                                                     }
                                                   },
                                                   leading: FutureBuilder(
-                                                    future: FirebaseStorageService.getTopicImage(context, searchResults[index]['topic_id'].toString()),
-                                                    builder: (context, snapshot) {
-                                                      if(snapshot.hasData){
+                                                    future: FirebaseStorageService
+                                                        .getTopicImage(
+                                                            context,
+                                                            searchResults[index]
+                                                                    ['topic_id']
+                                                                .toString()),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      if (snapshot.hasData) {
                                                         return CircleAvatar(
-                                                          backgroundImage: NetworkImage(snapshot.data),
+                                                          backgroundImage:
+                                                              NetworkImage(
+                                                                  snapshot
+                                                                      .data),
                                                         );
-                                                      }
-                                                      else{
-                                                        return CircularProgressIndicator(strokeWidth: 2,
-                                        backgroundColor: Theme.of(context).buttonColor,
-                                        valueColor: AlwaysStoppedAnimation(
-                                            loginButtonEnd));
+                                                      } else {
+                                                        return CircularProgressIndicator(
+                                                            strokeWidth: 2,
+                                                            backgroundColor:
+                                                                Theme.of(
+                                                                        context)
+                                                                    .buttonColor,
+                                                            valueColor:
+                                                                AlwaysStoppedAnimation(
+                                                                    loginButtonEnd));
                                                       }
                                                     },
                                                   ),
-                                                  title: Text(searchResults[index]
-                                                          ['topic_name']
-                                                      .toString(), style: Theme.of(context).textTheme.headline1),
+                                                  title: Text(
+                                                      searchResults[index]
+                                                              ['topic_name']
+                                                          .toString(),
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .headline1),
                                                   subtitle: Text(
-                                                      searchResults[index]['type']
-                                                          .toString(), style: Theme.of(context).textTheme.headline3),
+                                                      searchResults[index]
+                                                              ['type']
+                                                          .toString(),
+                                                      style: Theme.of(context)
+                                                          .textTheme
+                                                          .headline3),
                                                 );
                                               }
                                             } else {
@@ -954,11 +1021,12 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       );
                                     } else {
-                                      if (searchTextController.text.isNotEmpty) {
+                                      if (searchTextController
+                                          .text.isNotEmpty) {
                                         return Center(
                                           child: CircularProgressIndicator(
-                                            valueColor:
-                                                AlwaysStoppedAnimation(bgGradEnd),
+                                            valueColor: AlwaysStoppedAnimation(
+                                                bgGradEnd),
                                           ),
                                         );
                                       } else {
@@ -994,7 +1062,202 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
-        )
+        ),
+        Container(
+          width: screenWidth,
+          height: screenHeight,
+          color: Theme.of(context).canvasColor,
+          child: Column(
+            children: [
+              Container(
+                margin: EdgeInsets.only(top: 30, left: 10, right: 10),
+                child: Material(
+                  child: Row(
+                    children: [
+                      IconButton(
+                          icon: Icon(Icons.arrow_back_ios),
+                          onPressed: () {
+                            pageController.animateToPage(0,
+                                duration: Duration(milliseconds: 200),
+                                curve: Curves.bounceInOut);
+                          }),
+                      Text(
+                        "Notifications",
+                        style: TextStyle(
+                            fontSize: 30, fontWeight: FontWeight.bold),
+                      ),
+                      Spacer(),
+                      Icon(Icons.notifications)
+                    ],
+                  ),
+                ),
+              ),
+              Container(
+                width: screenWidth,
+                height: screenHeight / 1.129,
+                child: ListView(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Material(
+                        clipBehavior: Clip.antiAlias,
+                        child: Row(
+                          children: [
+                            Container(
+                              width: screenWidth / 1.4,
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      "https://picsum.photos/250?image=18"),
+                                ),
+                                title: Text("Darshil Kaneria"),
+                                subtitle: Text("commented on your post"),
+                              ),
+                            ),
+                            Spacer(),
+                            Text("3s ago")
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Material(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: screenWidth / 1.4,
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      "https://picsum.photos/250?image=18"),
+                                ),
+                                title: Text("Darshil Kaneria"),
+                                subtitle: Text("commented on your post"),
+                              ),
+                            ),
+                            Spacer(),
+                            Text("3s ago")
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Material(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: screenWidth / 1.4,
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      "https://picsum.photos/250?image=18"),
+                                ),
+                                title: Text("Darshil Kaneria"),
+                                subtitle: Text("commented on your post"),
+                              ),
+                            ),
+                            Spacer(),
+                            Text("3s ago")
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Material(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: screenWidth / 1.4,
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      "https://picsum.photos/250?image=18"),
+                                ),
+                                title: Text("Darshil Kaneria"),
+                                subtitle: Text("commented on your post"),
+                              ),
+                            ),
+                            Spacer(),
+                            Text("3s ago")
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Material(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: screenWidth / 1.4,
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      "https://picsum.photos/250?image=18"),
+                                ),
+                                title: Text("Darshil Kaneria"),
+                                subtitle: Text("commented on your post"),
+                              ),
+                            ),
+                            Spacer(),
+                            Text("3s ago")
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Material(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: screenWidth / 1.4,
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      "https://picsum.photos/250?image=18"),
+                                ),
+                                title: Text("Darshil Kaneria"),
+                                subtitle: Text("commented on your post"),
+                              ),
+                            ),
+                            Spacer(),
+                            Text("3s ago")
+                          ],
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Material(
+                        child: Row(
+                          children: [
+                            Container(
+                              width: screenWidth / 1.4,
+                              child: ListTile(
+                                leading: CircleAvatar(
+                                  backgroundImage: NetworkImage(
+                                      "https://picsum.photos/250?image=18"),
+                                ),
+                                title: Text("Darshil Kaneria"),
+                                subtitle: Text("commented on your post"),
+                              ),
+                            ),
+                            Spacer(),
+                            Text("3s ago")
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }
@@ -1002,15 +1265,14 @@ class _HomePageState extends State<HomePage> {
   Future<void> _handleRefresh() {
     Completer<Null> completer = new Completer<Null>();
     // setState(() {
-      offset.value = 0;
-      timeLine.setOffset(0);
-      print("Timeline refreshed");
-      timeLine.clearTimeline();
+    offset.value = 0;
+    timeLine.setOffset(0);
+    print("Timeline refreshed");
+    timeLine.clearTimeline();
     // });
     completer.complete();
     return completer.future;
   }
-  
 }
 
 class FirebaseStorageService extends ChangeNotifier {
@@ -1022,7 +1284,9 @@ class FirebaseStorageService extends ChangeNotifier {
         .child(image)
         .getDownloadURL();
   }
-  static Future<dynamic> getTopicImage(BuildContext context, String image) async {
+
+  static Future<dynamic> getTopicImage(
+      BuildContext context, String image) async {
     return await FirebaseStorage.instance
         .ref()
         .child("topic")

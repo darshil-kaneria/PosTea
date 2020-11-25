@@ -78,8 +78,12 @@ class _CreateTopicState extends State<CreateTopic> {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
+      extendBodyBehindAppBar: false,
       appBar: new AppBar(
-        title: Text("Create a New Topic", style: Theme.of(context).textTheme.headline4,),
+        title: Text(
+          "Create a New Topic",
+          style: Theme.of(context).textTheme.headline4,
+        ),
         elevation: 0,
         backgroundColor: Colors.transparent,
         iconTheme: IconThemeData(color: Theme.of(context).buttonColor),
