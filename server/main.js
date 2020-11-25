@@ -130,13 +130,6 @@ app.route("/engagement")
     handleEngagements.send(req.body);
     handleEngagements.on("message", message => res.send(message));
   });
-  // TODO
-  /*.delete((req, res)=> {
-    const handle = fork("./func/delete_engagement.js");
-    handle.send(req.body);
-    handle.on("message", message => res.send(message));
-
-  });*/
 
 // Topic follow data methods
 app.route("/topicfollowdata")
@@ -183,6 +176,7 @@ app.route("/followdata")
     handle.on("message", message => res.send(message));
   });
 
+//Topic methods  
 app.route("/topic")
   .get((req, res) => {
     const handleTopics = fork("./func/get_topic.js");
@@ -210,6 +204,19 @@ app.route("/profileMode")
       handleProfileMode.on("message", message => res.send(message));
     });
 
+// User methods
+app.route("/user")
+.post((req, res) => {
+  const handleUser = fork('./func/add_user.js');
+  handleUser.send(req.body);
+  handleUser.on("message", message => res.send(message));
+})
+.delete((req, res) => {
+  const handleUser = fork('./func/delete_user.js');
+  handleUser.send(req.body);
+  handleUser.on("message", message => res.send(message));
+})
+
 /**
  * Individual end points
  */
@@ -222,6 +229,7 @@ app.get('/selectposts', (req, res) => {
     select.on("message", message => res.send(message));
   });
 
+// User Follow data methods
 app.get("/search",(req, res) =>{
   const handle = fork("./func/search.js");
   var data = {
@@ -229,13 +237,7 @@ app.get("/search",(req, res) =>{
   }
   handle.send(data);
   handle.on("message", message => res.send(message));
-});
-// Add new user
-app.post('/adduser', (req, res) => {
-  const handlePosts = fork('./func/add_user.js');
-  handlePosts.send(req.body);
-  handlePosts.on("message", message => res.send(message));
-});
+})
 
 // Add engagement for a comment
 app.post('/addcommeng', (req, res) => {
