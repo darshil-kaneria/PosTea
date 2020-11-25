@@ -12,6 +12,7 @@ import '../pages/profile.dart';
 import 'package:badges/badges.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_cache_manager/flutter_cache_manager.dart';
+import 'package:linkwell/linkwell.dart';
 
 class PostTile extends StatefulWidget {
   var post_id;
@@ -251,7 +252,7 @@ class _PostTileState extends State<PostTile> {
             title: Text(post_title,
                 style:
                     Theme.of(context).textTheme.headline2),
-            subtitle: AutoSizeText(
+            subtitle: LinkWell(
               post_description,
               style: Theme.of(context).textTheme.headline3,
             )),
@@ -410,6 +411,24 @@ class _PostTileState extends State<PostTile> {
               onPressed: () {},
             ),
           ),
+          IconButton(
+                icon: Icon(Icons.file_download),
+                onPressed: () {
+                  ProcessSavePost processSavePost = new ProcessSavePost(
+                      post_title: post_title,
+                      post_description: post_description,
+                      post_id: post_id,
+                      profile_id: widget.profile_id,
+                      topic_id: topic_id,
+                      name: name,
+                      post_comments: post_comments.toString(),
+                      post_likes: post_likes.toString(),
+                      post_dislikes: post_dislikes.toString(),
+                      post_img: post_img,
+                      creation_date: creation_date);
+                  processSavePost.savePost();
+                },
+              ),
           Expanded(
             child: Container(
               padding: EdgeInsets.only(right: 15),

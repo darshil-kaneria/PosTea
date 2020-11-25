@@ -130,7 +130,7 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> with TickerProvider
                   valueListenable: comment_string,
                   builder: (_, value, __) => Text(
                     value.toString(),
-                    style: TextStyle(fontSize: 15),
+                    style: Theme.of(context).textTheme.headline5,
                   ),
                 ),
         onPressed: () async {
