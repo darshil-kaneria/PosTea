@@ -50,20 +50,51 @@ class _HomePageState extends State<HomePage> {
   var checkPosScrollController = new ScrollController();
   var topicEditingController = new TextEditingController();
   var searchTextController = new TextEditingController();
-  var topicButtonText = "Topic";
+  ValueNotifier<String> topicButtonText = ValueNotifier<String>("Topic");
   bool checkBoxVal = false;
   bool checkEnd = false;
   File imgToUpload;
   String base64Image = "";
   ProcessTimeline timeLine;
-  var isAnonymous = 0;
-  Color isAnonColor = Colors.grey;
+  ValueNotifier<int> isAnonymous = ValueNotifier<int>(0);
+  ValueNotifier<Color> isAnonColor = ValueNotifier<Color>(Colors.grey);
   var is_private = 0;
   var postID;
-  var offset = 0;
+  ValueNotifier<int> offset = ValueNotifier<int>(0);
+  List<String> topic_id_list = [];
+  List<String> post_id_list = [];
+  List<dynamic> engagementInfo = [];
 
   SharedPreferences pref;
   // var searchResults = [];
+
+  getUserData() async {
+    http
+        .get("http://postea-server.herokuapp.com/getUserInfo?profile_id=" +
+            widget.profileID.toString())
+        .then((result) {
+      var results = jsonDecode(result.body);
+      // List<int> post_id_list = results['postIDs'].cast<int>();
+
+      engagementInfo = results['engagementInfo'];
+
+      for (var i = 0; i < results['postIDs'].cast<int>().length; i++) {
+        post_id_list.add(results['postIDs'][i].toString());
+      }
+
+      for (var i = 0; i < results['topicIDs'].cast<int>().length; i++) {
+        topic_id_list.add(results['topicIDs'][i].toString());
+      }
+
+      pref.setStringList('postIDList', post_id_list);
+      pref.setStringList('topicIDList', topic_id_list);
+      pref.setString('engagementInfo', json.encode(engagementInfo));
+
+      // var val = pref.getString('engagementInfo');
+      // List<dynamic> engagementInfoJSON = jsonDecode(val);
+      // print(engagementInfoJSON[0]);
+    });
+  }
 
   ValueNotifier<int> searchNow = ValueNotifier<int>(0);
 
@@ -83,11 +114,11 @@ class _HomePageState extends State<HomePage> {
         !checkPosScrollController.position.outOfRange) {
       print("ISPOST" + timeLine.postRetrieved.toString());
       if (!timeLine.isEnd && timeLine.postRetrieved)
-        setState(() {
-          print("SETSTATE CALLED");
-          offset = offset + 10;
-          // updatePost();
-        });
+        // setState(() {
+        print("SETSTATE CALLED");
+      offset.value = offset.value + 10;
+      updatePost();
+      // });
     }
   }
 
@@ -107,10 +138,12 @@ class _HomePageState extends State<HomePage> {
     //   var timer = Provider.of<TimerCount>(context, listen: false);
     //   timer.changeVal();
     //  });
+    initializeSharedPref();
+    getUserData();
     checkPosScrollController.addListener(_scrollListener);
     //  setState(() {
     // offset = offset+3;
-    // updatePost();
+    updatePost();
     //         });
     super.initState();
   }
@@ -141,7 +174,7 @@ class _HomePageState extends State<HomePage> {
       "likes": 0,
       "dislikes": 0,
       "comment": 0,
-      "anonymous": isAnonymous,
+      "anonymous": isAnonymous.value,
       "is_private": is_private,
       "postID": postID
     };
@@ -154,7 +187,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<http.Response> updatePost() async {
-    await timeLine.setOffset(offset);
+    await timeLine.setOffset(offset.value);
     return await timeLine.getPosts();
   }
 
@@ -185,10 +218,8 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
-    isAnonColor = Theme.of(context).hintColor;
+    isAnonColor.value = Theme.of(context).hintColor;
     PageController pageController = new PageController(initialPage: 0);
-
-    initializeSharedPref();
 
     return PageView(
       physics: NeverScrollableScrollPhysics(),
@@ -371,24 +402,32 @@ class _HomePageState extends State<HomePage> {
                                                   Theme.of(context).hintColor,
                                             ),
                                             onPressed: () {}),
-                                        IconButton(
-                                            icon: Icon(
-                                              Icons.fingerprint,
-                                              color: isAnonColor,
-                                            ),
-                                            onPressed: () {
-                                              if (isAnonymous == 0) {
-                                                isAnonymous = 1;
-                                                isAnonColor =
-                                                    Colors.deepOrange[100];
-                                              } else if (isAnonymous == 1) {
-                                                isAnonymous = 0;
-                                                isAnonColor =
-                                                    Theme.of(context).hintColor;
-                                              }
-                                              setState(() {});
-                                              print(isAnonymous);
-                                            }),
+                                        ValueListenableBuilder(
+                                          valueListenable: isAnonymous,
+                                          builder: (context, value, child) {
+                                            return IconButton(
+                                                icon: Icon(
+                                                  Icons.fingerprint,
+                                                  color: isAnonColor.value,
+                                                ),
+                                                onPressed: () {
+                                                  if (isAnonymous.value == 0) {
+                                                    isAnonymous.value = 1;
+                                                    isAnonColor.value =
+                                                        Colors.deepOrange[100];
+                                                  } else if (isAnonymous
+                                                          .value ==
+                                                      1) {
+                                                    isAnonymous.value = 0;
+                                                    isAnonColor.value =
+                                                        Theme.of(context)
+                                                            .hintColor;
+                                                  }
+                                                  // setState(() {});
+                                                  print(isAnonymous.value);
+                                                });
+                                          },
+                                        ),
                                         IconButton(
                                           icon: Icon(
                                             CupertinoIcons.eye,
@@ -464,10 +503,11 @@ class _HomePageState extends State<HomePage> {
                                                                       child: RaisedButton(
                                                                           child: Text("Choose Topic"),
                                                                           onPressed: () {
-                                                                            setState(() {
-                                                                              topicButtonText = topicEditingController.text;
-                                                                              print(topicEditingController.text);
-                                                                            });
+                                                                            // setState(() {
+                                                                            topicButtonText.value =
+                                                                                topicEditingController.text;
+                                                                            print(topicEditingController.text);
+                                                                            // });
                                                                             Navigator.of(context, rootNavigator: true).pop();
                                                                           }),
                                                                     )
@@ -485,7 +525,7 @@ class _HomePageState extends State<HomePage> {
                                                     )
                                                   },
                                                   child: Text(
-                                                    topicButtonText,
+                                                    topicButtonText.value,
                                                     style:
                                                         TextStyle(fontSize: 15),
                                                   ),
@@ -627,72 +667,69 @@ class _HomePageState extends State<HomePage> {
               ),
               Padding(padding: EdgeInsets.only(top: 15)),
               Expanded(
-                child: FutureBuilder(
-                    future: updatePost(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<http.Response> snapshot) {
-                      if (snapshot.hasData) {
-                        return RefreshIndicator(
-                          onRefresh: _handleRefresh,
-                          child: ListView.builder(
-                              physics: BouncingScrollPhysics(),
-                              controller: checkPosScrollController,
-                              itemCount: timeLine.postList.length,
-                              itemBuilder: (BuildContext context, int index) {
-                                // if(timeLine.isEnd == true){
-                                //   if(checkEnd)
-                                //   return ListTile(
-                                //     leading: Icon(Icons.error_outline),
-                                //     title: Text("You have reached the end, my friend.", style: TextStyle(color: Colors.grey, fontSize: 15),),
-                                //   );
-                                //   if(index == timeLine.postList.length-1){
-                                //     checkEnd = true;
-                                //   }
-
-                                // }
-                                print("LIKES ARE: " +
-                                    timeLine.postList
-                                        .elementAt(index)
-                                        .post_likes);
-                                return PostTile(
-                                    timeLine.postList.elementAt(index).post_id,
-                                    timeLine.postList
-                                        .elementAt(index)
-                                        .profile_id,
-                                    timeLine.postList
-                                        .elementAt(index)
-                                        .post_description,
-                                    timeLine.postList.elementAt(index).topic_id,
-                                    timeLine.postList.elementAt(index).post_img,
-                                    timeLine.postList
-                                        .elementAt(index)
-                                        .creation_date,
-                                    timeLine.postList
-                                        .elementAt(index)
-                                        .post_likes,
-                                    timeLine.postList
-                                        .elementAt(index)
-                                        .post_dislikes,
-                                    timeLine.postList
-                                        .elementAt(index)
-                                        .post_comments,
-                                    timeLine.postList
-                                        .elementAt(index)
-                                        .post_title,
-                                    timeLine.postList
-                                        .elementAt(index)
-                                        .post_name,
-                                    widget.profileID.toString(),
-                                    0);
-                              }),
-                        );
-                      } else
-                        return Center(
-                            child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation(bgGradEnd),
-                        ));
-                      // else return null;
-                    }),
+                child: ValueListenableBuilder(
+                  valueListenable: timeLine.isLoaded,
+                  builder: (context, value, child) {
+                    print("ISLOADED: " + timeLine.isLoaded.toString());
+                    // return FutureBuilder(
+                    // future: updatePost(),
+                    // builder: (BuildContext context,
+                    // AsyncSnapshot<http.Response> snapshot) {
+                    // if (snapshot.hasData) {
+                    return RefreshIndicator(
+                      onRefresh: _handleRefresh,
+                      child: ListView.builder(
+                          physics: BouncingScrollPhysics(),
+                          controller: checkPosScrollController,
+                          itemCount: timeLine.postList.length + 1,
+                          itemBuilder: (BuildContext context, int index) {
+                            if (index == timeLine.postList.length &&
+                                timeLine.postList.length != 1) {
+                              // print("SIZE IS: "+snapshot.data.contentLength.toString());
+                              return Container(
+                                margin: EdgeInsets.all(10),
+                                child: Center(
+                                    child: CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation(bgGradEnd),
+                                )),
+                              );
+                            }
+                            print("LIKES ARE: " +
+                                timeLine.postList.elementAt(index).post_likes);
+                            return PostTile(
+                                timeLine.postList.elementAt(index).post_id,
+                                timeLine.postList.elementAt(index).profile_id,
+                                timeLine.postList
+                                    .elementAt(index)
+                                    .post_description,
+                                timeLine.postList.elementAt(index).topic_id,
+                                timeLine.postList.elementAt(index).post_img,
+                                timeLine.postList
+                                    .elementAt(index)
+                                    .creation_date,
+                                timeLine.postList.elementAt(index).post_likes,
+                                timeLine.postList
+                                    .elementAt(index)
+                                    .post_dislikes,
+                                timeLine.postList
+                                    .elementAt(index)
+                                    .post_comments,
+                                timeLine.postList.elementAt(index).post_title,
+                                timeLine.postList.elementAt(index).post_name,
+                                widget.profileID.toString(),
+                                0);
+                          }),
+                    );
+                    // } else
+                    //   return Center(
+                    //       child: CircularProgressIndicator(
+                    //     valueColor: AlwaysStoppedAnimation(bgGradEnd),
+                    //   ));
+                    // else return null;
+                    // });
+                  },
+                  // child: ,
+                ),
               )
             ],
 
@@ -844,9 +881,35 @@ class _HomePageState extends State<HomePage> {
                                                       );
                                                     }
                                                   },
-                                                  leading: CircleAvatar(
-                                                    backgroundImage: NetworkImage(
-                                                        "https://picsum.photos/250?image=18"),
+                                                  leading: FutureBuilder(
+                                                    future: FirebaseStorageService
+                                                        .getImage(
+                                                            context,
+                                                            searchResults[index]
+                                                                    [
+                                                                    'profile_id']
+                                                                .toString()),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      if (snapshot.hasData) {
+                                                        return CircleAvatar(
+                                                          backgroundImage:
+                                                              NetworkImage(
+                                                                  snapshot
+                                                                      .data),
+                                                        );
+                                                      } else {
+                                                        return CircularProgressIndicator(
+                                                            strokeWidth: 2,
+                                                            backgroundColor:
+                                                                Theme.of(
+                                                                        context)
+                                                                    .buttonColor,
+                                                            valueColor:
+                                                                AlwaysStoppedAnimation(
+                                                                    loginButtonEnd));
+                                                      }
+                                                    },
                                                   ),
                                                   title: Text(
                                                     searchResults[index]['name']
@@ -866,7 +929,13 @@ class _HomePageState extends State<HomePage> {
                                               } else {
                                                 return ListTile(
                                                   onTap: () {
-                                                    if (true) {
+                                                    var topicIDList =
+                                                        pref.getStringList(
+                                                            'topicIDList');
+                                                    if (topicIDList.contains(
+                                                        searchResults[index]
+                                                                ['topic_id']
+                                                            .toString())) {
                                                       Navigator.push(
                                                         context,
                                                         MaterialPageRoute(
@@ -900,9 +969,34 @@ class _HomePageState extends State<HomePage> {
                                                       );
                                                     }
                                                   },
-                                                  leading: CircleAvatar(
-                                                    backgroundImage: NetworkImage(
-                                                        "https://picsum.photos/250?image=18"),
+                                                  leading: FutureBuilder(
+                                                    future: FirebaseStorageService
+                                                        .getTopicImage(
+                                                            context,
+                                                            searchResults[index]
+                                                                    ['topic_id']
+                                                                .toString()),
+                                                    builder:
+                                                        (context, snapshot) {
+                                                      if (snapshot.hasData) {
+                                                        return CircleAvatar(
+                                                          backgroundImage:
+                                                              NetworkImage(
+                                                                  snapshot
+                                                                      .data),
+                                                        );
+                                                      } else {
+                                                        return CircularProgressIndicator(
+                                                            strokeWidth: 2,
+                                                            backgroundColor:
+                                                                Theme.of(
+                                                                        context)
+                                                                    .buttonColor,
+                                                            valueColor:
+                                                                AlwaysStoppedAnimation(
+                                                                    loginButtonEnd));
+                                                      }
+                                                    },
                                                   ),
                                                   title: Text(
                                                       searchResults[index]
@@ -1170,12 +1264,33 @@ class _HomePageState extends State<HomePage> {
 
   Future<void> _handleRefresh() {
     Completer<Null> completer = new Completer<Null>();
-    setState(() {
-      offset = 0;
-      print("Timeline refreshed");
-      timeLine.clearTimeline();
-    });
+    // setState(() {
+    offset.value = 0;
+    timeLine.setOffset(0);
+    print("Timeline refreshed");
+    timeLine.clearTimeline();
+    // });
     completer.complete();
     return completer.future;
+  }
+}
+
+class FirebaseStorageService extends ChangeNotifier {
+  FirebaseStorageService();
+  static Future<dynamic> getImage(BuildContext context, String image) async {
+    return await FirebaseStorage.instance
+        .ref()
+        .child("profile")
+        .child(image)
+        .getDownloadURL();
+  }
+
+  static Future<dynamic> getTopicImage(
+      BuildContext context, String image) async {
+    return await FirebaseStorage.instance
+        .ref()
+        .child("topic")
+        .child(image)
+        .getDownloadURL();
   }
 }

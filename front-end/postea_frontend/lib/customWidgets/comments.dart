@@ -1,13 +1,16 @@
 import 'package:auto_size_text/auto_size_text.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:postea_frontend/main.dart';
 
 class Comments extends StatefulWidget {
   var personName;
   var comment;
   var postID;
+  var profileID;
 
-  Comments(this.comment, this.personName);
+  Comments(this.profileID, this.comment, this.personName);
 
   @override
   _CommentsState createState() => _CommentsState(this.comment, this.personName);
@@ -31,11 +34,16 @@ class _CommentsState extends State<Comments> {
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
-                  child: CircleAvatar(
-                    backgroundImage:
-                        NetworkImage("https://picsum.photos/250?image=7"),
-                    backgroundColor: Colors.deepPurpleAccent[50],
-                    radius: 15,
+                  child: FutureBuilder(
+                    future: FirebaseStorageService.getImage(context, widget.profileID.toString()),
+                    builder: (context, snapshot) {
+                      return CircleAvatar(
+                      backgroundImage:
+                          NetworkImage(snapshot.data),
+                      backgroundColor: Colors.deepPurpleAccent[50],
+                      radius: 15,
+                    );
+                    },
                   ),
                 ),
               ),
@@ -66,5 +74,15 @@ class _CommentsState extends State<Comments> {
         ],
       ),
     );
+  }
+}
+class FirebaseStorageService extends ChangeNotifier {
+  FirebaseStorageService();
+  static Future<dynamic> getImage(BuildContext context, String image) async {
+    return await FirebaseStorage.instance
+        .ref()
+        .child("profile")
+        .child(image)
+        .getDownloadURL();
   }
 }

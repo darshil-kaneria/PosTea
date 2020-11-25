@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/colors.dart';
+import 'package:postea_frontend/data_models/process_theme.dart';
 import 'package:postea_frontend/pages/homepage.dart';
 import 'package:postea_frontend/pages/loggedIn.dart';
 import 'package:provider/provider.dart';
@@ -21,7 +22,12 @@ Future<void> main() async {
   profileId = prefs.getInt('profileID') ?? 0;
   await Firebase.initializeApp();
   print(profileId);
-  runApp(PosTea());
+  runApp(MultiProvider(providers: [
+    ChangeNotifierProvider(
+      create: (context) => ProcessTheme(),
+      lazy: false,
+    ),
+  ], child: PosTea()));
 }
 
 class PosTea extends StatefulWidget {
@@ -74,7 +80,9 @@ class _PosTeaState extends State<PosTea> {
               fontSize: 16, color: Colors.black, fontWeight: FontWeight.normal),
           headline2: TextStyle(
               fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),
-          headline3: TextStyle(fontSize: 13, color: Colors.black)),
+          headline3: TextStyle(fontSize: 13, color: Colors.black),
+          headline4: TextStyle(fontSize: 18, color: Colors.black),
+          headline5: TextStyle(fontSize: 16, color: Colors.black)),
     );
 
     ThemeData darkTheme = ThemeData(
@@ -91,13 +99,16 @@ class _PosTeaState extends State<PosTea> {
               fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
           headline2: TextStyle(
               fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
-          headline3: TextStyle(fontSize: 13, color: Colors.white)),
+          headline3: TextStyle(fontSize: 13, color: Colors.white),
+          headline4: TextStyle(fontSize: 18, color: Colors.white),
+          headline5: TextStyle(fontSize: 16, color: Colors.white)),
     );
-    return ChangeNotifierProvider(
-        create: (context) => TimerCount(),
-        child: MaterialApp(
+
+    return Consumer<ProcessTheme>(
+      builder: (context, value, child) {
+        return MaterialApp(
           darkTheme: darkTheme,
-          theme: lightTheme,
+          theme: value.themeData == 1 ? lightTheme : darkTheme,
           debugShowCheckedModeBanner: false,
           title: "PosTea app",
           initialRoute: firstScreen,
@@ -108,6 +119,8 @@ class _PosTeaState extends State<PosTea> {
                   name: firstScreen, arguments: HomePage(profileID: profileId)))
             ];
           },
-        ));
+        );
+      },
+    );
   }
 }

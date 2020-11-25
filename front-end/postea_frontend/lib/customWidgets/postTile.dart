@@ -4,6 +4,7 @@ import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:postea_frontend/customWidgets/topic_pill.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../colors.dart';
 import './expandedPostTile.dart';
 import 'package:postea_frontend/customWidgets/expandedPostTile.dart';
@@ -79,9 +80,6 @@ class _PostTileState extends State<PostTile> {
   var dislike_count;
   var isExpanded;
 
-  Color like_color = Colors.black;
-  Color dislike_color = Colors.black;
-
   _PostTileState(
       this.post_id,
       this.profile_id,
@@ -96,7 +94,7 @@ class _PostTileState extends State<PostTile> {
       this.name,
       this.myPID,
       this.isExpanded);
-
+  SharedPreferences pref;
   Future<http.Response> getLikesDislikes() async {
     http.Response resp;
     var url = "http://postea-server.herokuapp.com/engagement?post_id=" +
@@ -106,13 +104,36 @@ class _PostTileState extends State<PostTile> {
     return resp;
   }
 
+  initializeSharedPref() async {
+    pref = await SharedPreferences.getInstance();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    initializeSharedPref();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
+    ValueNotifier<bool> isOwnerTopic = ValueNotifier<bool>(false);
+    ValueNotifier<Color> like_color =
+        ValueNotifier<Color>(Theme.of(context).buttonColor);
+    ValueNotifier<Color> dislike_color =
+        ValueNotifier<Color>(Theme.of(context).buttonColor);
     int post_likes = int.parse(widget.post_likes);
     int post_dislikes = int.parse(widget.post_dislikes);
     int post_comments = int.parse(widget.post_comments);
 
     // print("post likes = " + widget.post_likes);
+    Future.delayed(Duration(seconds: 2)).then((value) {
+      var topic_id_list = pref.getStringList("topicIDList");
+      if (topic_id_list.contains(topic_id.toString())) {
+        isOwnerTopic.value = true;
+      } else
+        isOwnerTopic.value = false;
+    });
 
     bool showLikeBadge = post_likes > 0;
     bool showDislikeBadge = post_dislikes > 0;
@@ -131,16 +152,21 @@ class _PostTileState extends State<PostTile> {
       child: Column(
         children: [
           ListTile(
-            trailing: TopicPill(
-              topicId: topic_id,
-              // col1: Colors.purple[900],
-              // col2: Colors.purple[400],
-              col1: Theme.of(context).primaryColorLight,
-              col2: Theme.of(context).primaryColorDark,
-              height: screenheight / 20,
-              width: screenwidth / 4,
-              profileId: myPID,
-              isOwner: false,
+            trailing: ValueListenableBuilder(
+              valueListenable: isOwnerTopic,
+              builder: (context, value, child) {
+                return TopicPill(
+                  topicId: topic_id,
+                  // col1: Colors.purple[900],
+                  // col2: Colors.purple[400],
+                  col1: Theme.of(context).primaryColorLight,
+                  col2: Theme.of(context).primaryColorDark,
+                  height: screenheight / 20,
+                  width: screenwidth / 4,
+                  profileId: myPID,
+                  isOwner: value,
+                );
+              },
             ),
             onTap: () => {
               if (myPID != widget.profile_id)
@@ -200,36 +226,32 @@ class _PostTileState extends State<PostTile> {
               top: BorderSide(width: 0.5, color: Colors.grey),
             )),
             child: ListTile(
-              onTap: () => {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => ExpandedPostTile(
-                            post_id,
-                            profile_id,
-                            post_description,
-                            topic_id,
-                            post_img,
-                            creation_date,
-                            post_likes.toString(),
-                            post_dislikes.toString(),
-                            post_comments.toString(),
-                            post_title,
-                            name,
-                            myPID)))
-              },
-              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-              title: Text(post_title,
-                  style: Theme.of(context).textTheme.headline2),
-              subtitle: LinkWell(
-                post_description,
-                style: Theme.of(context).textTheme.headline3,
-              ),
-              // subtitle: AutoSizeText(
-              //   post_description,
-              //   style: Theme.of(context).textTheme.headline3,
-              // ),
-            ),
+                onTap: () => {
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ExpandedPostTile(
+                                  post_id,
+                                  profile_id,
+                                  post_description,
+                                  topic_id,
+                                  post_img,
+                                  creation_date,
+                                  post_likes.toString(),
+                                  post_dislikes.toString(),
+                                  post_comments.toString(),
+                                  post_title,
+                                  name,
+                                  myPID)))
+                    },
+                contentPadding:
+                    EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                title: Text(post_title,
+                    style: Theme.of(context).textTheme.headline2),
+                subtitle: LinkWell(
+                  post_description,
+                  style: Theme.of(context).textTheme.headline3,
+                )),
           ),
           Container(
               child: FutureBuilder(
@@ -284,44 +306,52 @@ class _PostTileState extends State<PostTile> {
                       post_likes.toString(),
                       style: TextStyle(fontSize: 10),
                     ),
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.thumb_up,
-                        color: Theme.of(context).buttonColor,
-                      ),
-                      iconSize: 16,
-                      onPressed: () {
-                        like_or_dislike = "1";
-                        setState(() {
-                          if (dislike_color == Colors.deepOrange[200]) {
-                            dislike_color = Colors.black;
-                            post_likes++;
-                            post_dislikes--;
-                          }
-                          if (like_color == Colors.deepOrange[200]) {
-                            like_color = Colors.black;
-                            post_likes--;
-                          } else {
-                            like_color = Colors.deepOrange[200];
-                            post_likes++;
-                          }
-                        });
-                        print(post_id);
-                        print(profile_id);
-                        print(like_or_dislike);
-                        print(comment);
-                        var data = {
-                          "engagement_post_id": post_id,
-                          "engagement_profile_id": myPID,
-                          "like_dislike": like_or_dislike,
-                          "comment": comment
-                        };
-                        var sendAnswer = JsonEncoder().convert(data);
-                        print(sendAnswer);
-                        Future<http.Response> resp = http.post(
-                            'http://postea-server.herokuapp.com/engagement',
-                            headers: {'Content-Type': 'application/json'},
-                            body: sendAnswer);
+                    child: ValueListenableBuilder(
+                      valueListenable: like_color,
+                      builder: (context, value, child) {
+                        return IconButton(
+                          icon: Icon(
+                            Icons.thumb_up,
+                            // color: Theme.of(context).buttonColor,
+                            color: like_color.value,
+                          ),
+                          iconSize: 16,
+                          onPressed: () {
+                            like_or_dislike = "1";
+                            // setState(() {
+                            if (dislike_color.value == Colors.deepOrange[200]) {
+                              dislike_color.value =
+                                  Theme.of(context).buttonColor;
+                              like_color.value = Colors.deepOrange[200];
+                              post_likes++;
+                              post_dislikes--;
+                            } else if (like_color.value ==
+                                Colors.deepOrange[200]) {
+                              like_color.value = Theme.of(context).buttonColor;
+                              post_likes--;
+                            } else {
+                              like_color.value = Colors.deepOrange[200];
+                              post_likes++;
+                            }
+                            // });
+                            print(post_id);
+                            print(profile_id);
+                            print(like_or_dislike);
+                            print(comment);
+                            var data = {
+                              "engagement_post_id": post_id,
+                              "engagement_profile_id": myPID,
+                              "like_dislike": like_or_dislike,
+                              "comment": comment
+                            };
+                            var sendAnswer = JsonEncoder().convert(data);
+                            print(sendAnswer);
+                            Future<http.Response> resp = http.post(
+                                'http://postea-server.herokuapp.com/engagement',
+                                headers: {'Content-Type': 'application/json'},
+                                body: sendAnswer);
+                          },
+                        );
                       },
                     ),
                   ),
@@ -337,39 +367,45 @@ class _PostTileState extends State<PostTile> {
                 position: BadgePosition.topEnd(top: 1, end: 1),
                 animationType: BadgeAnimationType.fade,
                 showBadge: showDislikeBadge,
-                child: IconButton(
-                  icon: Icon(
-                    Icons.thumb_down,
-                    color: Theme.of(context).buttonColor,
-                  ),
-                  iconSize: 16,
-                  onPressed: () {
-                    setState(() {
-                      like_or_dislike = "0";
-                      if (like_color == Colors.deepOrange[200]) {
-                        like_color = Colors.black;
-                        post_likes--;
+                child: ValueListenableBuilder(
+                  valueListenable: dislike_color,
+                  builder: (context, value, child) {
+                    return IconButton(
+                      icon: Icon(
+                        Icons.thumb_down,
+                        color: Theme.of(context).buttonColor,
+                      ),
+                      iconSize: 16,
+                      onPressed: () {
+                        // setState(() {
+                        like_or_dislike = "0";
+                        if (like_color.value == Colors.deepOrange[200]) {
+                          like_color.value = Theme.of(context).buttonColor;
+                          dislike_color.value = Colors.deepOrange[200];
+                          post_likes--;
+                          post_dislikes++;
+                        } else if (dislike_color.value ==
+                            Colors.deepOrange[200]) {
+                          dislike_color.value = Theme.of(context).buttonColor;
+                          post_dislikes--;
+                        } else
+                          dislike_color.value = Colors.deepOrange[200];
                         post_dislikes++;
-                      }
-                      if (dislike_color == Colors.deepOrange[200]) {
-                        dislike_color = Colors.black;
-                        post_dislikes--;
-                      } else
-                        dislike_color = Colors.deepOrange[200];
-                      post_dislikes++;
-                    });
+                        // });
 
-                    var data = {
-                      "engagement_post_id": post_id,
-                      "engagement_profile_id": myPID,
-                      "like_dislike": like_or_dislike,
-                      "comment": comment
-                    };
-                    var sendAnswer = JsonEncoder().convert(data);
-                    Future<http.Response> resp = http.post(
-                        'http://postea-server.herokuapp.com/engagement',
-                        headers: {'Content-Type': 'application/json'},
-                        body: sendAnswer);
+                        var data = {
+                          "engagement_post_id": post_id,
+                          "engagement_profile_id": myPID,
+                          "like_dislike": like_or_dislike,
+                          "comment": comment
+                        };
+                        var sendAnswer = JsonEncoder().convert(data);
+                        Future<http.Response> resp = http.post(
+                            'http://postea-server.herokuapp.com/engagement',
+                            headers: {'Content-Type': 'application/json'},
+                            body: sendAnswer);
+                      },
+                    );
                   },
                 ),
               ),

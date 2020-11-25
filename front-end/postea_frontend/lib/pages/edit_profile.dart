@@ -85,7 +85,7 @@ class _EditProfileState extends State<EditProfile> {
     var profileImgName = widget.username.toString() + ".JPG";
     return SafeArea(
       child: Scaffold(
-        backgroundColor: bgColor,
+        backgroundColor: Theme.of(context).canvasColor,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -96,6 +96,7 @@ class _EditProfileState extends State<EditProfile> {
               Navigator.pop(context);
             },
           ),
+          iconTheme: IconThemeData(color: Theme.of(context).buttonColor),
         ),
         extendBodyBehindAppBar: false,
         body: SingleChildScrollView(
@@ -187,9 +188,11 @@ class _EditProfileState extends State<EditProfile> {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Card(
+                  color: Theme.of(context).accentColor,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20)),
                   child: TextField(
+                    // style: Theme.of(context).textTheme.headline5,
                     controller: nameController,
                     decoration: InputDecoration(
                         floatingLabelBehavior: FloatingLabelBehavior.auto,
@@ -213,6 +216,7 @@ class _EditProfileState extends State<EditProfile> {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Card(
+                  color: Theme.of(context).accentColor,
                   elevation: 1,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20)),
@@ -243,17 +247,22 @@ class _EditProfileState extends State<EditProfile> {
                     elevation: 1,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
-                    child: ListTile(
-                        title: Text("Private profile"),
-                        trailing: Switch(
-                            value: widget.privacy,
-                            activeTrackColor: Colors.deepOrange[200],
-                            activeColor: Colors.deepOrange[700],
-                            onChanged: (value) {
-                              setState(() {
-                                widget.privacy = value;
-                              });
-                            })),
+                    child: Material(
+                      color: Theme.of(context).accentColor,
+                      shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20)),
+                      child: ListTile(
+                          title: Text("Private profile"),
+                          trailing: Switch(
+                              value: widget.privacy,
+                              activeTrackColor: Colors.deepOrange[200],
+                              activeColor: Colors.deepOrange[700],
+                              onChanged: (value) {
+                                setState(() {
+                                  widget.privacy = value;
+                                });
+                              })),
+                    ),
                   )),
               Padding(
                 padding: const EdgeInsets.all(10.0),

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -227,9 +228,9 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> with TickerProvider
                           itemCount: comments.length,
                           shrinkWrap: true,
                           itemBuilder: (BuildContext context, int index) {
-                            print('in list view builder');
+                            print(engagements[index]);
                             print(comments.elementAt(index));
-                            return Comments(
+                            return Comments(engagements[index]['profile_id'],
                                 comments.elementAt(index), engagements[index]['name']);
                           });
                     } else {
@@ -283,3 +284,5 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> with TickerProvider
     );
   }
 }
+
+

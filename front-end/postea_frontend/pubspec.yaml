@@ -42,6 +42,7 @@ dependencies:
   badges:
   linkwell: ^0.1.9
 
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
