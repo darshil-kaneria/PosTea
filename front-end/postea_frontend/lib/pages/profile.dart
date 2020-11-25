@@ -61,14 +61,14 @@ class _ProfileState extends State<Profile> {
   getFollowing() async {
     prefs = await SharedPreferences.getInstance();
     widget.myPID = prefs.getInt('profileID') ?? 0;
-    print("MY ID" + widget.myPID.toString());
+    print("MY ID" + widget.profileId.toString());
     http
         .get("http://postea-server.herokuapp.com/followdata?profile_id=" +
-            widget.myPID.toString() +
+            widget.profileId.toString() +
             "&flag=following_list")
         .then((resp) {
       listFollowing = jsonDecode(resp.body);
-      print("LIST FOLLOWING" + widget.profileId.toString());
+      print("LIST FOLLOWING" + listFollowing.toString());
       for (int i = 0; i < listFollowing.length; i++) {
         // print()
         if (listFollowing[i]['follower_id'] == widget.profileId) {
@@ -358,6 +358,8 @@ class _ProfileState extends State<Profile> {
                                                                       FollowerList(
                                                                         profileId:
                                                                             widget.profileId,
+                                                                        name:
+                                                                            name,
                                                                       ))).then(
                                                               (value) =>
                                                                   setState(
@@ -405,6 +407,8 @@ class _ProfileState extends State<Profile> {
                                                                       FollowingList(
                                                                         profileId:
                                                                             widget.profileId,
+                                                                        name:
+                                                                            name,
                                                                       ))).then(
                                                               (value) =>
                                                                   setState(
@@ -955,7 +959,11 @@ class _ProfileState extends State<Profile> {
                                     },
                                   );
                                 } else {
-                                  return Container();
+                                  return Center(
+                                      child: Text(
+                                    "You have no saved posts",
+                                    style: TextStyle(fontSize: 15),
+                                  ));
                                 }
                               },
                             ),
