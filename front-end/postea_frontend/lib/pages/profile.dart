@@ -124,7 +124,8 @@ class _ProfileState extends State<Profile> {
       _biodataController.text = profile["message"]["biodata"];
       bio_data = _biodataController.text;
       isPrivate =
-          profile["message"]["privacy"].toString().toLowerCase() == "true";
+          profile["message"]["privacy"].toString().toLowerCase() == "yes";
+      print("isPrivate is " + isPrivate.toString());
     });
 
     print(profile["message"]["profile_id"]);
@@ -189,8 +190,6 @@ class _ProfileState extends State<Profile> {
   }
 
   Future<http.Response> getUserPosts(int profile_id) async {
-    var profileID = prefs.getInt('profileID') ?? 0;
-    print("profile_id inside getuserposts is " + profileID.toString());
     var url = "http://postea-server.herokuapp.com/getAllUserPosts?profile_id=" +
         widget.profileId.toString();
 
@@ -206,460 +205,491 @@ class _ProfileState extends State<Profile> {
     var screenWidth = MediaQuery.of(context).size.width;
     print("profileId is " + widget.profileId.toString());
     print("username is " + username.toString());
+    print("isFollow is " + isFollow.toString());
     // displayImage();
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      extendBodyBehindAppBar: true,
-      resizeToAvoidBottomPadding: false,
-      resizeToAvoidBottomInset: false,
-      appBar: AppBar(
-        elevation: 0,
-        backgroundColor: Colors.transparent,
-        automaticallyImplyLeading: true,
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back),
-          color: Colors.black,
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        actions: [
-          widget.isOwner
-              ? IconButton(
-                  icon: Icon(
-                    Icons.edit,
-                    color: Colors.black,
-                  ),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        PageRouteBuilder(
-                          transitionDuration: Duration(milliseconds: 300),
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            return FadeTransition(
-                                opacity: animation,
-                                child: SlideTransition(
-                                  position: Tween<Offset>(
-                                          begin: Offset(0, -1),
-                                          end: Offset(0, 0))
-                                      .animate(CurvedAnimation(
-                                          parent: animation,
-                                          curve: Curves.decelerate)),
-                                  child: child,
-                                ));
-                          },
-                          pageBuilder: (BuildContext context,
-                              Animation<double> animation,
-                              Animation<double> secAnimation) {
-                            return EditProfile(
-                                nameText: name,
-                                biodata: bio_data,
-                                privacy: isPrivate,
-                                username: username,
-                                profile_id: widget.myPID);
-                          },
-                        ));
-                  },
-                )
-              : Container()
-        ],
-      ),
-      body: SafeArea(
+    return SafeArea(
+      child: Container(
+        width: screenWidth,
+        height: screenHeight,
         child: PageView(
           scrollDirection: Axis.horizontal,
           physics: NeverScrollableScrollPhysics(),
           controller: controller,
           children: [
-            Column(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: <Widget>[
-                  Container(
-                    // height: screenHeight / 4,
-                    width: screenWidth,
-                    color: Colors.transparent,
-                    // padding: EdgeInsets.only(top: screenHeight / 20),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.max,
-                      children: <Widget>[
-                        Container(
-                          margin: EdgeInsets.symmetric(horizontal: 12),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                            children: [
-                              Container(
-                                height: screenWidth / 4,
-                                width: screenWidth / 4,
-                                decoration: ShapeDecoration(
-                                    shape: CircleBorder(
-                                        side: BorderSide(
-                                            width: 1, color: Colors.blueGrey))),
-                                child: FutureBuilder(
-                                    future: FirebaseStorageService.getImage(
-                                        context, widget.profileId.toString()),
-                                    builder: (context,
-                                        AsyncSnapshot<dynamic> snapshot) {
-                                      if (snapshot.hasData) {
-                                        return CircleAvatar(
-                                          backgroundImage:
-                                              NetworkImage(snapshot.data),
-                                          maxRadius: screenWidth / 8,
-                                        );
-                                      } else {
-                                        return CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          backgroundColor: bgColor,
-                                          valueColor: AlwaysStoppedAnimation(
-                                              loginButtonEnd),
-                                        );
-                                      }
-                                    }),
-                              ),
-                              Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    AutoSizeText(
-                                      name,
-                                      maxFontSize: 29,
-                                      minFontSize: 27,
-                                      softWrap: true,
-                                    ),
-                                    Padding(
-                                        padding: EdgeInsets.only(
-                                            bottom: screenHeight / 40)),
-                                    IntrinsicHeight(
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceAround,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.stretch,
-                                        children: [
-                                          Column(
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (_) =>
-                                                              FollowerList(
-                                                                profileId: widget
-                                                                    .profileId,
-                                                              ))).then(
-                                                      (value) =>
-                                                          setState(() {}));
-                                                },
-                                                child: Text(
-                                                  "Followers",
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ),
-                                              ValueListenableBuilder(
-                                                  valueListenable:
-                                                      followerCountNotifier,
-                                                  builder: (_, value, __) =>
-                                                      Text(value.toString()))
-                                            ],
-                                          ),
-                                          Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal:
-                                                      screenWidth / 25)),
-                                          Container(
-                                            // height: 20,
-                                            width: 0.5,
-                                            color: Colors.blueGrey,
-                                          ),
-                                          Padding(
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal:
-                                                      screenWidth / 25)),
-                                          Column(
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
-                                                  Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (_) =>
-                                                              FollowingList(
-                                                                profileId: widget
-                                                                    .profileId,
-                                                              ))).then(
-                                                      (value) =>
-                                                          setState(() {}));
-                                                },
-                                                child: Text(
-                                                  "Following",
-                                                  style: TextStyle(
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ),
-                                              ValueListenableBuilder(
-                                                  valueListenable:
-                                                      followingCountNotifier,
-                                                  builder: (_, value, __) =>
-                                                      Text(value.toString()))
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                    )
-                                  ]),
-                            ],
-                          ),
+            Material(
+              child: Container(
+                width: screenWidth,
+                height: screenHeight / 1.1,
+                // margin: EdgeInsets.only(top: 20),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(Icons.arrow_back),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
                         ),
-                        // Profile circle
-                        SizedBox(
-                          height: screenHeight / 25,
-                        ),
-                        widget.isOwner == false
-                            ? Container(
-                                height: screenHeight / 14,
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: screenWidth / 15, vertical: 10),
-                                child: ButtonTheme(
-                                    buttonColor: buttonColor,
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius:
-                                            BorderRadius.circular(30)),
-                                    minWidth: screenWidth / 1.5,
-                                    child: RaisedButton(
-                                        elevation: 2,
-                                        clipBehavior: Clip.antiAlias,
-                                        child: Text(followButtonText),
-                                        onPressed: () async {
-                                          print(isFollow);
-
-                                          if (isFollow) {
-                                            buttonColor = Colors.red[50];
-                                            isFollow = false;
-                                            followButtonText = "Follow";
-                                            final request = http.Request(
-                                                "DELETE",
-                                                Uri.parse(
-                                                    "http://postea-server.herokuapp.com/followdata"));
-                                            request.headers.addAll({
-                                              'Content-Type': 'application/json'
-                                            });
-                                            request.body = jsonEncode({
-                                              "profile_id": widget.myPID,
-                                              "follower_id": widget.profileId
-                                            });
-                                            request.send();
-                                          } else {
-                                            buttonColor = Colors.redAccent[100];
-                                            isFollow = true;
-                                            followButtonText = "Following";
-                                            var addfollowing = {
-                                              "profile_id": widget.myPID,
-                                              "follower_id": widget.profileId
-                                            };
-                                            var addfollowingJson = JsonEncoder()
-                                                .convert(addfollowing);
-                                            http.post(
-                                                "http://postea-server.herokuapp.com/followdata",
-                                                headers: {
-                                                  'Content-Type':
-                                                      'application/json'
-                                                },
-                                                body: addfollowingJson);
-                                          }
-
-                                          setState(() {});
-                                        })),
+                        Spacer(),
+                        widget.isOwner
+                            ? IconButton(
+                                icon: Icon(
+                                  Icons.edit,
+                                  color: Colors.black,
+                                ),
+                                onPressed: () {
+                                  Navigator.push(
+                                      context,
+                                      PageRouteBuilder(
+                                        transitionDuration:
+                                            Duration(milliseconds: 300),
+                                        transitionsBuilder: (context, animation,
+                                            secondaryAnimation, child) {
+                                          return FadeTransition(
+                                              opacity: animation,
+                                              child: SlideTransition(
+                                                position: Tween<Offset>(
+                                                        begin: Offset(0, -1),
+                                                        end: Offset(0, 0))
+                                                    .animate(CurvedAnimation(
+                                                        parent: animation,
+                                                        curve:
+                                                            Curves.decelerate)),
+                                                child: child,
+                                              ));
+                                        },
+                                        pageBuilder: (BuildContext context,
+                                            Animation<double> animation,
+                                            Animation<double> secAnimation) {
+                                          return EditProfile(
+                                              nameText: name,
+                                              biodata: bio_data,
+                                              privacy: isPrivate,
+                                              username: username,
+                                              profile_id: widget.myPID);
+                                        },
+                                      ));
+                                },
                               )
                             : Container(),
-
-                        // Follow & Following Buttons
-                        // Row(
-                        //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        //   crossAxisAlignment: CrossAxisAlignment.center,
-                        //   children: <Widget>[
-                        // Follower button
-                        // Stack(
-                        //   alignment: Alignment.centerRight,
-                        //   children: [
-                        //     ButtonTheme(
-                        //       padding: EdgeInsets.only(right: 40),
-                        //       height: 50,
-                        //       minWidth: screenWidth / 2.5,
-                        //       child: RaisedButton(
-                        //         color: profileButtoColor,
-                        //         onPressed: () {},
-                        //         child: Row(
-                        //             mainAxisAlignment:
-                        //                 MainAxisAlignment.spaceAround,
-                        //             children: [
-                        //               // IconButton(
-                        //               //     icon: Icon(Icons.add), onPressed: () {}),
-                        //               Text("Followers")
-                        //             ]),
-                        //         elevation: 0,
-                        //         shape: RoundedRectangleBorder(
-                        //             borderRadius: BorderRadius.circular(100),
-                        //             side: BorderSide(color: Colors.transparent)),
-                        //       ),
-                        //     ),
-                        //     ButtonTheme(
-                        //       height: 55,
-                        //       minWidth: screenWidth / 7,
-                        //       child: RaisedButton(
-                        //         color: ffDisplayer,
-                        //         onPressed: () {},
-                        //         child: Text("4.2k"),
-                        //         elevation: 6,
-                        //         shape: RoundedRectangleBorder(
-                        //             borderRadius: BorderRadius.only(
-                        //                 topLeft: Radius.zero,
-                        //                 bottomLeft: Radius.zero,
-                        //                 topRight: Radius.circular(100),
-                        //                 bottomRight: Radius.circular(100)),
-                        //             side: BorderSide(color: Colors.black12)),
-                        //       ),
-                        //     )
-                        //   ],
-                        // ),
-                        // Stack(
-                        //   alignment: Alignment.centerRight,
-                        //   children: [
-                        //     ButtonTheme(
-                        //       padding: EdgeInsets.only(right: 40),
-                        //       height: 50,
-                        //       minWidth: screenWidth / 2.6,
-                        //       child: RaisedButton(
-                        //         color: profileButtoColor,
-                        //         onPressed: () {},
-                        //         child: Text(
-                        //           "Following",
-                        //         ),
-                        //         elevation: 0,
-                        //         shape: RoundedRectangleBorder(
-                        //             borderRadius: BorderRadius.circular(100),
-                        //             side: BorderSide(color: Colors.transparent)),
-                        //       ),
-                        //     ),
-                        //     ButtonTheme(
-                        //       height: 55,
-                        //       minWidth: screenWidth / 7,
-                        //       child: RaisedButton(
-                        //         color: ffDisplayer,
-                        //         onPressed: () {},
-                        //         child: Text("6.5k"),
-                        //         elevation: 6,
-                        //         shape: RoundedRectangleBorder(
-                        //             borderRadius: BorderRadius.only(
-                        //                 topLeft: Radius.zero,
-                        //                 bottomLeft: Radius.zero,
-                        //                 topRight: Radius.circular(100),
-                        //                 bottomRight: Radius.circular(100)),
-                        //             side: BorderSide(color: Colors.black12)),
-                        //       ),
-                        //     )
-                        //   ],
-                        // ),
-                        //   ],
-                        // )
                       ],
                     ),
-                  ),
-                  Expanded(
-                    child: Container(
-                      // height: screenHeight / 1.6,
+                    Container(
+                      // height: screenHeight / 4,
                       width: screenWidth,
                       color: Colors.transparent,
+                      // padding: EdgeInsets.only(top: screenHeight / 20),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.max,
                         children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10.0, horizontal: 12),
-                            child: Container(
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10.0),
-                                  color: Colors.red[50],
-                                  border: Border.all(color: Colors.black12)),
-                              child: Theme(
-                                data: Theme.of(context).copyWith(
-                                    canvasColor: Colors.red[100],
-                                    buttonTheme: ButtonTheme.of(context)
-                                        .copyWith(
-                                            shape: RoundedRectangleBorder(
-                                                side: BorderSide(
-                                                    width: 1.0,
-                                                    style: BorderStyle.solid),
-                                                borderRadius:
-                                                    BorderRadius.circular(
-                                                        50.0)),
-                                            alignedDropdown: true)),
-                                child: DropdownButton(
-                                    isExpanded: true,
-                                    underline: SizedBox(),
-                                    icon: null,
-                                    value: _value,
-                                    items: [
-                                      DropdownMenuItem(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10.0),
-                                          child: Container(
-                                            child: Text("About"),
-                                          ),
-                                        ),
-                                        value: 0,
+                          Container(
+                            margin: EdgeInsets.symmetric(horizontal: 12),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceAround,
+                              children: [
+                                Container(
+                                  height: screenWidth / 4,
+                                  width: screenWidth / 4,
+                                  decoration: ShapeDecoration(
+                                      shape: CircleBorder(
+                                          side: BorderSide(
+                                              width: 1,
+                                              color: Colors.blueGrey))),
+                                  child: FutureBuilder(
+                                      future: FirebaseStorageService.getImage(
+                                          context, widget.profileId.toString()),
+                                      builder: (context,
+                                          AsyncSnapshot<dynamic> snapshot) {
+                                        if (snapshot.hasData) {
+                                          return CircleAvatar(
+                                            backgroundImage:
+                                                NetworkImage(snapshot.data),
+                                            maxRadius: screenWidth / 8,
+                                          );
+                                        } else {
+                                          return CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            backgroundColor: bgColor,
+                                            valueColor: AlwaysStoppedAnimation(
+                                                loginButtonEnd),
+                                          );
+                                        }
+                                      }),
+                                ),
+                                Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      AutoSizeText(
+                                        name,
+                                        maxFontSize: 29,
+                                        minFontSize: 27,
+                                        softWrap: true,
                                       ),
-                                      DropdownMenuItem(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10.0),
-                                          child: Container(
-                                            child: Text("Posts"),
-                                          ),
+                                      Padding(
+                                          padding: EdgeInsets.only(
+                                              bottom: screenHeight / 40)),
+                                      IntrinsicHeight(
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceAround,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.stretch,
+                                          children: [
+                                            Column(
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: isPrivate &&
+                                                          !widget.isOwner &&
+                                                          !isFollow
+                                                      ? null
+                                                      : () {
+                                                          Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder: (_) =>
+                                                                      FollowerList(
+                                                                        profileId:
+                                                                            widget.profileId,
+                                                                      ))).then(
+                                                              (value) =>
+                                                                  setState(
+                                                                      () {}));
+                                                        },
+                                                  child: Text(
+                                                    "Followers",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                ),
+                                                ValueListenableBuilder(
+                                                    valueListenable:
+                                                        followerCountNotifier,
+                                                    builder: (_, value, __) =>
+                                                        Text(value.toString()))
+                                              ],
+                                            ),
+                                            Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal:
+                                                        screenWidth / 25)),
+                                            Container(
+                                              // height: 20,
+                                              width: 0.5,
+                                              color: Colors.blueGrey,
+                                            ),
+                                            Padding(
+                                                padding: EdgeInsets.symmetric(
+                                                    horizontal:
+                                                        screenWidth / 25)),
+                                            Column(
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: isPrivate &&
+                                                          !widget.isOwner &&
+                                                          !isFollow
+                                                      ? null
+                                                      : () {
+                                                          Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder: (_) =>
+                                                                      FollowingList(
+                                                                        profileId:
+                                                                            widget.profileId,
+                                                                      ))).then(
+                                                              (value) =>
+                                                                  setState(
+                                                                      () {}));
+                                                        },
+                                                  child: Text(
+                                                    "Following",
+                                                    style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                                  ),
+                                                ),
+                                                ValueListenableBuilder(
+                                                    valueListenable:
+                                                        followingCountNotifier,
+                                                    builder: (_, value, __) =>
+                                                        Text(value.toString()))
+                                              ],
+                                            )
+                                          ],
                                         ),
-                                        value: 1,
-                                      ),
-                                      DropdownMenuItem(
-                                        child: Padding(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 10.0),
-                                          child: Container(
-                                            child: Text("Topics"),
-                                          ),
-                                        ),
-                                        value: 2,
-                                      ),
-                                    ],
-                                    onChanged: (num value) {
-                                      setState(() {
-                                        _value = value;
-                                      });
-                                      controller.animateToPage(_value,
-                                          duration: Duration(milliseconds: 150),
-                                          curve: Curves.decelerate);
-                                      print(controller.page);
-                                    }),
-                              ),
+                                      )
+                                    ]),
+                              ],
                             ),
                           ),
-                          Expanded(
-                            flex: 4,
-                            child: Container(
-                              // height: screenHeight / 1.8,
-                              color: Colors.transparent,
-                              child: SingleChildScrollView(
-                                child: Column(
-                                  children: <Widget>[
-                                    Card(
+                          // Profile circle
+                          SizedBox(
+                            height: screenHeight / 25,
+                          ),
+                          widget.isOwner == false
+                              ? Container(
+                                  height: screenHeight / 14,
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: screenWidth / 15,
+                                      vertical: 10),
+                                  child: ButtonTheme(
+                                      buttonColor: buttonColor,
+                                      shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30)),
+                                      minWidth: screenWidth / 1.5,
+                                      child: RaisedButton(
+                                          elevation: 2,
+                                          clipBehavior: Clip.antiAlias,
+                                          child: Text(followButtonText),
+                                          onPressed: () async {
+                                            print(isFollow);
+
+                                            if (isFollow) {
+                                              buttonColor = Colors.red[50];
+                                              isFollow = false;
+                                              followButtonText = "Follow";
+                                              final request = http.Request(
+                                                  "DELETE",
+                                                  Uri.parse(
+                                                      "http://postea-server.herokuapp.com/followdata"));
+                                              request.headers.addAll({
+                                                'Content-Type':
+                                                    'application/json'
+                                              });
+                                              request.body = jsonEncode({
+                                                "profile_id": widget.myPID,
+                                                "follower_id": widget.profileId
+                                              });
+                                              request.send();
+                                            } else {
+                                              buttonColor =
+                                                  Colors.redAccent[100];
+                                              isFollow = true;
+                                              followButtonText = "Following";
+                                              var addfollowing = {
+                                                "profile_id": widget.myPID,
+                                                "follower_id": widget.profileId
+                                              };
+                                              var addfollowingJson =
+                                                  JsonEncoder()
+                                                      .convert(addfollowing);
+                                              http.post(
+                                                  "http://postea-server.herokuapp.com/followdata",
+                                                  headers: {
+                                                    'Content-Type':
+                                                        'application/json'
+                                                  },
+                                                  body: addfollowingJson);
+                                            }
+
+                                            setState(() {});
+                                          })),
+                                )
+                              : Container(),
+
+                          // Follow & Following Buttons
+                          // Row(
+                          //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          //   crossAxisAlignment: CrossAxisAlignment.center,
+                          //   children: <Widget>[
+                          // Follower button
+                          // Stack(
+                          //   alignment: Alignment.centerRight,
+                          //   children: [
+                          //     ButtonTheme(
+                          //       padding: EdgeInsets.only(right: 40),
+                          //       height: 50,
+                          //       minWidth: screenWidth / 2.5,
+                          //       child: RaisedButton(
+                          //         color: profileButtoColor,
+                          //         onPressed: () {},
+                          //         child: Row(
+                          //             mainAxisAlignment:
+                          //                 MainAxisAlignment.spaceAround,
+                          //             children: [
+                          //               // IconButton(
+                          //               //     icon: Icon(Icons.add), onPressed: () {}),
+                          //               Text("Followers")
+                          //             ]),
+                          //         elevation: 0,
+                          //         shape: RoundedRectangleBorder(
+                          //             borderRadius: BorderRadius.circular(100),
+                          //             side: BorderSide(color: Colors.transparent)),
+                          //       ),
+                          //     ),
+                          //     ButtonTheme(
+                          //       height: 55,
+                          //       minWidth: screenWidth / 7,
+                          //       child: RaisedButton(
+                          //         color: ffDisplayer,
+                          //         onPressed: () {},
+                          //         child: Text("4.2k"),
+                          //         elevation: 6,
+                          //         shape: RoundedRectangleBorder(
+                          //             borderRadius: BorderRadius.only(
+                          //                 topLeft: Radius.zero,
+                          //                 bottomLeft: Radius.zero,
+                          //                 topRight: Radius.circular(100),
+                          //                 bottomRight: Radius.circular(100)),
+                          //             side: BorderSide(color: Colors.black12)),
+                          //       ),
+                          //     )
+                          //   ],
+                          // ),
+                          // Stack(
+                          //   alignment: Alignment.centerRight,
+                          //   children: [
+                          //     ButtonTheme(
+                          //       padding: EdgeInsets.only(right: 40),
+                          //       height: 50,
+                          //       minWidth: screenWidth / 2.6,
+                          //       child: RaisedButton(
+                          //         color: profileButtoColor,
+                          //         onPressed: () {},
+                          //         child: Text(
+                          //           "Following",
+                          //         ),
+                          //         elevation: 0,
+                          //         shape: RoundedRectangleBorder(
+                          //             borderRadius: BorderRadius.circular(100),
+                          //             side: BorderSide(color: Colors.transparent)),
+                          //       ),
+                          //     ),
+                          //     ButtonTheme(
+                          //       height: 55,
+                          //       minWidth: screenWidth / 7,
+                          //       child: RaisedButton(
+                          //         color: ffDisplayer,
+                          //         onPressed: () {},
+                          //         child: Text("6.5k"),
+                          //         elevation: 6,
+                          //         shape: RoundedRectangleBorder(
+                          //             borderRadius: BorderRadius.only(
+                          //                 topLeft: Radius.zero,
+                          //                 bottomLeft: Radius.zero,
+                          //                 topRight: Radius.circular(100),
+                          //                 bottomRight: Radius.circular(100)),
+                          //             side: BorderSide(color: Colors.black12)),
+                          //       ),
+                          //     )
+                          //   ],
+                          // ),
+                          //   ],
+                          // )
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        // height: screenHeight / 1.6,
+                        width: screenWidth,
+                        color: Colors.transparent,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10.0, horizontal: 12),
+                              child: isPrivate && !widget.isOwner && !isFollow
+                                  ? Container()
+                                  : Container(
+                                      alignment: Alignment.center,
+                                      decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                          color: Colors.red[50],
+                                          border: Border.all(
+                                              color: Colors.black12)),
+                                      child: Theme(
+                                        data: Theme.of(context).copyWith(
+                                            canvasColor: Colors.red[100],
+                                            buttonTheme: ButtonTheme.of(context)
+                                                .copyWith(
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                            side: BorderSide(
+                                                                width: 1.0,
+                                                                style:
+                                                                    BorderStyle
+                                                                        .solid),
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        50.0)),
+                                                    alignedDropdown: true)),
+                                        child: DropdownButton(
+                                            isExpanded: true,
+                                            underline: SizedBox(),
+                                            icon: null,
+                                            value: _value,
+                                            items: [
+                                              DropdownMenuItem(
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 10.0),
+                                                  child: Container(
+                                                    child: Text("About"),
+                                                  ),
+                                                ),
+                                                value: 0,
+                                              ),
+                                              DropdownMenuItem(
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 10.0),
+                                                  child: Container(
+                                                    child: Text("Posts"),
+                                                  ),
+                                                ),
+                                                value: 1,
+                                              ),
+                                              DropdownMenuItem(
+                                                child: Padding(
+                                                  padding: const EdgeInsets
+                                                          .symmetric(
+                                                      horizontal: 10.0),
+                                                  child: Container(
+                                                    child: Text("Topics"),
+                                                  ),
+                                                ),
+                                                value: 2,
+                                              ),
+                                            ],
+                                            onChanged: (num value) {
+                                              setState(() {
+                                                _value = value;
+                                              });
+                                              controller.animateToPage(_value,
+                                                  duration: Duration(
+                                                      milliseconds: 150),
+                                                  curve: Curves.decelerate);
+                                              print(controller.page);
+                                            }),
+                                      ),
+                                    ),
+                            ),
+                            Expanded(
+                              flex: 4,
+                              child: Container(
+                                // height: screenHeight / 1.8,
+                                color: Colors.transparent,
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    children: <Widget>[
+                                      Card(
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(20),
@@ -673,221 +703,270 @@ class _ProfileState extends State<Profile> {
                                           child: Container(
                                             child: Text(bio_data),
                                           ),
-                                        ))
-                                  ],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               ),
+                            )
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Container(
+                    //   height: screenHeight/3,
+                    //   width: screenWidth,
+                    //   color: Colors.yellowAccent,
+                    // ),
+                  ],
+                ),
+              ),
+            ),
+            Material(
+              child: Container(
+                width: screenWidth,
+                height: screenHeight,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back),
+                      onPressed: () {
+                        controller.animateToPage(0,
+                            duration: Duration(milliseconds: 150),
+                            curve: Curves.easeIn);
+                      },
+                    ),
+                    Hero(
+                      tag: 'dmenu',
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10.0, horizontal: 12),
+                        child: Container(
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              color: Colors.red[50],
+                              border: Border.all(color: Colors.black12)),
+                          child: Theme(
+                            data: Theme.of(context).copyWith(
+                                canvasColor: Colors.red[100],
+                                buttonTheme: ButtonTheme.of(context)
+                                    .copyWith(alignedDropdown: true)),
+                            child: DropdownButton(
+                                isDense: false,
+                                isExpanded: true,
+                                underline: SizedBox(),
+                                icon: null,
+                                value: _value,
+                                items: [
+                                  DropdownMenuItem(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10.0),
+                                      child: Container(
+                                        child: Text("About"),
+                                      ),
+                                    ),
+                                    value: 0,
+                                  ),
+                                  DropdownMenuItem(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10.0),
+                                      child: Container(
+                                        child: Text("Posts"),
+                                      ),
+                                    ),
+                                    value: 1,
+                                  ),
+                                  DropdownMenuItem(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10.0),
+                                      child: Container(
+                                        child: Text("Topics"),
+                                      ),
+                                    ),
+                                    value: 2,
+                                  ),
+                                ],
+                                onChanged: (num value) {
+                                  setState(() {
+                                    _value = value;
+                                    controller.animateToPage(_value,
+                                        duration: Duration(milliseconds: 150),
+                                        curve: Curves.decelerate);
+                                    print(value);
+                                  });
+                                  // print(value);
+                                }),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        width: screenWidth,
+                        height: screenHeight / 1.4,
+                        child: Column(
+                          children: [
+                            widget.isOwner
+                                ? GestureDetector(
+                                    child: Text(
+                                      "View Saved Posts",
+                                      style: TextStyle(
+                                          decoration: TextDecoration.underline,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 20),
+                                    ),
+                                    onTap: () {
+                                      controller.animateToPage(3,
+                                          duration: Duration(milliseconds: 150),
+                                          curve: Curves.decelerate);
+                                    },
+                                  )
+                                : Container(
+                                    width: 0,
+                                    height: 0,
+                                  ),
+                            Container(
+                              width: screenWidth,
+                              height: screenHeight / 1.41,
+                              margin: EdgeInsets.only(top: 10),
+                              child: FutureBuilder(
+                                future: getUserPosts(widget.myPID),
+                                builder: (context, snapshot) {
+                                  if (snapshot.hasData &&
+                                      snapshot.data !=
+                                          "No posts made by this user") {
+                                    http.Response resp = snapshot.data;
+                                    var postData = json.decode(resp.body);
+                                    return ListView.builder(
+                                        itemCount: postData.length,
+                                        itemBuilder: (context, index) {
+                                          return PostTile(
+                                              postData[index]['post_id']
+                                                  .toString(),
+                                              postData[index]['profile_id']
+                                                  .toString(),
+                                              postData[index]
+                                                      ['post_description']
+                                                  .toString(),
+                                              postData[index]['topic_id']
+                                                  .toString(),
+                                              postData[index]['post_img']
+                                                  .toString(),
+                                              postData[index]['creation_date']
+                                                  .toString(),
+                                              postData[index]['post_likes']
+                                                  .toString(),
+                                              postData[index]['post_dislikes']
+                                                  .toString(),
+                                              postData[index]['post_comments']
+                                                  .toString(),
+                                              postData[index]['post_title']
+                                                  .toString(),
+                                              name.toString(),
+                                              profileId.toString(),
+                                              false);
+                                        });
+                                    // return ListView.builder(
+                                    //     itemCount: snapshot.data.length,
+                                    //     itemBuilder: (context, index) {});
+                                  } else {
+                                    return Container();
+                                  }
+                                },
+                              ),
                             ),
-                          )
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Material(
+              child: Container(
+                width: screenWidth,
+                height: screenHeight,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    IconButton(
+                      icon: Icon(Icons.arrow_back),
+                      onPressed: () {
+                        controller.animateToPage(1,
+                            duration: Duration(milliseconds: 150),
+                            curve: Curves.easeIn);
+                      },
+                    ),
+                    Container(
+                      width: screenWidth,
+                      height: screenHeight / 1.15,
+                      child: Column(
+                        children: [
+                          Container(
+                            child: Text(
+                              "Saved Posts",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold, fontSize: 30),
+                            ),
+                          ),
+                          Container(
+                            width: screenWidth,
+                            height: screenHeight / 1.25,
+                            margin: EdgeInsets.only(top: 10),
+                            child: FutureBuilder(
+                              future: getSavedPosts(),
+                              builder: (context, snapshot) {
+                                if (snapshot.hasData) {
+                                  var postInfo = snapshot.data;
+                                  var postInfoString = postInfo.toString();
+                                  List postMap = json.decode(postInfoString);
+
+                                  return ListView.builder(
+                                    itemCount: postMap.length,
+                                    itemBuilder: (context, index) {
+                                      return PostTile(
+                                          postMap[index]['post_id'].toString(),
+                                          postMap[index]['profile_id']
+                                              .toString(),
+                                          postMap[index]['description']
+                                              .toString(),
+                                          postMap[index]['topic_id'].toString(),
+                                          postMap[index]['post_img'].toString(),
+                                          postMap[index]['creation_date']
+                                              .toString(),
+                                          postMap[index]['post_likes']
+                                              .toString(),
+                                          postMap[index]['post_dislikes']
+                                              .toString(),
+                                          postMap[index]['post_comments']
+                                              .toString(),
+                                          postMap[index]['title'].toString(),
+                                          postMap[index]['name'].toString(),
+                                          widget.myPID.toString(),
+                                          false);
+                                    },
+                                  );
+                                } else {
+                                  return Container();
+                                }
+                              },
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  ),
-                  // Container(
-                  //   height: screenHeight/3,
-                  //   width: screenWidth,
-                  //   color: Colors.yellowAccent,
-                  // ),
-                ]),
-            // Posts page
-            Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                Hero(
-                  tag: 'dmenu',
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                        vertical: 10.0, horizontal: 12),
-                    child: Container(
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10.0),
-                          color: Colors.red[50],
-                          border: Border.all(color: Colors.black12)),
-                      child: Theme(
-                        data: Theme.of(context).copyWith(
-                            canvasColor: Colors.red[100],
-                            buttonTheme: ButtonTheme.of(context)
-                                .copyWith(alignedDropdown: true)),
-                        child: DropdownButton(
-                            isDense: false,
-                            isExpanded: true,
-                            underline: SizedBox(),
-                            icon: null,
-                            value: _value,
-                            items: [
-                              DropdownMenuItem(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10.0),
-                                  child: Container(
-                                    child: Text("About"),
-                                  ),
-                                ),
-                                value: 0,
-                              ),
-                              DropdownMenuItem(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10.0),
-                                  child: Container(
-                                    child: Text("Posts"),
-                                  ),
-                                ),
-                                value: 1,
-                              ),
-                              DropdownMenuItem(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 10.0),
-                                  child: Container(
-                                    child: Text("Topics"),
-                                  ),
-                                ),
-                                value: 2,
-                              ),
-                            ],
-                            onChanged: (num value) {
-                              setState(() {
-                                _value = value;
-                                controller.animateToPage(_value,
-                                    duration: Duration(milliseconds: 150),
-                                    curve: Curves.decelerate);
-                                print(value);
-                              });
-                              // print(value);
-                            }),
-                      ),
-                    ),
-                  ),
+                  ],
                 ),
-                Expanded(
-                  child: Container(
-                    width: screenWidth,
-                    height: screenHeight / 1.4,
-                    child: Column(
-                      children: [
-                        GestureDetector(
-                          child: Text(
-                            "View Saved Posts",
-                            style: TextStyle(
-                                decoration: TextDecoration.underline,
-                                fontWeight: FontWeight.bold,
-                                fontSize: 20),
-                          ),
-                          onTap: () {
-                            controller.animateToPage(3,
-                                duration: Duration(milliseconds: 150),
-                                curve: Curves.decelerate);
-                          },
-                        ),
-                        Container(
-                          width: screenWidth,
-                          height: screenHeight / 1.41,
-                          margin: EdgeInsets.only(top: 10),
-                          child: FutureBuilder(
-                            future: getUserPosts(widget.myPID),
-                            builder: (context, snapshot) {
-                              if (snapshot.hasData &&
-                                  snapshot.data !=
-                                      "No posts made by this user") {
-                                http.Response resp = snapshot.data;
-                                var postData = json.decode(resp.body);
-                                return ListView.builder(
-                                    itemCount: postData.length,
-                                    itemBuilder: (context, index) {
-                                      return PostTile(
-                                          postData[index]['post_id'].toString(),
-                                          postData[index]['profile_id']
-                                              .toString(),
-                                          postData[index]['post_description']
-                                              .toString(),
-                                          postData[index]['topic_id']
-                                              .toString(),
-                                          postData[index]['post_img']
-                                              .toString(),
-                                          postData[index]['creation_date']
-                                              .toString(),
-                                          postData[index]['post_likes']
-                                              .toString(),
-                                          postData[index]['post_dislikes']
-                                              .toString(),
-                                          postData[index]['post_comments']
-                                              .toString(),
-                                          postData[index]['post_title']
-                                              .toString(),
-                                          name.toString(),
-                                          profileId.toString(),
-                                          false);
-                                    });
-                                // return ListView.builder(
-                                //     itemCount: snapshot.data.length,
-                                //     itemBuilder: (context, index) {});
-                              } else {
-                                return Container();
-                              }
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                )
-              ],
-            ),
-            Container(
-              width: screenWidth,
-              height: screenHeight / 1.25,
-              child: Column(
-                children: [
-                  Container(
-                    child: Text(
-                      "Saved Posts",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 30),
-                    ),
-                  ),
-                  Container(
-                    width: screenWidth,
-                    height: screenHeight / 1.251,
-                    margin: EdgeInsets.only(top: 10),
-                    child: FutureBuilder(
-                      future: getSavedPosts(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasData) {
-                          var postInfo = snapshot.data;
-                          var postInfoString = postInfo.toString();
-                          List postMap = json.decode(postInfoString);
-
-                          return ListView.builder(
-                            itemCount: postMap.length,
-                            itemBuilder: (context, index) {
-                              return PostTile(
-                                  postMap[index]['post_id'].toString(),
-                                  postMap[index]['profile_id'].toString(),
-                                  postMap[index]['description'].toString(),
-                                  postMap[index]['topic_id'].toString(),
-                                  postMap[index]['post_img'].toString(),
-                                  postMap[index]['creation_date'].toString(),
-                                  postMap[index]['post_likes'].toString(),
-                                  postMap[index]['post_dislikes'].toString(),
-                                  postMap[index]['post_comments'].toString(),
-                                  postMap[index]['title'].toString(),
-                                  postMap[index]['name'].toString(),
-                                  widget.myPID.toString(),
-                                  false);
-                            },
-                          );
-                        } else {
-                          return Container();
-                        }
-                      },
-                    ),
-                  ),
-                ],
               ),
-            )
+            ),
           ],
         ),
       ),
