@@ -58,12 +58,96 @@ const getPost = async(postId, connection) => {
                     var string = "\"time_diff\":"+"\""+timeDiff+"\"";
                     temp = temp+","+string+"}]";
                     var final_result = JSON.parse(temp);
+                    var post_description = final_result[0].post_description;
+                    if (post_description.includes("@")) {
+                        var index_of_at = post_description.indexOf("@");
+                        var tag = post_description.substring(index_of_at, post_description.length);
+                        var index_of_space = tag.indexOf(" ");
+                        if (index_of_space == -1) {
+                          index_of_space = tag.length-1;
+                        }
+                        var tag = tag.substring(1, index_of_space + 1);
+                        await get_updated_result(final_result[0], tag, connection).then((value)=> {
+                          final_result = value;
+                      });                    
+                    } else {
+                      final_result[0]["flag"] = "No tag";
+                    }
+                    final_result = JSON.stringify(final_result);
+                    final_result = JSON.parse(final_result);
                     resolve(final_result);
                 }
                 // return result;  
         });
     });
 }
+
+const get_updated_result = async(current_result, tag, connection) => {
+    var new_field = "";
+    var id = 0;
+    var selectQuery1 = "SELECT profile_id FROM profile WHERE profile.username = ?";
+    return new Promise(async function(resolve, reject) {
+       await connection.query(selectQuery1,[tag],async function(err, result)  {
+            if (err) {
+                console.log("error exists");
+                reject(err.message);
+            }
+            else {
+                if (result.length == 0) {
+                  await get_updated_result1(current_result, tag, connection).then((value)=> {
+                    current_result = value;
+                  });  
+                } else {
+                  new_field = "profile_id";
+                  id = result[0].profile_id;
+                  if (new_field == "") {
+                    current_result["flag"] = "No tag";
+                  } else {
+                    current_result["tag_id"] = id;
+                    current_result["flag"] = "Tag exists: profile_id";
+                  }
+                }
+                
+                current_result = JSON.stringify(current_result);
+                current_result = JSON.parse(current_result);
+                resolve(current_result);
+            }
+        });
+    });
+  }
+  
+  const get_updated_result1 = async(current_result, tag, connection) => {
+    var new_field = "";
+    var id = 0;
+    var selectQuery1 = "SELECT topic_id FROM topic_info WHERE topic_info.topic_name = ?";
+    return new Promise(function(resolve, reject) {
+       connection.query(selectQuery1,[tag],function(err, result)  {
+            if (err) {
+                console.log("error exists");
+                reject(err.message);
+            }
+            else {
+                if (result.length == 0) {
+                  current_result["flag"] = "Incorrect tag";
+                } else {
+                  new_field = "topic_id";
+                  id = result[0].topic_id;
+                  if (new_field == "") {
+                    current_result["flag"] = "No tag";
+                  } else {
+                    current_result["tag_id"] = id;
+                    current_result["flag"] = "Tag exists: topic_id";
+                  }
+                }
+                
+                current_result = JSON.stringify(current_result);
+                current_result = JSON.parse(current_result);
+                resolve(current_result);
+                // return result;  
+            }
+        });
+    });
+  }
 
 const convert_to_username = async(id, connection) => {
     var query1 = "SELECT username FROM profile WHERE profile.profile_id = ?";

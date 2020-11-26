@@ -65,7 +65,7 @@ const getFollowing = async(user_id, connection) => {
             } else {
                 result = JSON.stringify(result);
                 result = JSON.parse(result);
-                await convert_to_username("following", user_id, result, connection).then((value)=> {
+                await convert_to_id_and_name("following", user_id, result, connection).then((value)=> {
                     result = value;
                 });
                 console.log("Following retrieved");
