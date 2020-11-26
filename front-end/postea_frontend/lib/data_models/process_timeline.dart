@@ -111,7 +111,8 @@ class ProcessTimeline{
         posts['result'][i]['post_dislikes'].toString(),
         posts['result'][i]['post_comments'].toString(),
         posts['result'][i]['post_title'].toString(),
-        name
+        name,
+        posts['result'][i]['is_sensitive'].toString()
         // "Darshil Kaneria"
       );
       print(posts['result'][i]['post_id']);

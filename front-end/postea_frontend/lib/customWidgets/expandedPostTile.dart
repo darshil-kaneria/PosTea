@@ -22,6 +22,7 @@ class ExpandedPostTile extends StatefulWidget {
   var post_title;
   var name;
   var myPID;
+  var is_sensitive;
 
   List<String> comments;
 
@@ -37,7 +38,8 @@ class ExpandedPostTile extends StatefulWidget {
       this.post_comments,
       this.post_title,
       this.name,
-      this.myPID);
+      this.myPID,
+      this.is_sensitive);
 
   @override
   _ExpandedPostTileState createState() => _ExpandedPostTileState(
@@ -182,7 +184,8 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> with TickerProvider
                   post_title,
                   name,
                   myPID,
-                  1),
+                  1,
+                  widget.is_sensitive),
             )
             ,
             Container(

@@ -140,7 +140,8 @@ class ProcessTopic {
           posts['result'][i]['post_dislikes'].toString(),
           posts['result'][i]['post_comments'].toString(),
           posts['result'][i]['post_title'].toString(),
-          posts['result'][i]['name'].toString()
+          posts['result'][i]['name'].toString(),
+          posts['result'][i]['is_sensitive'].toString()
           // "Darshil Kaneria"
           );
       print(posts['result'][i]['post_id']);

@@ -124,9 +124,8 @@ class _ProfileState extends State<Profile> {
       _biodataController.text = profile["message"]["biodata"];
       bio_data = _biodataController.text;
       isPrivate =
-          profile["message"]["privacy"].toString().toLowerCase() == "true";
+          profile["message"]["privacy"].toString().toLowerCase() == "yes";
     });
-
     print(profile["message"]["profile_id"]);
   }
 
@@ -819,7 +818,8 @@ class _ProfileState extends State<Profile> {
                                               .toString(),
                                           name.toString(),
                                           profileId.toString(),
-                                          false);
+                                          false,
+                                          postData[index]['is_sensitive']);
                                     });
                                 // return ListView.builder(
                                 //     itemCount: snapshot.data.length,
@@ -876,7 +876,8 @@ class _ProfileState extends State<Profile> {
                                   postMap[index]['title'].toString(),
                                   postMap[index]['name'].toString(),
                                   widget.myPID.toString(),
-                                  false);
+                                  false,
+                                  postMap[index]['in_sensitive']);
                             },
                           );
                         } else {

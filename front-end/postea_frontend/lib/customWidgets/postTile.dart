@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +12,6 @@ import 'package:postea_frontend/customWidgets/expandedPostTile.dart';
 import '../pages/profile.dart';
 import 'package:badges/badges.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import '../data_models/process_save_post.dart';
 import 'package:linkwell/linkwell.dart';
 
@@ -29,6 +29,7 @@ class PostTile extends StatefulWidget {
   var name;
   var myPID;
   var isExpanded;
+  var is_sensitive;
 
   PostTile(
       this.post_id,
@@ -43,7 +44,8 @@ class PostTile extends StatefulWidget {
       this.post_title,
       this.name,
       this.myPID,
-      this.isExpanded);
+      this.isExpanded,
+      this.is_sensitive);
 
   @override
   _PostTileState createState() => _PostTileState(
@@ -144,7 +146,7 @@ class _PostTileState extends State<PostTile> {
     var profilePicName = name == "Anonymous" ? "default-big.png" : profile_id.toString();
     var screenheight = MediaQuery.of(context).size.height;
     var screenwidth = MediaQuery.of(context).size.width;
-
+    print("IS SENSITIVE: " + widget.is_sensitive.toString());
     return Card(
         shape: RoundedRectangleBorder(
     borderRadius: BorderRadius.circular(20),
@@ -246,15 +248,16 @@ class _PostTileState extends State<PostTile> {
                               post_comments.toString(),
                               post_title,
                               name,
-                              myPID)))
+                              myPID,
+                              widget.is_sensitive)))
                 },
             contentPadding:
                 EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-            title: Text(post_title,
+            title: widget.is_sensitive == 1 ? Text("") : Text(post_title,
                 style:
                     Theme.of(context).textTheme.headline2),
             subtitle: LinkWell(
-              post_description,
+              widget.is_sensitive == 1 ? Text("") : post_description,
               style: Theme.of(context).textTheme.headline3,
             )),
       ),

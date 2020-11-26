@@ -10,8 +10,9 @@ class Post{
   var post_comments;
   var post_title;
   var post_name;
+  var is_sensitive;
 
-  Post(this.post_id, this.profile_id, this.post_description, this.topic_id, this.post_img, this.creation_date, this.post_likes, this.post_dislikes, this.post_comments, this.post_title, this.post_name){
+  Post(this.post_id, this.profile_id, this.post_description, this.topic_id, this.post_img, this.creation_date, this.post_likes, this.post_dislikes, this.post_comments, this.post_title, this.post_name, this.is_sensitive){
     print("INSIDE HERE");
   }
 

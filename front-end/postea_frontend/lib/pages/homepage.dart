@@ -116,6 +116,7 @@ class _HomePageState extends State<HomePage> {
       if (!timeLine.isEnd && timeLine.postRetrieved)
         // setState(() {
         print("SETSTATE CALLED");
+      if(timeLine.postList.length != 0)  
       offset.value = offset.value + 10;
       updatePost();
       // });
@@ -717,7 +718,8 @@ class _HomePageState extends State<HomePage> {
                                 timeLine.postList.elementAt(index).post_title,
                                 timeLine.postList.elementAt(index).post_name,
                                 widget.profileID.toString(),
-                                0);
+                                0,
+                                timeLine.postList.elementAt(index).is_sensitive);
                           }),
                     );
                     // } else

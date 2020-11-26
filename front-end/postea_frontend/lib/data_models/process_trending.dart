@@ -50,7 +50,8 @@ class ProcessTrending {
           posts[i]['post_dislikes'].toString(),
           posts[i]['post_comments'].toString(),
           posts[i]['post_title'].toString(),
-          posts[i]['name'].toString()
+          posts[i]['name'].toString(),
+          posts[i]['is_sensitive']
           // "Darshil Kaneria"
           );
       print(posts[i]['post_id']);

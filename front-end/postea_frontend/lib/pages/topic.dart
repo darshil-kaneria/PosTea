@@ -376,7 +376,8 @@ class _TopicState extends State<Topic> {
                             topic.postList.elementAt(index).post_title,
                             topic.postList.elementAt(index).post_name,
                             widget.profileId.toString(),
-                            0);
+                            0,
+                            topic.postList.elementAt(index).is_sensitive);
                       },
                     );
                   else
