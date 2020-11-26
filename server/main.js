@@ -21,7 +21,22 @@ var lastWorkerPID = -1;
 
 if (cluster.isMaster) {
   console.log(`Master ${process.pid} is running`);
-  
+  const clients = new Clients();
+  var server = new ws.Server(
+    {
+      port: 23557,
+    }
+  )
+
+  server.on('connection', (ws) => {
+    console.log("Websocket initiated by: "+ws._socket.remoteAddress + " on PID: "+process.pid);
+    ws.on('message', (profile_id) => {
+      if(clients.clientList[profile_id] == undefined){
+        clients.saveClient(profile_id, ws);
+        clients.clientList[profile_id].send("HELLO CLIENT");
+      }
+    });
+  });
   // Fork workers.
   for (let i = 0; i < numCPUs; i++) {
     cluster.fork();
@@ -32,7 +47,7 @@ if (cluster.isMaster) {
   });
 }
 else {
-  const clients = new Clients();
+  // const clients = new Clients();
   const server = app.listen(PORT, ()=>console.log("listening on port "+PORT+", PID: "+process.pid));
 
   app.use(cors({
@@ -40,26 +55,26 @@ else {
     credentials: true
   }));
 
-  // const fork = require("child_process").fork;
+  const fork = require("child_process").fork;
 
   // Setup websocket for notifications and activity tab
 
-  const wsServer = new ws.Server({ noServer: true });
-  wsServer.on('connection', (ws) => {
-    console.log("Websocket initiated by: "+ws._socket.remoteAddress + " on PID: "+process.pid);
-    ws.on('message', (profile_id) => {
-      if(clients.clientList[profile_id] == undefined){
-        clients.saveClient(profile_id, ws);
-        clients.clientList[profile_id].send("HELLO CLIENT");
-      }
-    });
-  });
+  // const wsServer = new ws.Server({ noServer: true });
+  // wsServer.on('connection', (ws) => {
+  //   console.log("Websocket initiated by: "+ws._socket.remoteAddress + " on PID: "+process.pid);
+  //   ws.on('message', (profile_id) => {
+  //     if(clients.clientList[profile_id] == undefined){
+  //       clients.saveClient(profile_id, ws);
+  //       clients.clientList[profile_id].send("HELLO CLIENT");
+  //     }
+  //   });
+  // });
   
-  server.on('upgrade', (request, socket, head) => {
-    wsServer.handleUpgrade(request, socket, head, socket => {
-      wsServer.emit('connection', socket, request);
-    });
-  });
+  // server.on('upgrade', (request, socket, head) => {
+  //   wsServer.handleUpgrade(request, socket, head, socket => {
+  //     wsServer.emit('connection', socket, request);
+  //   });
+  // });
 
 /**
  * User endpoints
