@@ -55,7 +55,7 @@ else {
       if(clients.clientList[profile_id] == undefined){
         clients.saveClient(profile_id, ws);
         clients.clientList[profile_id].send("HELLO CLIENT");
-        var subscriber = redis.createClient();
+        var subscriber = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
         subscriber.on("message", (channel, message) => {
           console.log("Message: "+message+". sent to " + channel);
         });
@@ -144,7 +144,7 @@ app.route("/engagement")
     const handleEngagements = fork('./func/add_engagement.js');
     handleEngagements.send(req.body);
     handleEngagements.on("message", message => {
-      var publisher = redis.createClient();
+      var publisher = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
       publisher.on(String(message), "Message from "+String(req.body.engagement_profile_id) + " to "+String(message));
       // clients.clientList[message].send("YOU HAVE A MESSAGE FROM " + req.body.engagement_profile_id);
       res.send(message);
