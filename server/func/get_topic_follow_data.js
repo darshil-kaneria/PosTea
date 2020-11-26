@@ -43,7 +43,7 @@ const getTopicFollowers = async(topic_id, connection) => {
                 result = JSON.stringify(result);
                 result = JSON.parse(result);
                 console.log(result);
-                await convert_to_username(result, connection).then((value)=> {
+                await convert_to_id_and_name(result, connection).then((value)=> {
                     result = value;
                 });
                 console.log("Topic followers retrieved.")
@@ -53,8 +53,8 @@ const getTopicFollowers = async(topic_id, connection) => {
     });
 }
 
-const convert_to_username = async(ids, connection) => {
-    var query1 = "SELECT username FROM profile WHERE";
+const convert_to_id_and_name = async(ids, connection) => {
+    var query1 = "SELECT profile_id, name FROM profile WHERE";
     var profile_ids = [];
     for (var i = 0; i < ids.length; i++) {
         profile_ids.push(ids[i].follower_id);
