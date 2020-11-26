@@ -45,8 +45,8 @@ else {
 
   const wsServer = new ws.Server({ noServer: true });
   wsServer.on('connection', (ws, socket) => {
-    console.log("Websocket initiated by: "+ws._socket.remoteAddress);
-    socket.on('message', message => console.log(message));
+    console.log("Websocket initiated by: "+ws._socket.remoteAddress + " on PID: "+process.pid);
+    ws.on('message', message => console.log("client profileID is: "+message));
   });
   
   server.on('upgrade', (request, socket, head) => {
