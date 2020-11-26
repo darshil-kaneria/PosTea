@@ -19,19 +19,19 @@ var lastWorkerPID = -1;
 
 
 
-// if (cluster.isMaster) {
-//   console.log(`Master ${process.pid} is running`);
+if (cluster.isMaster) {
+  console.log(`Master ${process.pid} is running`);
   
-//   // Fork workers.
-//   for (let i = 0; i < numCPUs; i++) {
-//     cluster.fork();
-//   }
+  // Fork workers.
+  for (let i = 0; i < numCPUs; i++) {
+    cluster.fork();
+  }
 
-//   cluster.on('exit', (worker, code, signal) => {
-//     console.log(`worker ${worker.process.pid} died`);
-//   });
-// }
-// else {
+  cluster.on('exit', (worker, code, signal) => {
+    console.log(`worker ${worker.process.pid} died`);
+  });
+}
+else {
   const clients = new Clients();
   const server = app.listen(PORT, ()=>console.log("listening on port "+PORT+", PID: "+process.pid));
 
@@ -40,7 +40,7 @@ var lastWorkerPID = -1;
     credentials: true
   }));
 
-  const fork = require("child_process").fork;
+  // const fork = require("child_process").fork;
 
   // Setup websocket for notifications and activity tab
 
@@ -386,7 +386,7 @@ app.get('/gettrending', (req, res) => {
 
 });
 
-// if(cluster.worker.id == 2){
+if(cluster.worker.id == 2){
   var trendingInterval = setInterval(() => {
     console.log("retrieving trending posts...")
     const trending = fork('./func/getTrending.js');
@@ -398,8 +398,8 @@ app.get('/gettrending', (req, res) => {
   1800000
   );
 
-// }
-// }
+}
+}
 
 
   
