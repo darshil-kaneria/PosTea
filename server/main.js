@@ -6,6 +6,7 @@
  */
 const cluster = require('cluster');
 const express = require('express');
+const Clients = require("./clients")
 const app = express();
 app.use(express.static("dir"));
 app.use(express.json({limit: '2mb'}));
@@ -31,7 +32,7 @@ if (cluster.isMaster) {
   });
 }
 else {
-
+  const clients = new Clients();
   const server = app.listen(PORT, ()=>console.log("listening on port "+PORT+", PID: "+process.pid));
 
   app.use(cors({
@@ -44,9 +45,14 @@ else {
   // Setup websocket for notifications and activity tab
 
   const wsServer = new ws.Server({ noServer: true });
-  wsServer.on('connection', (ws, socket) => {
+  wsServer.on('connection', (ws) => {
     console.log("Websocket initiated by: "+ws._socket.remoteAddress + " on PID: "+process.pid);
-    ws.on('message', message => console.log("client profileID is: "+message));
+    ws.on('message', (profile_id) => {
+      if(clients.clientList[profile_id] == undefined){
+        clients.saveClient(profile_id, ws);
+        clients.clientList[profile_id].send("HELLO CLIENT");
+      }
+    });
   });
   
   server.on('upgrade', (request, socket, head) => {
@@ -127,7 +133,10 @@ app.route("/engagement")
   .post((req, res) => {
     const handleEngagements = fork('./func/add_engagement.js');
     handleEngagements.send(req.body);
-    handleEngagements.on("message", message => res.send(message));
+    handleEngagements.on("message", message => {
+      clients.clientList[message].send("YOU HAVE A MESSAGE FROM " + req.body.engagement_profile_id);
+      res.send(message);
+    });
   });
 
 // Topic follow data methods
