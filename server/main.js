@@ -58,6 +58,7 @@ else {
         var subscriber = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
         subscriber.on("message", (channel, message) => {
           console.log("Message: "+message+". sent to " + channel);
+          ws.send("You have a new message");
         });
         subscriber.subscribe(String(profile_id));
         console.log("Subscribed to: " + String(profile_id));
