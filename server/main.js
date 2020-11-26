@@ -6,6 +6,7 @@
  */
 const cluster = require('cluster');
 const express = require('express');
+const Clients = require("./clients")
 const app = express();
 app.use(express.static("dir"));
 app.use(express.json({limit: '2mb'}));
@@ -31,7 +32,7 @@ if (cluster.isMaster) {
   });
 }
 else {
-
+  const clients = new Clients();
   const server = app.listen(PORT, ()=>console.log("listening on port "+PORT+", PID: "+process.pid));
 
   app.use(cors({
@@ -39,16 +40,20 @@ else {
     credentials: true
   }));
 
-  const fork = require("child_process").fork;
+  // const fork = require("child_process").fork;
 
   // Setup websocket for notifications and activity tab
 
   const wsServer = new ws.Server({ noServer: true });
-  wsServer.on('connection', (ws, socket) => {
-    console.log("Websocket initiated by: "+ws._socket.remoteAddress);
-    socket.on('message', message => console.log(message));
+  wsServer.on('connection', (ws) => {
+    console.log("Websocket initiated by: "+ws._socket.remoteAddress + " on PID: "+process.pid);
+    ws.on('message', (profile_id) => {
+      if(clients.clientList[profile_id] == undefined){
+        clients.saveClient(profile_id, ws);
+        clients.clientList[profile_id].send("HELLO CLIENT");
+      }
+    });
   });
-
   
   server.on('upgrade', (request, socket, head) => {
     wsServer.handleUpgrade(request, socket, head, socket => {
@@ -128,15 +133,11 @@ app.route("/engagement")
   .post((req, res) => {
     const handleEngagements = fork('./func/add_engagement.js');
     handleEngagements.send(req.body);
-    handleEngagements.on("message", message => res.send(message));
+    handleEngagements.on("message", message => {
+      clients.clientList[message].send("YOU HAVE A MESSAGE FROM " + req.body.engagement_profile_id);
+      res.send(message);
+    });
   });
-  // TODO
-  /*.delete((req, res)=> {
-    const handle = fork("./func/delete_engagement.js");
-    handle.send(req.body);
-    handle.on("message", message => res.send(message));
-
-  });*/
 
 // Topic follow data methods
 app.route("/topicfollowdata")
@@ -183,6 +184,7 @@ app.route("/followdata")
     handle.on("message", message => res.send(message));
   });
 
+//Topic methods  
 app.route("/topic")
   .get((req, res) => {
     const handleTopics = fork("./func/get_topic.js");
@@ -210,6 +212,19 @@ app.route("/profileMode")
       handleProfileMode.on("message", message => res.send(message));
     });
 
+// User methods
+app.route("/user")
+.post((req, res) => {
+  const handleUser = fork('./func/add_user.js');
+  handleUser.send(req.body);
+  handleUser.on("message", message => res.send(message));
+})
+.delete((req, res) => {
+  const handleUser = fork('./func/delete_user.js');
+  handleUser.send(req.body);
+  handleUser.on("message", message => res.send(message));
+})
+
 /**
  * Individual end points
  */
@@ -222,6 +237,7 @@ app.get('/selectposts', (req, res) => {
     select.on("message", message => res.send(message));
   });
 
+// User Follow data methods
 app.get("/search",(req, res) =>{
   const handle = fork("./func/search.js");
   var data = {
@@ -229,13 +245,7 @@ app.get("/search",(req, res) =>{
   }
   handle.send(data);
   handle.on("message", message => res.send(message));
-});
-// Add new user
-app.post('/adduser', (req, res) => {
-  const handlePosts = fork('./func/add_user.js');
-  handlePosts.send(req.body);
-  handlePosts.on("message", message => res.send(message));
-});
+})
 
 // Add engagement for a comment
 app.post('/addcommeng', (req, res) => {

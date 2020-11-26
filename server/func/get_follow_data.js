@@ -92,7 +92,7 @@ const getFollowers = async(user_id, connection) => {
                 result = JSON.stringify(result);
                 result = JSON.parse(result);
                 console.log(result);
-                await convert_to_username("followers", user_id, result, connection).then((value)=> {
+                await convert_to_id_and_name("followers", user_id, result, connection).then((value)=> {
                     result = value;
                 });
                 console.log("Followers retrieved");
@@ -103,8 +103,8 @@ const getFollowers = async(user_id, connection) => {
     });
 }
 
-const convert_to_username = async(flag, current_user, ids, connection) => {
-    var query1 = "SELECT username FROM profile WHERE";
+const convert_to_id_and_name = async(flag, current_user, ids, connection) => {
+    var query1 = "SELECT profile_id, name FROM profile WHERE";
     var profile_ids = [];
     if (flag == "following") {
         for (var i = 0; i < ids.length; i++) {
