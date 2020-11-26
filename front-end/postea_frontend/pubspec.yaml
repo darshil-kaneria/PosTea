@@ -39,6 +39,7 @@ dependencies:
   custom_switch:
   google_fonts: ^1.1.1
   shared_preferences:
+  web_socket_channel: ^1.1.0
   badges:
   linkwell:
 

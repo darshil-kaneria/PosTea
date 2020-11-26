@@ -27,6 +27,8 @@ import 'package:postea_frontend/customWidgets/topic_pill.dart';
 import 'package:http/http.dart' as http;
 import 'package:postea_frontend/data_models/process_timeline.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 import 'login.dart';
 import 'topic.dart';
 import 'settingsPage.dart';
@@ -41,7 +43,7 @@ class HomePage extends StatefulWidget {
   _HomePageState createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   // File _postImage;
 
   var _scrollController = new ScrollController();
@@ -64,7 +66,7 @@ class _HomePageState extends State<HomePage> {
   List<String> topic_id_list = [];
   List<String> post_id_list = [];
   List<dynamic> engagementInfo = [];
-
+  WebSocketChannel webSocketChannel;
   SharedPreferences pref;
   // var searchResults = [];
 
@@ -124,15 +126,39 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
-  // void dispose() {
-  //   // TODO: implement dispose
-  //   checkPosScrollController.dispose();
-  //   _scrollController.dispose();
-  //   super.dispose();
-  // }
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    switch (state) {
+      case AppLifecycleState.inactive:
+        print("app inactive");
+        break;
+      case AppLifecycleState.detached:
+        print("app detached");
+        webSocketChannel.sink.close();
+        break;
+      case AppLifecycleState.paused:
+        print("app paused");
+        break;
+      case AppLifecycleState.resumed:
+        print("app resumed");
+        break;
+    }
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    // checkPosScrollController.dispose();
+    // _scrollController.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    print("removed observer");
+    super.dispose();
+  }
 
   @override
   void initState() {
+    WidgetsBinding.instance.addObserver(this);
+    print("added observer");
     print("The profile ID is: " + widget.profileID.toString());
     timeLine = new ProcessTimeline(widget.profileID);
     // Timer.periodic(Duration(seconds: 1), (timer) {
@@ -140,6 +166,7 @@ class _HomePageState extends State<HomePage> {
     //   timer.changeVal();
     //  });
     initializeSharedPref();
+    initializeWebSocket();
     getUserData();
     checkPosScrollController.addListener(_scrollListener);
     //  setState(() {
@@ -213,6 +240,17 @@ class _HomePageState extends State<HomePage> {
 
   initializeSharedPref() async {
     pref = await SharedPreferences.getInstance();
+  }
+
+  initializeWebSocket() async {
+    webSocketChannel =
+        IOWebSocketChannel.connect("ws://postea-server.herokuapp.com");
+
+    print("WEB SOCKET CONNECTION ESTABLISHED!");
+
+    webSocketChannel.sink.add(widget.profileID.toString());
+
+    print("WEB SOCKET: Profile ID " + widget.profileID.toString() + " sent");
   }
 
   @override
@@ -583,6 +621,12 @@ class _HomePageState extends State<HomePage> {
             ),
             actions: <Widget>[
               IconButton(
+                icon: Icon(Icons.notifications_active),
+                onPressed: () {
+                  webSocketChannel.sink.add("WEB SOCKET: BUTTON PRESSED");
+                },
+              ),
+              IconButton(
                 icon: Icon(
                   Icons.search,
                   size: 20,
@@ -599,6 +643,12 @@ class _HomePageState extends State<HomePage> {
                     size: 20,
                   ),
                   onPressed: () {
+                    StreamBuilder(
+                      stream: webSocketChannel.stream,
+                      builder: (context, snapshot) {
+                        return Text(snapshot.hasData ? '${snapshot.data}' : '');
+                      },
+                    );
                     pageController.animateToPage(2,
                         duration: Duration(milliseconds: 200),
                         curve: Curves.bounceInOut);

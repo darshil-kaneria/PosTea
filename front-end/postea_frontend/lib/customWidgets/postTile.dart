@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:postea_frontend/customWidgets/topic_pill.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 import '../colors.dart';
 import './expandedPostTile.dart';
 import 'package:postea_frontend/customWidgets/expandedPostTile.dart';
@@ -83,7 +85,7 @@ class _PostTileState extends State<PostTile> {
   var dislike_count;
   var isExpanded;
 
-  
+  WebSocketChannel webSocketChannel;
 
   _PostTileState(
       this.post_id,
