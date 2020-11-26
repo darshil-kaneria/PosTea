@@ -55,7 +55,8 @@ class ExpandedPostTile extends StatefulWidget {
       this.myPID);
 }
 
-class _ExpandedPostTileState extends State<ExpandedPostTile> with TickerProviderStateMixin {
+class _ExpandedPostTileState extends State<ExpandedPostTile>
+    with TickerProviderStateMixin {
   var post_id;
   var profile_id;
   var post_description;
@@ -88,7 +89,7 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> with TickerProvider
     return resp;
   }
 
-    var commentController = TextEditingController();
+  var commentController = TextEditingController();
   _ExpandedPostTileState(
       this.post_id,
       this.profile_id,
@@ -102,7 +103,7 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> with TickerProvider
       this.post_title,
       this.name,
       this.myPID);
-  
+
   @override
   Widget build(BuildContext context) {
     // engagementInfo();
@@ -111,56 +112,54 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> with TickerProvider
 
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
-    final slideController = AnimationController(vsync: this, duration: Duration(milliseconds: 2000));
-    final slideAnimation = Tween(begin: Offset(0, 0), end: Offset(1, 0)).animate(slideController);
+    final slideController = AnimationController(
+        vsync: this, duration: Duration(milliseconds: 2000));
+    final slideAnimation =
+        Tween(begin: Offset(0, 0), end: Offset(1, 0)).animate(slideController);
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if(checkCommVal == true)
-      comment_string.value = "Edit Comment";
+      if (checkCommVal == true) comment_string.value = "Edit Comment";
     });
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: new AppBar(
         backgroundColor: Theme.of(context).canvasColor,
-        elevation: 0, 
-        iconTheme: IconThemeData(color: Theme.of(context).buttonColor),),
+        elevation: 0,
+        iconTheme: IconThemeData(color: Theme.of(context).buttonColor),
+      ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: barrier,
-        icon: Icon(Icons.add),
-        label: ValueListenableBuilder(
-                  valueListenable: comment_string,
-                  builder: (_, value, __) => Text(
-                    value.toString(),
-                    style: TextStyle(fontSize: 15),
-                  ),
-                ),
-        onPressed: () async {
-          if(pg.page == 0.0)
-          {
-            pg.animateToPage(1, duration: Duration(milliseconds: 100), curve: Curves.easeInQuad);
-            if(checkCommVal == true)
-            comment_string.value = "Edit Comment";
-          }
-          else{
+          backgroundColor: barrier,
+          icon: Icon(Icons.add),
+          label: ValueListenableBuilder(
+            valueListenable: comment_string,
+            builder: (_, value, __) => Text(
+              value.toString(),
+              style: TextStyle(fontSize: 15),
+            ),
+          ),
+          onPressed: () async {
+            if (pg.page == 0.0) {
+              pg.animateToPage(1,
+                  duration: Duration(milliseconds: 100),
+                  curve: Curves.easeInQuad);
+              if (checkCommVal == true) comment_string.value = "Edit Comment";
+            } else {
+              var reqBody = {
+                "engagement_post_id": post_id,
+                "engagement_profile_id": myPID,
+                "like_dislike": null,
+                "comment":
+                    commentController.text == "" ? null : commentController.text
+              };
 
-            var reqBody = {
-                    "engagement_post_id": post_id,
-                    "engagement_profile_id": myPID,
-                    "like_dislike": null,
-                    "comment": commentController.text == "" ? null: commentController.text
-                  };
-
-            var reqBodyJson = jsonEncode(reqBody);
-            http.post(
-              "http://postea-server.herokuapp.com/engagement",
-              headers: {"Content-Type": "application/json"},
-              body: reqBodyJson
-            ).then((value) => print(value.body));
-
-          }
-          
-        }
-        ),
-        floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+              var reqBodyJson = jsonEncode(reqBody);
+              http
+                  .post("http://postea-server.herokuapp.com/engagement",
+                      headers: {"Content-Type": "application/json"},
+                      body: reqBodyJson)
+                  .then((value) => print(value.body));
+            }
+          }),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: Container(
         color: Theme.of(context).canvasColor,
         child: ListView(
@@ -168,7 +167,6 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> with TickerProvider
           children: [
             SlideTransition(
               position: slideAnimation,
-              
               child: PostTile(
                   post_id,
                   profile_id,
@@ -183,71 +181,97 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> with TickerProvider
                   name,
                   myPID,
                   1),
-            )
-            ,
+            ),
             Container(
-              height: screenHeight/1.5,
+              height: screenHeight / 1.5,
               width: screenWidth,
               margin: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
               child: PageView(
-                physics: NeverScrollableScrollPhysics(),
-                controller: pg,
-                children: [
-                FutureBuilder(
-                  future: engagementInfo(),
-                  builder: (BuildContext context,
-                      AsyncSnapshot<dynamic> snapshot) {
+                  physics: NeverScrollableScrollPhysics(),
+                  controller: pg,
+                  children: [
+                    FutureBuilder(
+                      future: engagementInfo(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<dynamic> snapshot) {
                         comments = [];
-                    if (snapshot.hasData && snapshot.data.body != "Post does not exist") {
-                      bool myComm = false;
-                      var myCommId = 0;
-                      print("response");
-                      print(snapshot.data.body);
-                      var engagements = jsonDecode(snapshot.data.body);
+                        List<Map> commEngagement = [];
+                        if (snapshot.hasData &&
+                            snapshot.data.body != "Post does not exist") {
+                          bool myComm = false;
+                          var myCommId = 0;
+                          print("response");
+                          print(snapshot.data.body);
+                          Map temp = {};
+                          var engagements = jsonDecode(snapshot.data.body);
 
-                      for (int i = 0; i < engagements.length; i++) {
-                        if (engagements[i]['comment'] == null) {
-                          continue;
+                          for (int i = 0; i < engagements.length; i++) {
+                            if (engagements[i]['comment'] == null) {
+                              continue;
+                            }
+
+                            print(
+                                engagements[i]['comment'].toString() != null &&
+                                    engagements[i]['profile_id'].toString() ==
+                                        myPID.toString());
+                            if (engagements[i]['comment'].toString() != null) {
+                              print("IN HERE");
+
+                              temp['profile_id'] = engagements[i]['profile_id'];
+
+                              temp['name'] = name;
+
+                              commEngagement.add(temp);
+                              commentController.text =
+                                  engagements[i]['comment'];
+                              // comment_string.value = "Edit comment";
+                              checkCommVal = true;
+                            }
+                            comments.add(engagements[i]['comment'].toString());
+                          }
+
+                          if (comments.length == 0 || comments == null) {
+                            return Container();
+                          }
+
+                          return ListView.builder(
+                            itemCount: comments.length,
+                            shrinkWrap: true,
+                            itemBuilder: (BuildContext context, int index) {
+                              print(commEngagement[index]);
+                              print("Now printing comment");
+                              print(comments.elementAt(index));
+                              if (comments.elementAt(index) == null) {
+                                return Container(
+                                  width: 0,
+                                  height: 0,
+                                );
+                              } else {
+                                return Comments(
+                                  commEngagement[index]['profile_id'],
+                                  comments.elementAt(index),
+                                  commEngagement[index]['name'],
+                                );
+                              }
+                            },
+                          );
+                        } else {
+                          return Container();
                         }
-                        print(engagements[i]['comment'].toString() != null && engagements[i]['profile_id'].toString() == myPID.toString());
-                        if(engagements[i]['comment'].toString() != null && engagements[i]['profile_id'].toString() == myPID.toString()){
-                          print("IN HERE");
-
-                          commentController.text = engagements[i]['comment'];
-                          // comment_string.value = "Edit comment";
-                          checkCommVal = true;
-                        }
-                        comments.add(engagements[i]['comment'].toString());
-                      }
-
-                      if (comments.length == 0 || comments == null) {
-                        return Container();
-                      }
-
-                      return ListView.builder(
-                          itemCount: comments.length,
-                          shrinkWrap: true,
-                          itemBuilder: (BuildContext context, int index) {
-                            print(engagements[index]);
-                            print(comments.elementAt(index));
-                            return Comments(engagements[index]['profile_id'],
-                                comments.elementAt(index), engagements[index]['name']);
-                          });
-                    } else {
-                      return Container();
-                    }
-                  },
-                ),
-                Container(
-                  margin: EdgeInsets.only(left: 15, right: 15),
-                  child: TextField(
-                    cursorColor: Theme.of(context).accentColor,
-                    style: Theme.of(context).textTheme.headline2,
-                    controller: commentController,
-                    decoration: InputDecoration(labelText: "Your comment:", labelStyle: Theme.of(context).textTheme.headline1),
-                  ),
-                )
-              ]),
+                      },
+                    ),
+                    Container(
+                      margin: EdgeInsets.only(left: 15, right: 15),
+                      child: TextField(
+                        cursorColor: Theme.of(context).accentColor,
+                        style: Theme.of(context).textTheme.headline2,
+                        controller: commentController,
+                        decoration: InputDecoration(
+                            labelText: "Your comment:",
+                            labelStyle: Theme.of(context).textTheme.headline1),
+                      ),
+                    )
+                  ]),
             ),
             // ButtonTheme(
             //   child: RaisedButton(
@@ -280,9 +304,6 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> with TickerProvider
           ],
         ),
       ),
-      
     );
   }
 }
-
-

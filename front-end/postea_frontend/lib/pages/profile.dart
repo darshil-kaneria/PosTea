@@ -12,6 +12,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:postea_frontend/main.dart';
 import 'package:postea_frontend/pages/edit_profile.dart';
 import 'package:postea_frontend/pages/followingList.dart';
+import 'package:postea_frontend/pages/topicFollowingList.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data_models/process_save_post.dart';
 
@@ -206,6 +207,7 @@ class _ProfileState extends State<Profile> {
     print("profileId is " + widget.profileId.toString());
     print("username is " + username.toString());
     print("isFollow is " + isFollow.toString());
+    var followerString = "Topics that " + name.toString() + " follows";
     // displayImage();
 
     return SafeArea(
@@ -669,7 +671,7 @@ class _ProfileState extends State<Profile> {
                                                     child: Text("Topics"),
                                                   ),
                                                 ),
-                                                value: 2,
+                                                value: 3,
                                               ),
                                             ],
                                             onChanged: (num value) {
@@ -794,7 +796,7 @@ class _ProfileState extends State<Profile> {
                                         child: Text("Topics"),
                                       ),
                                     ),
-                                    value: 2,
+                                    value: 3,
                                   ),
                                 ],
                                 onChanged: (num value) {
@@ -827,7 +829,7 @@ class _ProfileState extends State<Profile> {
                                           fontSize: 20),
                                     ),
                                     onTap: () {
-                                      controller.animateToPage(3,
+                                      controller.animateToPage(2,
                                           duration: Duration(milliseconds: 150),
                                           curve: Curves.decelerate);
                                     },
@@ -904,9 +906,9 @@ class _ProfileState extends State<Profile> {
                     IconButton(
                       icon: Icon(Icons.arrow_back),
                       onPressed: () {
-                        controller.animateToPage(1,
-                            duration: Duration(milliseconds: 150),
-                            curve: Curves.easeIn);
+                        controller.jumpToPage(
+                          1,
+                        );
                       },
                     ),
                     Container(
@@ -972,6 +974,43 @@ class _ProfileState extends State<Profile> {
                       ),
                     ),
                   ],
+                ),
+              ),
+            ),
+            SafeArea(
+              child: Container(
+                width: screenWidth,
+                height: screenHeight,
+                child: Material(
+                  child: Container(
+                    height: screenHeight / 1.1,
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.arrow_back),
+                              onPressed: () {
+                                controller.jumpToPage(
+                                  0,
+                                );
+                              },
+                            ),
+                            Text(
+                              followerString,
+                              style: TextStyle(
+                                  color: Theme.of(context).iconTheme.color,
+                                  fontSize: 20),
+                            ),
+                          ],
+                        ),
+                        TopicFollowingList(
+                          profileId: widget.profileId.toString(),
+                          name: name,
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ),

@@ -1,6 +1,7 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:postea_frontend/pages/profile.dart';
 import 'dart:convert';
 
 import '../colors.dart';
@@ -60,6 +61,17 @@ class _FollowerListState extends State<FollowerList> {
                 itemCount: followingList.length,
                 itemBuilder: (context, index) {
                   return ListTile(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Profile(
+                            profileId: int.parse(profileIDs[index]),
+                            isOwner: false,
+                          ),
+                        ),
+                      );
+                    },
                     leading: FutureBuilder(
                       future: FirebaseStorageService.getImage(
                           context, profileIDs[index].toString()),
