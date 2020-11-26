@@ -145,7 +145,9 @@ app.route("/engagement")
     handleEngagements.send(req.body);
     handleEngagements.on("message", message => {
       var publisher = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
-      publisher.on(String(message), "Message from "+String(req.body.engagement_profile_id) + " to "+String(message));
+      publisher.on(String(message), "Message from "+String(req.body.engagement_profile_id) + " to "+String(message), function(){
+        console.log("Finished");
+      });
       // clients.clientList[message].send("YOU HAVE A MESSAGE FROM " + req.body.engagement_profile_id);
       res.send(message);
     });
