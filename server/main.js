@@ -48,7 +48,6 @@ else {
     console.log("Websocket initiated by: "+ws._socket.remoteAddress);
     socket.on('message', message => console.log(message));
   });
-
   
   server.on('upgrade', (request, socket, head) => {
     wsServer.handleUpgrade(request, socket, head, socket => {
