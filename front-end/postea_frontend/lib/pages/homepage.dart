@@ -643,12 +643,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     size: 20,
                   ),
                   onPressed: () {
-                    StreamBuilder(
-                      stream: webSocketChannel.stream,
-                      builder: (context, snapshot) {
-                        return Text(snapshot.hasData ? '${snapshot.data}' : '');
-                      },
-                    );
                     pageController.animateToPage(2,
                         duration: Duration(milliseconds: 200),
                         curve: Curves.bounceInOut);
@@ -670,6 +664,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           backgroundColor: Theme.of(context).canvasColor,
           body: Column(
             children: [
+              StreamBuilder(
+                      stream: webSocketChannel.stream,
+                      builder: (context, snapshot) {
+                        return Text(snapshot.hasData ? '${snapshot.data}' : '');
+                      },
+                    ),
               Container(
                 height: screenHeight / 15,
                 width: screenWidth,
