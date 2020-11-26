@@ -5,56 +5,53 @@ import 'dart:convert';
 
 import '../colors.dart';
 
-class FollowingList extends StatefulWidget {
+class TopicFollowingList extends StatefulWidget {
   var profileId;
   var name;
 
-  FollowingList({this.profileId, this.name});
+  TopicFollowingList({this.profileId, this.name});
   @override
-  _FollowingListState createState() => _FollowingListState();
+  _TopicFollowingListState createState() => _TopicFollowingListState();
 }
 
-class _FollowingListState extends State<FollowingList> {
+class _TopicFollowingListState extends State<TopicFollowingList> {
   List<String> followingList = [];
   List<String> profileIDs = [];
-  Future<http.Response> getFollowingList() async {
+  Future<http.Response> getTopicFollowingList() async {
     followingList = [];
-    print("hello before taking following data list");
+    print("hello before taking follow data");
     http.Response resp = await http.get(
-      "http://postea-server.herokuapp.com/followdata?profile_id=" +
+      "http://postea-server.herokuapp.com/topicfollowdata?profile_id=" +
           widget.profileId.toString() +
-          "&flag=following_list",
+          "&flag=follower_list",
     );
-    print("following list is " + json.decode(resp.body).toString());
+
+    print("follower data is " + json.decode(resp.body).toString());
     return resp;
   }
 
   @override
   Widget build(BuildContext context) {
-    var followingString = widget.name.toString() + " is following";
+    var followerString = "Followers of " + widget.name.toString();
     var screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
-      extendBodyBehindAppBar: true,
       appBar: new AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        iconTheme: IconThemeData(color: Theme.of(context).iconTheme.color),
         title: Text(
-          followingString,
+          followerString,
           style: TextStyle(color: Theme.of(context).iconTheme.color),
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        iconTheme:
-            IconThemeData(color: Theme.of(context).accentIconTheme.color),
       ),
       body: Container(
         margin: EdgeInsets.all(14),
         child: FutureBuilder(
-          future: getFollowingList(),
+          future: getTopicFollowingList(),
           builder: (BuildContext context, AsyncSnapshot snapshot) {
             if (snapshot.hasData) {
               print("HERE");
               var temp = jsonDecode(snapshot.data.body);
-              print("temp is " + temp.toString());
               for (var i = 0; i < temp.length; i++) {
                 followingList.add(temp[i]['name'].toString());
                 profileIDs.add(temp[i]['profile_id'].toString());
@@ -89,8 +86,7 @@ class _FollowingListState extends State<FollowingList> {
             } else
               return Center(
                   child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation(bgGradEnd),
-              ));
+                      valueColor: AlwaysStoppedAnimation(bgGradEnd)));
           },
         ),
       ),

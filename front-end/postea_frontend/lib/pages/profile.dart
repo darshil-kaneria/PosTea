@@ -184,7 +184,7 @@ class _ProfileState extends State<Profile> {
 
     var postInfo = await processSavePost.retrievePost();
 
-    print("postInfo is " + postInfo.toString());
+    // print("postInfo is " + postInfo.toString());
 
     return postInfo;
   }
@@ -195,7 +195,7 @@ class _ProfileState extends State<Profile> {
 
     http.Response resp = await http.get(url);
     print("retrieved posts");
-    print(resp.body);
+    // print(resp.body);
     return resp;
   }
 

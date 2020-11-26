@@ -16,8 +16,10 @@ class FollowerList extends StatefulWidget {
 
 class _FollowerListState extends State<FollowerList> {
   List<String> followingList = [];
+  List<String> profileIDs = [];
   Future<http.Response> getFollowingList() async {
     followingList = [];
+    print("hello before taking follow data");
     http.Response resp = await http.get(
       "http://postea-server.herokuapp.com/followdata?profile_id=" +
           widget.profileId.toString() +
@@ -51,7 +53,8 @@ class _FollowerListState extends State<FollowerList> {
               print("HERE");
               var temp = jsonDecode(snapshot.data.body);
               for (var i = 0; i < temp.length; i++) {
-                followingList.add(temp[i]['username'].toString());
+                followingList.add(temp[i]['name'].toString());
+                profileIDs.add(temp[i]['profile_id'].toString());
               }
               return ListView.builder(
                 itemCount: followingList.length,
@@ -59,12 +62,18 @@ class _FollowerListState extends State<FollowerList> {
                   return ListTile(
                     leading: FutureBuilder(
                       future: FirebaseStorageService.getImage(
-                          context, widget.profileId.toString()),
+                          context, profileIDs[index].toString()),
                       builder: (BuildContext context,
                           AsyncSnapshot<dynamic> snapshot) {
                         if (snapshot.hasData) {
                           return CircleAvatar(
                             backgroundImage: NetworkImage(snapshot.data),
+                            maxRadius: screenWidth / 20,
+                          );
+                        } else {
+                          return CircleAvatar(
+                            backgroundImage: NetworkImage(
+                                "https://picsum.photos/250?image=18"),
                             maxRadius: screenWidth / 20,
                           );
                         }
