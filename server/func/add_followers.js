@@ -10,7 +10,7 @@ process.on("message", message => {
             profile_id: message.profile_id,
             follower_id: message.follower_id
           }
-          //  addFollower(message.profile_id,message.follower_id, connection).then((answer) => {
+//  addFollower(message.profile_id,message.follower_id, connection).then((answer) => {
          addFollower(data, connection).then((answer) => {
             connection.release();
             if (answer == "Relationship already exists") {
