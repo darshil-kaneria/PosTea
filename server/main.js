@@ -435,6 +435,15 @@ app.get("/getFollowingTopics", (req, res) => {
   handleGetFollowingTopics.on("message", message => res.send(message));
 });
 
+app.get("/getAllPostsWithEngagement", (req, res) => {
+  const handleGetAllEngagements = fork("./func/getAllEngagements");
+  var data = {
+    profile_id: req.query.profile_id
+  }
+  handleGetAllEngagements.send(data);
+  handleGetAllEngagements.on("message", message => res.send(message));
+});
+
 /**
  * Dev endpoints - use with caution.
  */
