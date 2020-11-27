@@ -56,15 +56,17 @@ else {
     var tm;
     function ping() {
       ws.send('__ping__');
+      console.log("ping sent");
       tm = setTimeout(function () {  
         subscriber.quit();
       }, 5000);
     }
     function pong() {
       clearTimeout(tm);
+      console.log("pong received");
     }
     ws.onopen = function() {
-      setInterval(ping, 30000);
+      setInterval(ping, 5000);
     }
 
     ws.on('message', (profile_id) => {
