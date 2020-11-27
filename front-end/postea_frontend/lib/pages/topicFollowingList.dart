@@ -21,6 +21,12 @@ class _TopicFollowingListState extends State<TopicFollowingList> {
   List<String> followingList = [];
   List<String> topicIDs = [];
   SharedPreferences prefs;
+  ValueNotifier<String> topicFollowingText = ValueNotifier<String>("Follow");
+  ValueNotifier<bool> isFollow = ValueNotifier<bool>(false);
+
+  ValueNotifier<String> topicNameNotifier = ValueNotifier("");
+  ValueNotifier<String> topicDescNotifier = ValueNotifier("");
+  ValueNotifier<Color> buttonColor = ValueNotifier<Color>(Colors.red[50]);
 
   Future<http.Response> getFollowingList() async {
     followingList = [];
@@ -34,6 +40,12 @@ class _TopicFollowingListState extends State<TopicFollowingList> {
 
   initializeSharedPref() async {
     prefs = await SharedPreferences.getInstance();
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
   }
 
   @override
@@ -59,54 +71,122 @@ class _TopicFollowingListState extends State<TopicFollowingList> {
             return ListView.builder(
               itemCount: followingList.length,
               itemBuilder: (context, index) {
-                return ListTile(
-                  onTap: () async {
-                    initializeSharedPref();
-                    var topicIDList = prefs.getStringList('topicIDList');
-                    if (topicIDList.contains(topicIDs[index])) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Topic(
-                            profileId: int.parse(widget.profileId),
-                            topicId: topicIDs[index],
-                            isOwner: true,
+                return Row(
+                  children: [
+                    Container(
+                      width: screenWidth / 2,
+                      child: ListTile(
+                        onTap: () async {
+                          var topicIDList = prefs.getStringList('topicIDList');
+                          if (topicIDList.contains(topicIDs[index])) {
+                            topicFollowingText.value = "Following";
+                            isFollow.value = true;
+                            buttonColor.value = Colors.redAccent[100];
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Topic(
+                                  profileId: int.parse(widget.profileId),
+                                  topicId: topicIDs[index],
+                                  isOwner: true,
+                                ),
+                              ),
+                            );
+                          } else {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Topic(
+                                  profileId: int.parse(widget.profileId),
+                                  topicId: topicIDs[index],
+                                  isOwner: false,
+                                ),
+                              ),
+                            );
+                          }
+                        },
+                        leading: FutureBuilder(
+                          future: FirebaseStorageService.getImage(
+                              context, topicIDs[index].toString()),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<dynamic> snapshot) {
+                            if (snapshot.hasData) {
+                              return CircleAvatar(
+                                backgroundImage: NetworkImage(snapshot.data),
+                                maxRadius: screenWidth / 20,
+                              );
+                            } else {
+                              return CircleAvatar(
+                                backgroundImage: NetworkImage(
+                                    "https://picsum.photos/250?image=18"),
+                                maxRadius: screenWidth / 20,
+                              );
+                            }
+                          },
+                        ),
+                        title: Text(followingList[index].toString()),
+                      ),
+                    ),
+                    Spacer(),
+                    Container(
+                      child: ValueListenableBuilder(
+                        valueListenable: isFollow,
+                        builder: (_, isFollowValue, __) => Container(
+                          height: screenHeight / 25,
+                          child: ButtonTheme(
+                            buttonColor: buttonColor.value,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30)),
+                            minWidth: screenWidth / 5,
+                            child: RaisedButton(
+                              elevation: 2,
+                              clipBehavior: Clip.antiAlias,
+                              child: Text(topicFollowingText.value),
+                              onPressed: () async {
+                                print("IS FOLLOW VALUE: " +
+                                    isFollowValue.toString());
+
+                                if (isFollowValue) {
+                                  buttonColor.value = Colors.red[50];
+                                  isFollow.value = false;
+                                  topicFollowingText.value = "Follow";
+                                  final request = http.Request(
+                                      "DELETE",
+                                      Uri.parse(
+                                          "http://postea-server.herokuapp.com/topicfollowdata"));
+                                  request.headers.addAll(
+                                      {'Content-Type': 'application/json'});
+                                  request.body = jsonEncode({
+                                    "topic_id": topicIDs[index],
+                                    "follower_id": widget.profileId
+                                  });
+                                  request.send();
+                                } else {
+                                  buttonColor.value = Colors.redAccent[100];
+                                  isFollow.value = true;
+                                  topicFollowingText.value = "Following";
+                                  var addfollowing = {
+                                    "topic_id": topicIDs[index],
+                                    "follower_id": widget.profileId
+                                  };
+                                  var addfollowingJson =
+                                      JsonEncoder().convert(addfollowing);
+                                  http.post(
+                                      "http://postea-server.herokuapp.com/topicfollowdata",
+                                      headers: {
+                                        'Content-Type': 'application/json'
+                                      },
+                                      body: addfollowingJson);
+                                }
+
+                                // setState(() {});
+                              },
+                            ),
                           ),
                         ),
-                      );
-                    } else {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => Topic(
-                            profileId: int.parse(widget.profileId),
-                            topicId: topicIDs[index],
-                            isOwner: false,
-                          ),
-                        ),
-                      );
-                    }
-                  },
-                  leading: FutureBuilder(
-                    future: FirebaseStorageService.getImage(
-                        context, topicIDs[index].toString()),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<dynamic> snapshot) {
-                      if (snapshot.hasData) {
-                        return CircleAvatar(
-                          backgroundImage: NetworkImage(snapshot.data),
-                          maxRadius: screenWidth / 20,
-                        );
-                      } else {
-                        return CircleAvatar(
-                          backgroundImage: NetworkImage(
-                              "https://picsum.photos/250?image=18"),
-                          maxRadius: screenWidth / 20,
-                        );
-                      }
-                    },
-                  ),
-                  title: Text(followingList[index].toString()),
+                      ),
+                    ),
+                  ],
                 );
               },
             );

@@ -42,6 +42,9 @@ class _ProfileState extends State<Profile> {
   int _value;
   PageController controller = PageController(initialPage: 0);
 
+  ValueNotifier<bool> viewEngagements = new ValueNotifier(false);
+  Color toggle = Colors.redAccent[100].withOpacity(0.5);
+
   @override
   void initState() {
     // TODO: implement initState
@@ -465,9 +468,10 @@ class _ProfileState extends State<Profile> {
                                               isFollow = false;
                                               followButtonText = "Follow";
                                               final request = http.Request(
-                                                  "DELETE",
-                                                  Uri.parse(
-                                                      "http://postea-server.herokuapp.com/followdata"));
+                                                "DELETE",
+                                                Uri.parse(
+                                                    "http://postea-server.herokuapp.com/followdata"),
+                                              );
                                               request.headers.addAll({
                                                 'Content-Type':
                                                     'application/json'
@@ -819,25 +823,125 @@ class _ProfileState extends State<Profile> {
                         height: screenHeight / 1.4,
                         child: Column(
                           children: [
-                            widget.isOwner
-                                ? GestureDetector(
-                                    child: Text(
-                                      "View Saved Posts",
-                                      style: TextStyle(
-                                          decoration: TextDecoration.underline,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20),
-                                    ),
-                                    onTap: () {
-                                      controller.animateToPage(2,
-                                          duration: Duration(milliseconds: 150),
-                                          curve: Curves.decelerate);
-                                    },
-                                  )
-                                : Container(
-                                    width: 0,
-                                    height: 0,
+                            Row(
+                              children: [
+                                Container(
+                                  width: screenWidth / 2,
+                                  margin: EdgeInsets.only(left: 15),
+                                  child: Row(
+                                    children: [
+                                      Text("View engagements"),
+                                      Container(
+                                        margin: EdgeInsets.only(left: 10),
+                                        child: ValueListenableBuilder(
+                                          valueListenable: viewEngagements,
+                                          builder: (context, value, child) {
+                                            return AnimatedContainer(
+                                              duration:
+                                                  Duration(milliseconds: 200),
+                                              height: 20,
+                                              width: 50,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                  color: toggle),
+                                              child: Stack(
+                                                children: [
+                                                  AnimatedPositioned(
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          if (viewEngagements
+                                                              .value) {
+                                                            toggle = Colors
+                                                                .redAccent
+                                                                .withOpacity(
+                                                                    0.5);
+                                                            viewEngagements
+                                                                .value = false;
+                                                          } else {
+                                                            toggle = Colors
+                                                                .greenAccent;
+                                                            viewEngagements
+                                                                .value = true;
+                                                          }
+                                                          // toggleButton();
+                                                        },
+                                                        child: AnimatedSwitcher(
+                                                          duration: Duration(
+                                                              milliseconds:
+                                                                  200),
+                                                          transitionBuilder:
+                                                              (Widget child,
+                                                                  Animation<
+                                                                          double>
+                                                                      animation) {
+                                                            return ScaleTransition(
+                                                              child: child,
+                                                              scale: animation,
+                                                            );
+                                                          },
+                                                          child: value
+                                                              ? Icon(
+                                                                  Icons
+                                                                      .check_circle,
+                                                                  color: Colors
+                                                                      .green,
+                                                                  size: 15,
+                                                                  key:
+                                                                      UniqueKey(),
+                                                                )
+                                                              : Icon(
+                                                                  Icons
+                                                                      .remove_circle_outline,
+                                                                  color: Colors
+                                                                      .red,
+                                                                  size: 15,
+                                                                  key:
+                                                                      UniqueKey(),
+                                                                ),
+                                                        ),
+                                                      ),
+                                                      duration: Duration(
+                                                          milliseconds: 200),
+                                                      curve: Curves.easeIn,
+                                                      top: 3,
+                                                      left: value ? 30 : 0,
+                                                      right: value ? 0 : 30),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
+                                ),
+                                Container(
+                                  width: screenWidth / 2.5,
+                                  child: widget.isOwner
+                                      ? GestureDetector(
+                                          child: Text(
+                                            "View Saved Posts",
+                                            style: TextStyle(
+                                                decoration:
+                                                    TextDecoration.underline,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15),
+                                          ),
+                                          onTap: () {
+                                            controller.animateToPage(2,
+                                                duration:
+                                                    Duration(milliseconds: 150),
+                                                curve: Curves.decelerate);
+                                          },
+                                        )
+                                      : Container(
+                                          width: 0,
+                                          height: 0,
+                                        ),
+                                ),
+                              ],
+                            ),
                             Container(
                               width: screenWidth,
                               height: screenHeight / 1.41,
