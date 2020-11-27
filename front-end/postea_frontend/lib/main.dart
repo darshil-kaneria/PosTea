@@ -40,7 +40,7 @@ class _PosTeaState extends State<PosTea> {
 
   void checkUserLoggedIn() async {
     User user = FirebaseAuth.instance.currentUser;
-    print("UID IS: " + user.uid);
+    // print("UID IS: " + user.uid);
 
     if (user != null) {
       setState(() {
