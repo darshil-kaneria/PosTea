@@ -15,6 +15,7 @@ const numCPUs = require('os').cpus().length;
 var cors = require('cors');
 const ws = require('ws');
 const db = require('./func/db_connection.js');
+const { send } = require('process');
 var redis = db.redis_conn;
 
 var lastWorkerPID = -1;
@@ -57,8 +58,21 @@ else {
         clients.clientList[profile_id].send("HELLO CLIENT");
         var subscriber = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
         subscriber.on("message", (channel, message) => {
-          console.log("Message: "+message+". sent to " + channel);
-          ws.send("You have a new message");
+          var receivedMessage = JSON.parse(message);
+          var engagement = "";
+          if(receivedMessage['like_dislike'] == 1){
+            engagement = " liked your post.";
+          }
+          else if(receivedMessage['comment'] !== null){
+            engagement = " commented on your post.";
+          }
+          var sendMessage = String(receivedMessage['senderClient']) + engagement
+          var sendJSON = {
+            "message": sendMessage,
+            "postID": receivedMessage['postID']
+          };
+          var sendMessageJson = JSON.stringify(sendJSON);
+          ws.send(sendMessageJson);
         });
         subscriber.subscribe(String(profile_id));
         console.log("Subscribed to: " + String(profile_id));
@@ -146,9 +160,19 @@ app.route("/engagement")
     handleEngagements.send(req.body);
     handleEngagements.on("message", message => {
       var publisher = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
-      publisher.publish(String(message), "Message from "+String(req.body.engagement_profile_id) + " to "+String(message), function(){
+      var publishInfo = {
+        "senderClient": req.body.engagement_profile_id,
+        "affectedClient": message,
+        "like_dislike": req.body.like_dislike,
+        "comment": req.body.comment,
+        "followReq": null,
+        "postID": req.body.engagement_post_id
+      }
+
+      var publishInfoJsonString = JSON.stringify(publishInfo);
+      publisher.publish(String(message), publishInfoJsonString, function(){
         console.log("Finished");
-        res.send(message);
+        res.send(String(message));
       });
       // clients.clientList[message].send("YOU HAVE A MESSAGE FROM " + req.body.engagement_profile_id);
       
