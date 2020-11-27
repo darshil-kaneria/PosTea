@@ -35,14 +35,18 @@ class _CommentsState extends State<Comments> {
                 padding: const EdgeInsets.all(8.0),
                 child: Container(
                   child: FutureBuilder(
-                    future: FirebaseStorageService.getImage(context, widget.profileID.toString()),
+                    future: FirebaseStorageService.getImage(
+                        context, widget.profileID.toString()),
                     builder: (context, snapshot) {
-                      return CircleAvatar(
-                      backgroundImage:
-                          NetworkImage(snapshot.data),
-                      backgroundColor: Colors.deepPurpleAccent[50],
-                      radius: 15,
-                    );
+                      if (snapshot.hasData) {
+                        return CircleAvatar(
+                          backgroundImage: NetworkImage(snapshot.data),
+                          backgroundColor: Colors.deepPurpleAccent[50],
+                          radius: 15,
+                        );
+                      } else {
+                        return CircularProgressIndicator();
+                      }
                     },
                   ),
                 ),
@@ -52,23 +56,28 @@ class _CommentsState extends State<Comments> {
                 children: [
                   Padding(
                     padding: const EdgeInsets.only(bottom: 2),
-                    child: AutoSizeText(
-                      this.personName,
-                      style:
-                          Theme.of(context).textTheme.headline2,
-                    ),
+                    child: this.personName == null
+                        ? Container()
+                        : AutoSizeText(
+                            this.personName,
+                            style: Theme.of(context).textTheme.headline2,
+                          ),
                   ),
-                  AutoSizeText(
-                    this.comment,
-                    // "{\"post retrieved\": \"success\"}",
-                    style: Theme.of(context).textTheme.headline3,
-                  ),
+                  this.comment == null
+                      ? Container()
+                      : AutoSizeText(
+                          this.comment,
+                          // "{\"post retrieved\": \"success\"}",
+                          style: Theme.of(context).textTheme.headline3,
+                        ),
                 ],
               ),
               Spacer(),
-              Icon(Icons.thumb_up,
-              color: Theme.of(context).buttonColor,
-              size: 17,)
+              Icon(
+                Icons.thumb_up,
+                color: Theme.of(context).buttonColor,
+                size: 17,
+              )
             ],
           ),
         ],
@@ -76,6 +85,7 @@ class _CommentsState extends State<Comments> {
     );
   }
 }
+
 class FirebaseStorageService extends ChangeNotifier {
   FirebaseStorageService();
   static Future<dynamic> getImage(BuildContext context, String image) async {

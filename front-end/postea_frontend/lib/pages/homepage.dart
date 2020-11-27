@@ -665,11 +665,20 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           body: Column(
             children: [
               StreamBuilder(
-                      stream: webSocketChannel.stream,
-                      builder: (context, snapshot) {
-                        return Text(snapshot.hasData ? '${snapshot.data}' : '');
-                      },
-                    ),
+                stream: webSocketChannel.stream,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    if (snapshot.data == "__ping__") {
+                      webSocketChannel.sink.add("__pong__");
+                      return Text("Received PING. SENT PONG");
+                    } else {
+                      return Text(snapshot.data);
+                    }
+                  } else {
+                    return Text("Awaiting message");
+                  }
+                },
+              ),
               Container(
                 height: screenHeight / 15,
                 width: screenWidth,

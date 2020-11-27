@@ -1,6 +1,7 @@
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:postea_frontend/pages/profile.dart';
 import 'dart:convert';
 
 import '../colors.dart';
@@ -16,8 +17,10 @@ class FollowingList extends StatefulWidget {
 
 class _FollowingListState extends State<FollowingList> {
   List<String> followingList = [];
+  List<String> profileIDs = [];
   Future<http.Response> getFollowingList() async {
     followingList = [];
+    print("hello before taking following data list");
     http.Response resp = await http.get(
       "http://postea-server.herokuapp.com/followdata?profile_id=" +
           widget.profileId.toString() +
@@ -52,21 +55,40 @@ class _FollowingListState extends State<FollowingList> {
             if (snapshot.hasData) {
               print("HERE");
               var temp = jsonDecode(snapshot.data.body);
+              print("temp is " + temp.toString());
               for (var i = 0; i < temp.length; i++) {
-                followingList.add(temp[i]['username'].toString());
+                followingList.add(temp[i]['name'].toString());
+                profileIDs.add(temp[i]['profile_id'].toString());
               }
               return ListView.builder(
                 itemCount: followingList.length,
                 itemBuilder: (context, index) {
                   return ListTile(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => Profile(
+                            profileId: int.parse(profileIDs[index]),
+                            isOwner: false,
+                          ),
+                        ),
+                      );
+                    },
                     leading: FutureBuilder(
                       future: FirebaseStorageService.getImage(
-                          context, widget.profileId.toString()),
+                          context, profileIDs[index].toString()),
                       builder: (BuildContext context,
                           AsyncSnapshot<dynamic> snapshot) {
                         if (snapshot.hasData) {
                           return CircleAvatar(
                             backgroundImage: NetworkImage(snapshot.data),
+                            maxRadius: screenWidth / 20,
+                          );
+                        } else {
+                          return CircleAvatar(
+                            backgroundImage: NetworkImage(
+                                "https://picsum.photos/250?image=18"),
                             maxRadius: screenWidth / 20,
                           );
                         }

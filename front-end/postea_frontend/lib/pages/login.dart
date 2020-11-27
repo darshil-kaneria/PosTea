@@ -22,6 +22,7 @@ class _LoginState extends State<Login> {
   var _usernameController = TextEditingController();
   var _passwordController = TextEditingController();
   var _forgotPasswordController = TextEditingController();
+  SharedPreferences prefs;
 
   PageController _pageController = PageController(
     initialPage: 0,
@@ -36,6 +37,10 @@ class _LoginState extends State<Login> {
   //         context, MaterialPageRoute(builder: (context) => LoggedIn()));
   //   }
   // }
+
+  initializeSharedPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+  }
 
   getUsername(String email) async {
     final databaseReference =
@@ -63,6 +68,10 @@ class _LoginState extends State<Login> {
       username = await getUsername(email);
       print("username after retrieval is " + username.toString());
     }
+
+    await initializeSharedPrefs();
+    prefs.setString("username", username);
+
     try {
       User user = (await FirebaseAuth.instance
               .signInWithEmailAndPassword(email: email, password: password))

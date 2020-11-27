@@ -12,6 +12,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:postea_frontend/main.dart';
 import 'package:postea_frontend/pages/edit_profile.dart';
 import 'package:postea_frontend/pages/followingList.dart';
+import 'package:postea_frontend/pages/topicFollowingList.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../data_models/process_save_post.dart';
 
@@ -40,6 +41,9 @@ class _ProfileState extends State<Profile> {
   int itemCount = 0;
   int _value;
   PageController controller = PageController(initialPage: 0);
+
+  ValueNotifier<bool> viewEngagements = new ValueNotifier(false);
+  Color toggle = Colors.redAccent[100].withOpacity(0.5);
 
   @override
   void initState() {
@@ -183,7 +187,7 @@ class _ProfileState extends State<Profile> {
 
     var postInfo = await processSavePost.retrievePost();
 
-    print("postInfo is " + postInfo.toString());
+    // print("postInfo is " + postInfo.toString());
 
     return postInfo;
   }
@@ -194,7 +198,7 @@ class _ProfileState extends State<Profile> {
 
     http.Response resp = await http.get(url);
     print("retrieved posts");
-    print(resp.body);
+    // print(resp.body);
     return resp;
   }
 
@@ -205,6 +209,7 @@ class _ProfileState extends State<Profile> {
     print("profileId is " + widget.profileId.toString());
     print("username is " + username.toString());
     print("isFollow is " + isFollow.toString());
+    var followerString = "Topics that " + name.toString() + " follows";
     // displayImage();
 
     return SafeArea(
@@ -462,9 +467,10 @@ class _ProfileState extends State<Profile> {
                                               isFollow = false;
                                               followButtonText = "Follow";
                                               final request = http.Request(
-                                                  "DELETE",
-                                                  Uri.parse(
-                                                      "http://postea-server.herokuapp.com/followdata"));
+                                                "DELETE",
+                                                Uri.parse(
+                                                    "http://postea-server.herokuapp.com/followdata"),
+                                              );
                                               request.headers.addAll({
                                                 'Content-Type':
                                                     'application/json'
@@ -668,7 +674,7 @@ class _ProfileState extends State<Profile> {
                                                     child: Text("Topics"),
                                                   ),
                                                 ),
-                                                value: 2,
+                                                value: 3,
                                               ),
                                             ],
                                             onChanged: (num value) {
@@ -793,7 +799,7 @@ class _ProfileState extends State<Profile> {
                                         child: Text("Topics"),
                                       ),
                                     ),
-                                    value: 2,
+                                    value: 3,
                                   ),
                                 ],
                                 onChanged: (num value) {
@@ -816,25 +822,125 @@ class _ProfileState extends State<Profile> {
                         height: screenHeight / 1.4,
                         child: Column(
                           children: [
-                            widget.isOwner
-                                ? GestureDetector(
-                                    child: Text(
-                                      "View Saved Posts",
-                                      style: TextStyle(
-                                          decoration: TextDecoration.underline,
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 20),
-                                    ),
-                                    onTap: () {
-                                      controller.animateToPage(3,
-                                          duration: Duration(milliseconds: 150),
-                                          curve: Curves.decelerate);
-                                    },
-                                  )
-                                : Container(
-                                    width: 0,
-                                    height: 0,
+                            Row(
+                              children: [
+                                Container(
+                                  width: screenWidth / 2,
+                                  margin: EdgeInsets.only(left: 15),
+                                  child: Row(
+                                    children: [
+                                      Text("View engagements"),
+                                      Container(
+                                        margin: EdgeInsets.only(left: 10),
+                                        child: ValueListenableBuilder(
+                                          valueListenable: viewEngagements,
+                                          builder: (context, value, child) {
+                                            return AnimatedContainer(
+                                              duration:
+                                                  Duration(milliseconds: 200),
+                                              height: 20,
+                                              width: 50,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                  color: toggle),
+                                              child: Stack(
+                                                children: [
+                                                  AnimatedPositioned(
+                                                      child: InkWell(
+                                                        onTap: () {
+                                                          if (viewEngagements
+                                                              .value) {
+                                                            toggle = Colors
+                                                                .redAccent
+                                                                .withOpacity(
+                                                                    0.5);
+                                                            viewEngagements
+                                                                .value = false;
+                                                          } else {
+                                                            toggle = Colors
+                                                                .greenAccent;
+                                                            viewEngagements
+                                                                .value = true;
+                                                          }
+                                                          // toggleButton();
+                                                        },
+                                                        child: AnimatedSwitcher(
+                                                          duration: Duration(
+                                                              milliseconds:
+                                                                  200),
+                                                          transitionBuilder:
+                                                              (Widget child,
+                                                                  Animation<
+                                                                          double>
+                                                                      animation) {
+                                                            return ScaleTransition(
+                                                              child: child,
+                                                              scale: animation,
+                                                            );
+                                                          },
+                                                          child: value
+                                                              ? Icon(
+                                                                  Icons
+                                                                      .check_circle,
+                                                                  color: Colors
+                                                                      .green,
+                                                                  size: 15,
+                                                                  key:
+                                                                      UniqueKey(),
+                                                                )
+                                                              : Icon(
+                                                                  Icons
+                                                                      .remove_circle_outline,
+                                                                  color: Colors
+                                                                      .red,
+                                                                  size: 15,
+                                                                  key:
+                                                                      UniqueKey(),
+                                                                ),
+                                                        ),
+                                                      ),
+                                                      duration: Duration(
+                                                          milliseconds: 200),
+                                                      curve: Curves.easeIn,
+                                                      top: 3,
+                                                      left: value ? 30 : 0,
+                                                      right: value ? 0 : 30),
+                                                ],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ],
                                   ),
+                                ),
+                                Container(
+                                  width: screenWidth / 2.5,
+                                  child: widget.isOwner
+                                      ? GestureDetector(
+                                          child: Text(
+                                            "View Saved Posts",
+                                            style: TextStyle(
+                                                decoration:
+                                                    TextDecoration.underline,
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 15),
+                                          ),
+                                          onTap: () {
+                                            controller.animateToPage(2,
+                                                duration:
+                                                    Duration(milliseconds: 150),
+                                                curve: Curves.decelerate);
+                                          },
+                                        )
+                                      : Container(
+                                          width: 0,
+                                          height: 0,
+                                        ),
+                                ),
+                              ],
+                            ),
                             Container(
                               width: screenWidth,
                               height: screenHeight / 1.41,
@@ -904,9 +1010,9 @@ class _ProfileState extends State<Profile> {
                     IconButton(
                       icon: Icon(Icons.arrow_back),
                       onPressed: () {
-                        controller.animateToPage(1,
-                            duration: Duration(milliseconds: 150),
-                            curve: Curves.easeIn);
+                        controller.jumpToPage(
+                          1,
+                        );
                       },
                     ),
                     Container(
@@ -970,9 +1076,47 @@ class _ProfileState extends State<Profile> {
                         ),
                       ],
                     ),
+                  ],
+                ),
+              ),
+            ),
+            SafeArea(
+              child: Container(
+                width: screenWidth,
+                height: screenHeight,
+                child: Material(
+                  child: Container(
+                    height: screenHeight / 1.1,
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            IconButton(
+                              icon: Icon(Icons.arrow_back),
+                              onPressed: () {
+                                controller.jumpToPage(
+                                  0,
+                                );
+                              },
+                            ),
+                            Text(
+                              followerString,
+                              style: TextStyle(
+                                  color: Theme.of(context).iconTheme.color,
+                                  fontSize: 20),
+                            ),
+                          ],
+                        ),
+                        TopicFollowingList(
+                          profileId: widget.profileId.toString(),
+                          name: name,
+                        ),
+                      ],
+                    ),
                   ),
-              ],
-            ),))
+                ),
+              ),
+            ),
           ],
         ),
       ),
