@@ -52,11 +52,31 @@ else {
   const wsServer = new ws.Server({ noServer: true });
   wsServer.on('connection', (ws) => {
     console.log("Websocket initiated by: "+ws._socket.remoteAddress + " on PID: "+process.pid);
+    var subscriber = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
+    var tm;
+    function ping() {
+      ws.send('__ping__');
+      tm = setTimeout(function () {  
+        subscriber.quit();
+      }, 5000);
+    }
+    function pong() {
+      clearTimeout(tm);
+    }
+    ws.onopen = function() {
+      setInterval(ping, 30000);
+    }
+
     ws.on('message', (profile_id) => {
+      if(profile_id == "__pong__"){
+        pong();
+        return
+      }
       if(clients.clientList[profile_id] == undefined){
         clients.saveClient(profile_id, ws);
         clients.clientList[profile_id].send("HELLO CLIENT");
-        var subscriber = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
+        
+        
         subscriber.on("message", (channel, message) => {
           var receivedMessage = JSON.parse(message);
           var engagement = "";
@@ -78,6 +98,9 @@ else {
         console.log("Subscribed to: " + String(profile_id));
       }
     });
+
+    // ws.onopen();
+    
   });
   
   server.on('upgrade', (request, socket, head) => {
