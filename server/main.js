@@ -52,6 +52,7 @@ else {
   const wsServer = new ws.Server({ noServer: true });
   wsServer.on('connection', (ws) => {
     console.log("Websocket initiated by: "+ws._socket.remoteAddress + " on PID: "+process.pid);
+    setInterval(ping, 5000);
     var subscriber = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
     var tm;
     function ping() {
@@ -59,15 +60,15 @@ else {
       console.log("ping sent");
       tm = setTimeout(function () {  
         subscriber.quit();
-      }, 5000);
+      }, 3000);
     }
     function pong() {
       clearTimeout(tm);
       console.log("pong received");
     }
-    ws.onopen = function() {
-      setInterval(ping, 5000);
-    }
+    // ws.onopen = function() {
+      
+    // }
 
     ws.on('message', (profile_id) => {
       if(profile_id == "__pong__"){
