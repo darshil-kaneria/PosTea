@@ -193,7 +193,7 @@ app.route("/engagement")
       }
 
       var publishInfoJsonString = JSON.stringify(publishInfo);
-      publisher.publish(String(message), publishInfoJsonString, function(){
+      publisher.publish(String(message['affectedClient']), publishInfoJsonString, function(){
         console.log("Finished");
         res.send(String(message));
       });
