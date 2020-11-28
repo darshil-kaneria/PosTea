@@ -70,6 +70,18 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   SharedPreferences pref;
   // var searchResults = [];
 
+  Future getNotifs(Stream stream) async {
+    await for(var notif in stream){
+      if(notif != "__ping__"){
+        print(notif);
+      }
+      else{
+        webSocketChannel.sink.add("__pong__");
+        print("Sent pong");
+      }
+    } 
+  }
+
   getUserData() async {
     http
         .get("http://postea-server.herokuapp.com/getUserInfo?profile_id=" +
@@ -221,9 +233,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
   Future<http.Response> getSearchResults(String searchString) async {
     ProcessSearch processSearch = new ProcessSearch(searchString: searchString);
-    print("hello before getting results");
     http.Response resp = await processSearch.getSearchResults();
-    print("hello after getting results");
     print(resp.body.toString());
     return resp;
   }
@@ -251,6 +261,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     webSocketChannel.sink.add(widget.profileID.toString());
 
     print("WEB SOCKET: Profile ID " + widget.profileID.toString() + " sent");
+    getNotifs(webSocketChannel.stream);
   }
 
   @override
@@ -621,12 +632,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ),
             actions: <Widget>[
               IconButton(
-                icon: Icon(Icons.notifications_active),
-                onPressed: () {
-                  webSocketChannel.sink.add("WEB SOCKET: BUTTON PRESSED");
-                },
-              ),
-              IconButton(
                 icon: Icon(
                   Icons.search,
                   size: 20,
@@ -643,9 +648,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                     size: 20,
                   ),
                   onPressed: () {
-                    pageController.animateToPage(2,
-                        duration: Duration(milliseconds: 200),
-                        curve: Curves.bounceInOut);
+                    pageController.jumpToPage(2);
                   }),
               IconButton(
                   icon: Icon(
@@ -664,21 +667,21 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
           backgroundColor: Theme.of(context).canvasColor,
           body: Column(
             children: [
-              StreamBuilder(
-                stream: webSocketChannel.stream,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    if (snapshot.data == "__ping__") {
-                      webSocketChannel.sink.add("__pong__");
-                      return Text("Received PING. SENT PONG");
-                    } else {
-                      return Text(snapshot.data);
-                    }
-                  } else {
-                    return Text("Awaiting message");
-                  }
-                },
-              ),
+              // StreamBuilder(
+              //   stream: webSocketChannel.stream,
+              //   builder: (context, snapshot) {
+              //     if (snapshot.hasData) {
+              //       if (snapshot.data == "__ping__") {
+              //         webSocketChannel.sink.add("__pong__");
+              //         return Text("Received PING. SENT PONG");
+              //       } else {
+              //         return Text(snapshot.data);
+              //       }
+              //     } else {
+              //       return Text("Awaiting message");
+              //     }
+              //   },
+              // ),
               Container(
                 height: screenHeight / 15,
                 width: screenWidth,
