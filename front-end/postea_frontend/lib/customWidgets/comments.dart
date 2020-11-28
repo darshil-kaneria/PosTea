@@ -53,7 +53,7 @@ class _CommentsState extends State<Comments> {
     if (widget.flag.contains("Tag exists")) {
       atIndex = comment.indexOf("@");
       firstHalf = comment.substring(0, atIndex);
-      String tempString = comment.substring(atIndex, comment.length - 1);
+      String tempString = comment.substring(atIndex, comment.length);
       if (comment.lastIndexOf(" ") + 1 == atIndex) {
         tag = tempString;
       } else {

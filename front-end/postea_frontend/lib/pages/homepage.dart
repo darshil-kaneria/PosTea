@@ -58,8 +58,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   File imgToUpload;
   String base64Image = "";
   ProcessTimeline timeLine;
-  ValueNotifier<int> isAnonymous = ValueNotifier<int>(0);
-  ValueNotifier<Color> isAnonColor = ValueNotifier<Color>(Colors.grey);
+  ValueNotifier<int> isAnonymous = new ValueNotifier(0);
+  ValueNotifier<Color> isAnonColor = new ValueNotifier(Colors.grey);
+  ValueNotifier<bool> showNameSuggestions = new ValueNotifier(false);
   var is_private = 0;
   var postID;
   ValueNotifier<int> offset = ValueNotifier<int>(0);
@@ -179,6 +180,39 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     // PickedFile img = await ImagePicker().getImage(source: ImageSource.gallery);
     imgToUpload = await ImagePicker.pickImage(source: ImageSource.gallery);
     print(imgToUpload);
+  }
+
+  getFollowingList() async {
+    print("hello before taking following data list");
+    http.Response resp = await http.get(
+      "http://postea-server.herokuapp.com/followdata?profile_id=" +
+          widget.profileID.toString() +
+          "&flag=following_list",
+    );
+    print("following list is " + json.decode(resp.body).toString());
+
+    var followingData = json.decode(resp.body);
+
+    print("hello before taking topic list");
+    http.Response response = await http.get(
+        "http://postea-server.herokuapp.com/getFollowingTopics?profile_id=" +
+            widget.profileID.toString());
+    print("topic following list is " + json.decode(resp.body).toString());
+
+    var topicFollowData = json.decode(response.body);
+
+    var finalFollowData = [];
+    for (var i = 0; i < followingData.length; i++) {
+      finalFollowData.add(followingData[i]);
+    }
+
+    for (var i = 0; i < topicFollowData.length; i++) {
+      finalFollowData.add(topicFollowData[i]);
+    }
+
+    print("final follow data is " + finalFollowData.toString());
+
+    return finalFollowData;
   }
 
   Future uploadImage(File file) async {
@@ -396,15 +430,218 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                     padding:
                                         EdgeInsets.symmetric(horizontal: 18),
                                     scrollDirection: Axis.vertical,
-                                    child: TextField(
-                                      cursorColor: Colors.black,
-                                      maxLines: null,
-                                      keyboardType: TextInputType.multiline,
-                                      decoration: InputDecoration(
-                                        border: InputBorder.none,
-                                        hintText: "Post description",
-                                      ),
-                                      controller: postTextController,
+                                    child: Column(
+                                      children: [
+                                        TextField(
+                                          cursorColor: Colors.black,
+                                          maxLines: null,
+                                          onChanged: (text) {
+                                            if (text.endsWith("@")) {
+                                              showNameSuggestions.value = true;
+                                            } else if (!text.contains("@")) {
+                                              showNameSuggestions.value = false;
+                                            } else if (text.contains("@") &&
+                                                text.lastIndexOf(" ") >
+                                                    text.indexOf("@")) {
+                                              showNameSuggestions.value = false;
+                                            }
+                                          },
+                                          keyboardType: TextInputType.multiline,
+                                          decoration: InputDecoration(
+                                            border: InputBorder.none,
+                                            hintText: "Post description",
+                                          ),
+                                          controller: postTextController,
+                                        ),
+                                        Container(
+                                          child: ValueListenableBuilder(
+                                            valueListenable:
+                                                showNameSuggestions,
+                                            builder: (_, value, __) {
+                                              if (value) {
+                                                return FutureBuilder(
+                                                  future: getFollowingList(),
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot.hasData) {
+                                                      var followingData =
+                                                          snapshot.data;
+                                                      return Container(
+                                                        width: screenWidth,
+                                                        height:
+                                                            screenHeight / 2,
+                                                        child: ListView.builder(
+                                                          itemCount:
+                                                              followingData
+                                                                  .length,
+                                                          itemBuilder:
+                                                              (context, index) {
+                                                            return ListTile(
+                                                              onTap: () {
+                                                                String
+                                                                    currPostDesc =
+                                                                    postTextController
+                                                                        .text;
+
+                                                                int indexOfAt =
+                                                                    currPostDesc
+                                                                        .indexOf(
+                                                                            "@");
+
+                                                                if (followingData[
+                                                                            index]
+                                                                        [
+                                                                        'username'] !=
+                                                                    null) {
+                                                                  if (indexOfAt ==
+                                                                      currPostDesc
+                                                                              .length -
+                                                                          1) {
+                                                                    postTextController
+                                                                        .text = postTextController
+                                                                            .text +
+                                                                        followingData[index]
+                                                                            [
+                                                                            'username'];
+                                                                  } else {
+                                                                    postTextController.text = postTextController.text.replaceFirst(
+                                                                        currPostDesc.substring(
+                                                                            indexOfAt +
+                                                                                1,
+                                                                            currPostDesc
+                                                                                .length),
+                                                                        followingData[index]
+                                                                            [
+                                                                            'username']);
+                                                                  }
+                                                                } else {
+                                                                  if (indexOfAt ==
+                                                                      currPostDesc
+                                                                              .length -
+                                                                          1) {
+                                                                    postTextController
+                                                                        .text = postTextController
+                                                                            .text +
+                                                                        followingData[index]
+                                                                            [
+                                                                            'topic_name'];
+                                                                  } else {
+                                                                    postTextController.text = postTextController.text.replaceFirst(
+                                                                        currPostDesc.substring(
+                                                                            indexOfAt +
+                                                                                1,
+                                                                            currPostDesc
+                                                                                .length),
+                                                                        followingData[index]
+                                                                            [
+                                                                            'topic_name']);
+                                                                  }
+                                                                }
+                                                              },
+                                                              leading:
+                                                                  FutureBuilder(
+                                                                future: followingData[index]
+                                                                            [
+                                                                            'profile_id'] ==
+                                                                        null
+                                                                    ? FirebaseStorageService
+                                                                        .getImage(
+                                                                        context,
+                                                                        followingData[index]['topic_id']
+                                                                            .toString(),
+                                                                      )
+                                                                    : FirebaseStorageService
+                                                                        .getImage(
+                                                                        context,
+                                                                        followingData[index]['profile_id']
+                                                                            .toString(),
+                                                                      ),
+                                                                builder: (context,
+                                                                    AsyncSnapshot<
+                                                                            dynamic>
+                                                                        snapshot) {
+                                                                  if (snapshot
+                                                                      .hasData) {
+                                                                    return CircleAvatar(
+                                                                      backgroundImage:
+                                                                          NetworkImage(
+                                                                              snapshot.data),
+                                                                      maxRadius:
+                                                                          screenWidth /
+                                                                              25,
+                                                                    );
+                                                                  } else {
+                                                                    return CircleAvatar(
+                                                                      maxRadius:
+                                                                          screenWidth /
+                                                                              25,
+                                                                      backgroundImage:
+                                                                          NetworkImage(
+                                                                              "https://picsum.photos/250?image=18"),
+                                                                    );
+                                                                  }
+                                                                },
+                                                              ),
+                                                              title: followingData[
+                                                                              index]
+                                                                          [
+                                                                          'username'] ==
+                                                                      null
+                                                                  ? Text(
+                                                                      followingData[
+                                                                              index]
+                                                                          [
+                                                                          'topic_name'],
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              14),
+                                                                    )
+                                                                  : Text(
+                                                                      followingData[
+                                                                              index]
+                                                                          [
+                                                                          'username'],
+                                                                      style: TextStyle(
+                                                                          fontSize:
+                                                                              14),
+                                                                    ),
+                                                              subtitle:
+                                                                  followingData[index]
+                                                                              [
+                                                                              'username'] ==
+                                                                          null
+                                                                      ? Text(
+                                                                          "Topic",
+                                                                          style:
+                                                                              TextStyle(fontSize: 12),
+                                                                        )
+                                                                      : Text(
+                                                                          "Profile",
+                                                                          style:
+                                                                              TextStyle(fontSize: 12),
+                                                                        ),
+                                                            );
+                                                          },
+                                                        ),
+                                                      );
+                                                    } else {
+                                                      return Center(
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                          valueColor:
+                                                              AlwaysStoppedAnimation(
+                                                                  bgGradEnd),
+                                                        ),
+                                                      );
+                                                    }
+                                                  },
+                                                );
+                                              } else {
+                                                return Container();
+                                              }
+                                            },
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ),

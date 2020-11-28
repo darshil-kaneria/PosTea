@@ -103,12 +103,27 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
     print("following list is " + json.decode(resp.body).toString());
 
     var followingData = json.decode(resp.body);
-    // for (var i = 0; i < followingData.length; i++) {
-    //   followingList.add(followingData['name']);
-    //   followingProfileIDs.add(followingData['profile_id']);
-    // }
 
-    return followingData;
+    print("hello before taking topic list");
+    http.Response response = await http.get(
+        "http://postea-server.herokuapp.com/getFollowingTopics?profile_id=" +
+            widget.profile_id.toString());
+    print("topic following list is " + json.decode(resp.body).toString());
+
+    var topicFollowData = json.decode(response.body);
+
+    var finalFollowData = [];
+    for (var i = 0; i < followingData.length; i++) {
+      finalFollowData.add(followingData[i]);
+    }
+
+    for (var i = 0; i < topicFollowData.length; i++) {
+      finalFollowData.add(topicFollowData[i]);
+    }
+
+    print("final follow data is " + finalFollowData.toString());
+
+    return finalFollowData;
   }
 
   Future<http.Response> getComments() async {
@@ -379,27 +394,70 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
                                                 int indexOfAt =
                                                     currComment.indexOf("@");
 
-                                                commentController.text =
-                                                    commentController
-                                                        .text
-                                                        .replaceFirst(
-                                                            currComment
-                                                                .substring(
+                                                if (followingData[index]
+                                                        ['username'] !=
+                                                    null) {
+                                                  if (indexOfAt ==
+                                                      currComment.length - 1) {
+                                                    commentController.text =
+                                                        commentController.text +
+                                                            followingData[index]
+                                                                ['username'];
+                                                  } else {
+                                                    commentController.text =
+                                                        commentController
+                                                            .text
+                                                            .replaceFirst(
+                                                                currComment.substring(
                                                                     indexOfAt +
                                                                         1,
                                                                     currComment
                                                                         .length),
+                                                                followingData[
+                                                                        index][
+                                                                    'username']);
+                                                  }
+                                                } else {
+                                                  if (indexOfAt ==
+                                                      currComment.length - 1) {
+                                                    commentController.text =
+                                                        commentController.text +
                                                             followingData[index]
-                                                                ['name']);
+                                                                ['topic_name'];
+                                                  } else {
+                                                    commentController.text =
+                                                        commentController
+                                                            .text
+                                                            .replaceFirst(
+                                                                currComment.substring(
+                                                                    indexOfAt +
+                                                                        1,
+                                                                    currComment
+                                                                        .length),
+                                                                followingData[
+                                                                        index][
+                                                                    'topic_name']);
+                                                  }
+                                                }
                                               },
                                               leading: FutureBuilder(
-                                                future: FirebaseStorageService
-                                                    .getImage(
-                                                  context,
-                                                  followingData[index]
-                                                          ['profile_id']
-                                                      .toString(),
-                                                ),
+                                                future: followingData[index]
+                                                            ['profile_id'] ==
+                                                        null
+                                                    ? FirebaseStorageService
+                                                        .getImage(
+                                                        context,
+                                                        followingData[index]
+                                                                ['topic_id']
+                                                            .toString(),
+                                                      )
+                                                    : FirebaseStorageService
+                                                        .getImage(
+                                                        context,
+                                                        followingData[index]
+                                                                ['profile_id']
+                                                            .toString(),
+                                                      ),
                                                 builder: (context,
                                                     AsyncSnapshot<dynamic>
                                                         snapshot) {
@@ -419,9 +477,20 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
                                                   }
                                                 },
                                               ),
-                                              title: Text(
-                                                followingData[index]['name'],
-                                              ),
+                                              title: followingData[index]
+                                                          ['username'] ==
+                                                      null
+                                                  ? Text(followingData[index]
+                                                      ['topic_name'])
+                                                  : Text(
+                                                      followingData[index]
+                                                          ['username'],
+                                                    ),
+                                              subtitle: followingData[index]
+                                                          ['username'] ==
+                                                      null
+                                                  ? Text("Topic")
+                                                  : Text("Profile"),
                                             );
                                           },
                                         ),
@@ -441,7 +510,7 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
                               }
                             },
                           ),
-                        )
+                        ),
                       ],
                     ),
                   ),
