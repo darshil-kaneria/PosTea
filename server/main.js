@@ -96,6 +96,7 @@ else {
         "postID": receivedMessage['postID']
       };
       var sendMessageJson = JSON.stringify(sendJSON);
+      console.log("SENT MESSAGE TO WEBSOCKET");
       ws.send(sendMessageJson);
     });
 
