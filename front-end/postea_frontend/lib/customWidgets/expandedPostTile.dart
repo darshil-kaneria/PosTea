@@ -3,6 +3,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:postea_frontend/colors.dart';
 import 'package:postea_frontend/customWidgets/postTile.dart';
 import 'package:postea_frontend/pages/profile.dart';
@@ -78,6 +79,7 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
   PageController pg = PageController();
   List<String> comments = [];
   ValueNotifier<String> comment_string = ValueNotifier<String>("Add comment");
+  ValueNotifier<bool> showNameSuggestions = ValueNotifier<bool>(false);
   var checkCommVal = false;
   Color like_color = Colors.black;
   Color dislike_color = Colors.black;
@@ -89,6 +91,15 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
         post_id.toString();
     resp = await http.get(url);
     return resp;
+  }
+
+  Future<http.Response> getComments() async {
+    comments = [];
+    var url = "http://postea-server.herokuapp.com/getcomments?post_id=" +
+        post_id.toString();
+
+    http.Response response = await http.get(url);
+    return response;
   }
 
   var commentController = TextEditingController();
@@ -195,7 +206,7 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
                   controller: pg,
                   children: [
                     FutureBuilder(
-                      future: engagementInfo(),
+                      future: getComments(),
                       builder: (BuildContext context,
                           AsyncSnapshot<dynamic> snapshot) {
                         comments = [];
@@ -205,10 +216,9 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
                           bool myComm = false;
                           var myCommId = 0;
                           print("response");
-                          print(snapshot.data.body);
                           Map temp = {};
-                          var engagements = jsonDecode(snapshot.data.body);
-
+                          var jsonDecodedEng = jsonDecode(snapshot.data.body);
+                          var engagements = jsonDecodedEng['message'];
                           for (int i = 0; i < engagements.length; i++) {
                             if (engagements[i]['comment'] == null) {
                               continue;
@@ -221,11 +231,38 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
                             if (engagements[i]['comment'].toString() != null) {
                               print("IN HERE");
 
-                              temp['profile_id'] = engagements[i]['profile_id'];
+                              // temp['profile_id'] = engagements[i]['profile_id'];
 
-                              temp['name'] = name;
+                              // temp['name'] = engagements[i]['name'];
 
-                              commEngagement.add(temp);
+                              // print("temp is " + temp.toString());
+                              print("engagements[i] is " +
+                                  engagements[i].toString());
+                              if (engagements[i]['flag']
+                                  .contains("Tag exists")) {
+                                commEngagement.add(
+                                  {
+                                    "profile_id": engagements[i]['profile_id'],
+                                    "name": engagements[i]['name'],
+                                    "tag": engagements[i]['tag'],
+                                    "tag_id": engagements[i]['tag_id'],
+                                    "flag": engagements[i]['flag'],
+                                  },
+                                );
+                              } else {
+                                commEngagement.add(
+                                  {
+                                    "profile_id": engagements[i]['profile_id'],
+                                    "name": engagements[i]['name'],
+                                    "tag": null,
+                                    "tag_id": null,
+                                    "flag": engagements[i]['flag'],
+                                  },
+                                );
+                              }
+
+                              print("commEngagement[i] is " +
+                                  commEngagement.toString());
                               commentController.text =
                                   engagements[i]['comment'];
                               // comment_string.value = "Edit comment";
@@ -239,7 +276,7 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
                           }
 
                           return ListView.builder(
-                            itemCount: comments.length,
+                            itemCount: commEngagement.length,
                             shrinkWrap: true,
                             itemBuilder: (BuildContext context, int index) {
                               print(commEngagement[index]);
@@ -251,11 +288,32 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
                                   height: 0,
                                 );
                               } else {
-                                return Comments(
-                                  commEngagement[index]['profile_id'],
-                                  comments.elementAt(index),
-                                  commEngagement[index]['name'],
-                                );
+                                if (commEngagement[index]['flag']
+                                    .contains("Tag exists")) {
+                                  return Comments(
+                                    profileID: commEngagement[index]
+                                        ['profile_id'],
+                                    comment: comments.elementAt(index),
+                                    personName: commEngagement[index]['name']
+                                        .toString(),
+                                    flag: commEngagement[index]['flag']
+                                        .toString(),
+                                    tag:
+                                        commEngagement[index]['tag'].toString(),
+                                    tagID: commEngagement[index]['tag_id']
+                                        .toString(),
+                                  );
+                                } else {
+                                  return Comments(
+                                    profileID: commEngagement[index]
+                                        ['profile_id'],
+                                    comment: comments.elementAt(index),
+                                    personName: commEngagement[index]['name']
+                                        .toString(),
+                                    flag: commEngagement[index]['flag']
+                                        .toString(),
+                                  );
+                                }
                               }
                             },
                           );

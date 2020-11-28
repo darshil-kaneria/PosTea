@@ -3,28 +3,61 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/main.dart';
+import 'package:postea_frontend/pages/profile.dart';
+import 'package:postea_frontend/pages/topic.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/gestures.dart';
 
 class Comments extends StatefulWidget {
-  var personName;
-  var comment;
+  String personName;
+  String comment;
+  String tag;
+  String tagID;
+  String flag;
   var postID;
   var profileID;
 
-  Comments(this.profileID, this.comment, this.personName);
+  Comments(
+      {this.profileID,
+      this.comment,
+      this.personName,
+      this.tag,
+      this.tagID,
+      this.flag});
 
   @override
   _CommentsState createState() => _CommentsState(this.comment, this.personName);
 }
 
 class _CommentsState extends State<Comments> {
-  var comment;
-  var personName;
+  String comment;
+  String personName;
   var screenWidth;
+  SharedPreferences prefs;
 
   _CommentsState(this.comment, this.personName);
 
   @override
   Widget build(BuildContext context) {
+    String tag = "";
+    int atIndex;
+    String firstHalf = "";
+    String secondHalf = "";
+
+    if (widget.flag.contains("Tag exists")) {
+      atIndex = comment.indexOf("@");
+      firstHalf = comment.substring(0, atIndex);
+      String tempString = comment.substring(atIndex, comment.length - 1);
+      if (comment.lastIndexOf(" ") + 1 == atIndex) {
+        tag = tempString;
+      } else {
+        var spaceIndex = tempString.indexOf(" ");
+        secondHalf = comment.substring(atIndex + spaceIndex, comment.length);
+        tag = comment.substring(atIndex, atIndex + spaceIndex);
+      }
+      print("tag is " + tag);
+    }
+
     return Container(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,11 +98,62 @@ class _CommentsState extends State<Comments> {
                   ),
                   this.comment == null
                       ? Container()
-                      : AutoSizeText(
-                          this.comment,
-                          // "{\"post retrieved\": \"success\"}",
-                          style: Theme.of(context).textTheme.headline3,
-                        ),
+                      : widget.flag.contains("No tag")
+                          ? AutoSizeText(this.comment,
+                              style: Theme.of(context).textTheme.headline3)
+                          : RichText(
+                              text: TextSpan(
+                                text: firstHalf,
+                                style: TextStyle(
+                                  color: Colors.black,
+                                ),
+                                children: [
+                                  TextSpan(
+                                      text: tag,
+                                      style: TextStyle(color: Colors.lightBlue),
+                                      recognizer: TapGestureRecognizer()
+                                        ..onTap = () {
+                                          if (widget.flag
+                                              .contains("profile_id")) {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => Profile(
+                                                  profileId:
+                                                      int.parse(widget.tagID),
+                                                  isOwner: widget.profileID ==
+                                                          int.parse(
+                                                              widget.tagID)
+                                                      ? true
+                                                      : false,
+                                                ),
+                                              ),
+                                            );
+                                          } else {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => Topic(
+                                                  topicId: widget.tagID,
+                                                  profileId: widget.profileID,
+                                                  isOwner: false,
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        }),
+                                  TextSpan(
+                                    text: secondHalf,
+                                    style: TextStyle(color: Colors.black),
+                                  )
+                                ],
+                              ),
+                            )
+                  // : AutoSizeText(
+                  //     this.comment,
+                  //     // "{\"post retrieved\": \"success\"}",
+                  //     style: Theme.of(context).textTheme.headline3,
+                  //   ),
                 ],
               ),
               Spacer(),

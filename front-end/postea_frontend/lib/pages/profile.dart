@@ -62,6 +62,14 @@ class _ProfileState extends State<Profile> {
     super.dispose();
   }
 
+  getAllPostsWithEngagements() async {
+    var url =
+        "http://postea-server.herokuapp.com/getAllPostsWithEngagement?profile_id=" +
+            widget.profileId.toString();
+
+    http.get(url).then((resp) => {});
+  }
+
   getFollowing() async {
     prefs = await SharedPreferences.getInstance();
     widget.myPID = prefs.getInt('profileID') ?? 0;
