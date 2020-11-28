@@ -62,15 +62,17 @@ const getPost = async(postId, connection) => {
                     if (typeof post_description !== 'undefined'){
                     if (post_description.includes("@")) {
                         var index_of_at = post_description.indexOf("@");
-                        var tag = post_description.substring(index_of_at, post_description.length);
-                        var index_of_space = tag.indexOf(" ");
-                        if (index_of_space == -1) {
-                          index_of_space = tag.length-1;
-                        }
-                        var tag = tag.substring(1, index_of_space + 1);
-                        await get_updated_result(final_result[0], tag, connection).then((value)=> {
-                          final_result = value;
-                      });                    
+                        if (index_of_at >= 0 && post_description.charAt(index_of_at-1) == ' ') {
+                          var tag = post_description.substring(index_of_at, post_description.length);
+                          var index_of_space = tag.indexOf(" ");
+                          if (index_of_space == -1) {
+                            index_of_space = tag.length-1;
+                          }
+                          var tag = tag.substring(1, index_of_space + 1);
+                          await get_updated_result(final_result[0], tag, connection).then((value)=> {
+                            final_result = value;
+                        }); 
+                    }                   
                     } }
                     else {
                       final_result[0]["flag"] = "No tag";
