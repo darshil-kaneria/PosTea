@@ -255,7 +255,7 @@ app.route("/followdata")
       }
 
       var publishInfoJsonString = JSON.stringify(publishInfo);
-      publisher.publish(String(message['affectedClient']), publishInfoJsonString, function(){
+      publisher.publish(String(req.body.follower_id), publishInfoJsonString, function(){
         console.log("Finished");
         res.send(String(message));
       });
