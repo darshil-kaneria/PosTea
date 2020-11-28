@@ -59,6 +59,7 @@ const getPost = async(postId, connection) => {
                     temp = temp+","+string+"}]";
                     var final_result = JSON.parse(temp);
                     var post_description = final_result[0].post_description;
+                    if (typeof post_description !== 'undefined'){
                     if (post_description.includes("@")) {
                         var index_of_at = post_description.indexOf("@");
                         var tag = post_description.substring(index_of_at, post_description.length);
@@ -70,7 +71,8 @@ const getPost = async(postId, connection) => {
                         await get_updated_result(final_result[0], tag, connection).then((value)=> {
                           final_result = value;
                       });                    
-                    } else {
+                    } }
+                    else {
                       final_result[0]["flag"] = "No tag";
                     }
                     final_result = JSON.stringify(final_result);
