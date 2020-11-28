@@ -87,6 +87,9 @@ else {
       else if(receivedMessage['comment'] !== null){
         engagement = " commented on your post.";
       }
+      else if(receivedMessage['followReg'] == true){
+        engagement = " is following you.";
+      }
       var sender = String(receivedMessage['senderClient']);
       var senderName = String(receivedMessage['senderName']);
       var sendJSON = {
@@ -239,7 +242,24 @@ app.route("/followdata")
   .post((req, res) => {
     const handle = fork("./func/add_followers.js");
     handle.send(req.body);
-    handle.on("message", message => res.send(message));
+    handle.on("message", message => {
+      var publisher = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
+      var publishInfo = {
+        "senderClient": req.body.profile_id,
+        "affectedClient": req.body.follower_id,
+        "senderName": message,
+        "like_dislike": null,
+        "comment": null,
+        "followReq": true,
+        "postID": null
+      }
+
+      var publishInfoJsonString = JSON.stringify(publishInfo);
+      publisher.publish(String(message['affectedClient']), publishInfoJsonString, function(){
+        console.log("Finished");
+        res.send(String(message));
+      });
+    });
   })
   .delete((req, res)=> {
     const handle = fork("./func/delete_followers.js");

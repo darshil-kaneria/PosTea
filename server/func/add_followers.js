@@ -1,5 +1,5 @@
 const db = require('./db_connection.js');
-
+var name = "";
 process.on("message", message => {
     db.conn.getConnection(function(err, connection) {
           if (err) {
@@ -16,7 +16,7 @@ process.on("message", message => {
             if (answer == "Relationship already exists") {
                 process.send({"Error": "User-User relationship already exists"});
             } else {
-                process.send({"Success": "Follower relationship created"});
+                process.send(name);
                 }
             process.exit();
           }).catch(function(result) {
@@ -35,6 +35,7 @@ process.on("message", message => {
     var follower_id = data.follower_id;
     var selectQuery = "SELECT * FROM user_follower WHERE profile_id = '"+profile_id+"' AND follower_id = '"+follower_id+"'";
     var addFollowerQuery = "INSERT INTO user_follower (row_id, profile_id, follower_id) VALUES ?";
+    var getName = "select name from profile where profile_id = "+profile_id;
     var row_id = Math.floor(Math.random() * 100000);
     var values1 = [[profile_id, follower_id]];
     var values2 = [[row_id, profile_id, follower_id]]
@@ -48,22 +49,34 @@ process.on("message", message => {
           if (result.length == 1) {
             resolve("Relationship already exists");
             } else {
+              connection.query(getName, async function(err, nameResult) {
+
+                if(err){
+                  reject(err);
+                }
+                nameResult = JSON.stringify(nameResult);
+                nameResult = JSON.parse(nameResult);
+                
+                name = nameResult[0]['name'];
+
                 connection.query(addFollowerQuery, [values2], function (err, result) {
               
-                if (err) {
+                  if (err) {
+                    reject(err.message);
+                  /*
+                  if (err.code === 'ER_DUP_ENTRY') {
+                      addFollower(data, connection)
+                  } else {
+                  console.log(err);
                   reject(err.message);
-                /*
-                if (err.code === 'ER_DUP_ENTRY') {
-                    addFollower(data, connection)
-                } else {
-                console.log(err);
-                reject(err.message);
-              }
-              */
-              } 
-
-                resolve("Added");
+                }
+                */
+                } 
+  
+                  resolve("Added");
+                });
               });
+                
           }
         }
         catch (error){
