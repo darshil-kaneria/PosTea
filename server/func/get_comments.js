@@ -25,18 +25,27 @@ function getComments(post_id, connection) {
             for (var i = 0; i < result.length; i++) {
                 var comment = result[i].comment;
                 console.log(comment);
-                if (comment.includes("@")) {
-                    var index_of_at = comment.indexOf("@");
-                    var tag = comment.substring(index_of_at, comment.length);
-                    var index_of_space = tag.indexOf(" ");
-                    if (index_of_space == -1) {
-                      index_of_space = tag.length-1;
-                    }
-                    var tag = tag.substring(1, index_of_space + 1);
-                    await get_updated_result(result[i], tag, connection).then((value)=> {
-                      result[i] = value;
-                  });                    
-                } else {
+                if (typeof comment !== 'undefined' && comment != null){
+                  if (comment.includes("@")) {
+                      var index_of_at = comment.indexOf("@");
+                      if (index_of_at >= 0 && comment.charAt(index_of_at-1) == ' ') {
+
+                      var tag = comment.substring(index_of_at, comment.length);
+                      var index_of_space = tag.indexOf(" ");
+                      if (index_of_space == -1) {
+                        index_of_space = tag.length-1;
+                      }
+                      var tag = tag.substring(1, index_of_space + 1);
+                      await get_updated_result(result[i], tag, connection).then((value)=> {
+                        result[i] = value;
+                    }); 
+                  } else {
+                    result[i]["flag"] = "No tag";
+                  }                   
+                  } else {
+                    result[i]["flag"] = "No tag";
+                  }
+              } else {
                   result[i]["flag"] = "No tag";
                 }
             }

@@ -39,6 +39,7 @@ if (cluster.isMaster) {
 else {
   const clients = new Clients();
   const server = app.listen(PORT, ()=>console.log("listening on port "+PORT+", PID: "+process.pid));
+  var publisher = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
 
   app.use(cors({
     origin: ["http://localhost:23556"],
@@ -52,24 +53,18 @@ else {
   const wsServer = new ws.Server({ noServer: true });
   wsServer.on('connection', (ws) => {
     console.log("Websocket initiated by: "+ws._socket.remoteAddress + " on PID: "+process.pid);
-    setInterval(ping, 5000);
+    setInterval(ping, 30000);
     var subscriber = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
     var tm;
     function ping() {
       ws.send('__ping__');
-      console.log("ping sent");
       tm = setTimeout(function () {  
         subscriber.quit();
-      }, 3000);
+      }, 5000);
     }
     function pong() {
       clearTimeout(tm);
-      console.log("pong received");
     }
-    // ws.onopen = function() {
-      
-    // }
-
     ws.on('message', (profile_id) => {
       if(profile_id == "__pong__"){
         pong();
@@ -78,32 +73,36 @@ else {
       if(clients.clientList[profile_id] == undefined){
         clients.saveClient(profile_id, ws);
         clients.clientList[profile_id].send("HELLO CLIENT");
-        
-        
-        subscriber.on("message", (channel, message) => {
-          var receivedMessage = JSON.parse(message);
-          var engagement = "";
-          if(receivedMessage['like_dislike'] == 1){
-            engagement = " liked your post.";
-          }
-          else if(receivedMessage['comment'] !== null){
-            engagement = " commented on your post.";
-          }
-          var sendMessage = String(receivedMessage['senderClient']) + engagement
-          var sendJSON = {
-            "message": sendMessage,
-            "postID": receivedMessage['postID']
-          };
-          var sendMessageJson = JSON.stringify(sendJSON);
-          ws.send(sendMessageJson);
-        });
         subscriber.subscribe(String(profile_id));
         console.log("Subscribed to: " + String(profile_id));
       }
     });
-
-    // ws.onopen();
     
+
+    subscriber.on("message", (channel, message) => {
+      var receivedMessage = JSON.parse(message);
+      var engagement = "";
+      if(receivedMessage['like_dislike'] == 1){
+        engagement = " liked your post.";
+      }
+      else if(receivedMessage['comment'] !== null){
+        engagement = " commented on your post.";
+      }
+      else if(receivedMessage['followReq'] == true){
+        engagement = " is following you.";
+      }
+      var sender = String(receivedMessage['senderClient']);
+      var senderName = String(receivedMessage['senderName']);
+      var sendJSON = {
+        "senderName": senderName,
+        "senderID": sender,
+        "engagement": engagement,
+        "postID": receivedMessage['postID']
+      };
+      var sendMessageJson = JSON.stringify(sendJSON);
+      ws.send(sendMessageJson);
+    });
+
   });
   
   server.on('upgrade', (request, socket, head) => {
@@ -185,10 +184,11 @@ app.route("/engagement")
     const handleEngagements = fork('./func/add_engagement.js');
     handleEngagements.send(req.body);
     handleEngagements.on("message", message => {
-      var publisher = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
+      
       var publishInfo = {
         "senderClient": req.body.engagement_profile_id,
-        "affectedClient": message,
+        "affectedClient": message['affectedClient'],
+        "senderName": message['senderName'],
         "like_dislike": req.body.like_dislike,
         "comment": req.body.comment,
         "followReq": null,
@@ -196,7 +196,7 @@ app.route("/engagement")
       }
 
       var publishInfoJsonString = JSON.stringify(publishInfo);
-      publisher.publish(String(message), publishInfoJsonString, function(){
+      publisher.publish(String(message['affectedClient']), publishInfoJsonString, function(){
         console.log("Finished");
         res.send(String(message));
       });
@@ -242,7 +242,23 @@ app.route("/followdata")
   .post((req, res) => {
     const handle = fork("./func/add_followers.js");
     handle.send(req.body);
-    handle.on("message", message => res.send(message));
+    handle.on("message", message => {
+      var publisher = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
+      var publishInfo = {
+        "senderClient": req.body.profile_id,
+        "affectedClient": req.body.follower_id,
+        "senderName": message,
+        "like_dislike": null,
+        "comment": null,
+        "followReq": true,
+        "postID": null
+      }
+
+      var publishInfoJsonString = JSON.stringify(publishInfo);
+      publisher.publish(String(req.body.follower_id), publishInfoJsonString, function(){
+        res.send(String(message));
+      });
+    });
   })
   .delete((req, res)=> {
     const handle = fork("./func/delete_followers.js");
