@@ -319,72 +319,16 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
                       },
                     ),
                     Container(
-                        margin: EdgeInsets.only(left: 15, right: 15),
-                        child: FlutterMentions(
-                          mentions: [
-                            Mention(
-                              trigger: '@',
-                              matchAll: false,
-                              data: [
-                                {
-                                  'id': 'asfgasga41',
-                                  'display': 'Vidit',
-                                  'full_name': 'Vidit',
-                                  'photo':
-                                      'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
-                                },
-                                {
-                                  'id': 'asfsaf451a',
-                                  'display': 'Darshil',
-                                  'full_name': 'Darshil',
-                                  'photo':
-                                      'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940'
-                                }
-                              ],
-                              suggestionBuilder: (data) {
-                                return Container(
-                                  color: Colors.white,
-                                  padding: EdgeInsets.all(10),
-                                  child: Row(
-                                    children: [
-                                      CircleAvatar(
-                                        backgroundImage: NetworkImage(
-                                          data['photo'],
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 20.0,
-                                      ),
-                                      Column(
-                                        children: <Widget>[
-                                          Text(data['full_name']),
-                                          Text('@${data['display']}'),
-                                        ],
-                                      )
-                                    ],
-                                  ),
-                                );
-                              },
-                            )
-                          ],
-                          decoration: InputDecoration(
+                      margin: EdgeInsets.only(left: 15, right: 15),
+                      child: TextField(
+                        cursorColor: Theme.of(context).accentColor,
+                        style: Theme.of(context).textTheme.headline2,
+                        controller: commentController,
+                        decoration: InputDecoration(
                             labelText: "Your comment:",
-                            labelStyle: Theme.of(context).textTheme.headline1,
-                          ),
-                          suggestionPosition: SuggestionPosition.Bottom,
-                          hideSuggestionList: false,
-                          minLines: 1,
-                          maxLines: 4,
-                        )
-                        // TextField(
-                        //   cursorColor: Theme.of(context).accentColor,
-                        //   style: Theme.of(context).textTheme.headline2,
-                        //   controller: commentController,
-                        //   decoration: InputDecoration(
-                        //       labelText: "Your comment:",
-                        //       labelStyle: Theme.of(context).textTheme.headline1),
-                        // ),
-                        )
+                            labelStyle: Theme.of(context).textTheme.headline1),
+                      ),
+                    )
                   ]),
             ),
             // ButtonTheme(
