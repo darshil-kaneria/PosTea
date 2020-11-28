@@ -20,7 +20,7 @@ process.on("message", message => {
 });
 
 const getEngagement = async(postId, connection) => {
-    var query = "SELECT * FROM engagement WHERE post_id = ?";
+    var query = "select * from engagement as e join profile as p where e.post_id = ? and p.profile_id = e.profile_id ";
     console.log(postId);
     return new Promise(function(resolve, reject) {
        connection.query(query,[postId],function(err, result)  {

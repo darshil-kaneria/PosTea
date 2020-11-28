@@ -14,29 +14,19 @@ const PORT = process.env.PORT || 23556;
 const numCPUs = require('os').cpus().length;
 var cors = require('cors');
 const ws = require('ws');
+const db = require('./func/db_connection.js');
+const { send } = require('process');
+var redis = db.redis_conn;
 
 var lastWorkerPID = -1;
 
 
 
+
+
 if (cluster.isMaster) {
   console.log(`Master ${process.pid} is running`);
-  const clients = new Clients();
-  var server = new ws.Server(
-    {
-      port: 23557,
-    }
-  )
-
-  server.on('connection', (ws) => {
-    console.log("Websocket initiated by: "+ws._socket.remoteAddress + " on PID: "+process.pid);
-    ws.on('message', (profile_id) => {
-      if(clients.clientList[profile_id] == undefined){
-        clients.saveClient(profile_id, ws);
-        clients.clientList[profile_id].send("HELLO CLIENT");
-      }
-    });
-  });
+  
   // Fork workers.
   for (let i = 0; i < numCPUs; i++) {
     cluster.fork();
@@ -47,7 +37,7 @@ if (cluster.isMaster) {
   });
 }
 else {
-  // const clients = new Clients();
+  const clients = new Clients();
   const server = app.listen(PORT, ()=>console.log("listening on port "+PORT+", PID: "+process.pid));
 
   app.use(cors({
@@ -59,22 +49,63 @@ else {
 
   // Setup websocket for notifications and activity tab
 
-  // const wsServer = new ws.Server({ noServer: true });
-  // wsServer.on('connection', (ws) => {
-  //   console.log("Websocket initiated by: "+ws._socket.remoteAddress + " on PID: "+process.pid);
-  //   ws.on('message', (profile_id) => {
-  //     if(clients.clientList[profile_id] == undefined){
-  //       clients.saveClient(profile_id, ws);
-  //       clients.clientList[profile_id].send("HELLO CLIENT");
-  //     }
-  //   });
-  // });
+  const wsServer = new ws.Server({ noServer: true });
+  wsServer.on('connection', (ws) => {
+    console.log("Websocket initiated by: "+ws._socket.remoteAddress + " on PID: "+process.pid);
+    setInterval(ping, 30000);
+    var subscriber = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
+    var tm;
+    function ping() {
+      ws.send('__ping__');
+      tm = setTimeout(function () {  
+        subscriber.quit();
+      }, 5000);
+    }
+    function pong() {
+      clearTimeout(tm);
+    }
+    ws.on('message', (profile_id) => {
+      if(profile_id == "__pong__"){
+        pong();
+        return
+      }
+      if(clients.clientList[profile_id] == undefined){
+        clients.saveClient(profile_id, ws);
+        clients.clientList[profile_id].send("HELLO CLIENT");
+        
+        
+        subscriber.on("message", (channel, message) => {
+          var receivedMessage = JSON.parse(message);
+          var engagement = "";
+          if(receivedMessage['like_dislike'] == 1){
+            engagement = " liked your post.";
+          }
+          else if(receivedMessage['comment'] !== null){
+            engagement = " commented on your post.";
+          }
+          var sender = String(receivedMessage['senderClient']);
+          var senderName = String(receivedMessage['senderName']);
+          var sendJSON = {
+            "senderName": senderName,
+            "senderID": sender,
+            "engagement": engagement,
+            "postID": receivedMessage['postID']
+          };
+          var sendMessageJson = JSON.stringify(sendJSON);
+          ws.send(sendMessageJson);
+        });
+        subscriber.subscribe(String(profile_id));
+        console.log("Subscribed to: " + String(profile_id));
+      }
+    });
+    
+  });
   
-  // server.on('upgrade', (request, socket, head) => {
-  //   wsServer.handleUpgrade(request, socket, head, socket => {
-  //     wsServer.emit('connection', socket, request);
-  //   });
-  // });
+  server.on('upgrade', (request, socket, head) => {
+    wsServer.handleUpgrade(request, socket, head, socket => {
+      wsServer.emit('connection', socket, request);
+    });
+  });
 
 /**
  * User endpoints
@@ -149,8 +180,24 @@ app.route("/engagement")
     const handleEngagements = fork('./func/add_engagement.js');
     handleEngagements.send(req.body);
     handleEngagements.on("message", message => {
-      clients.clientList[message].send("YOU HAVE A MESSAGE FROM " + req.body.engagement_profile_id);
-      res.send(message);
+      var publisher = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
+      var publishInfo = {
+        "senderClient": req.body.engagement_profile_id,
+        "affectedClient": message['affectedClient'],
+        "senderName": message['senderName'],
+        "like_dislike": req.body.like_dislike,
+        "comment": req.body.comment,
+        "followReq": null,
+        "postID": req.body.engagement_post_id
+      }
+
+      var publishInfoJsonString = JSON.stringify(publishInfo);
+      publisher.publish(String(message), publishInfoJsonString, function(){
+        console.log("Finished");
+        res.send(String(message));
+      });
+      // clients.clientList[message].send("YOU HAVE A MESSAGE FROM " + req.body.engagement_profile_id);
+      
     });
   });
 
@@ -382,6 +429,15 @@ app.get("/getFollowingTopics", (req, res) => {
   }
   handleGetFollowingTopics.send(data);
   handleGetFollowingTopics.on("message", message => res.send(message));
+});
+
+app.get("/getAllPostsWithEngagement", (req, res) => {
+  const handleGetAllEngagements = fork("./func/getAllEngagements");
+  var data = {
+    profile_id: req.query.profile_id
+  }
+  handleGetAllEngagements.send(data);
+  handleGetAllEngagements.on("message", message => res.send(message));
 });
 
 /**
