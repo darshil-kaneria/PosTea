@@ -1040,41 +1040,45 @@ class _ProfileState extends State<Profile> {
                                   List postMap = json.decode(postInfoString);
 
                                   return ListView.builder(
-                                    itemCount: postMap.length,
-                                    itemBuilder: (context, index) {
-                                      return PostTile(
-                                          postMap[index]['post_id'].toString(),
-                                          postMap[index]['profile_id']
-                                              .toString(),
-                                          postMap[index]['description']
-                                              .toString(),
-                                          postMap[index]['topic_id'].toString(),
-                                          postMap[index]['post_img'].toString(),
-                                          postMap[index]['creation_date']
-                                              .toString(),
-                                          postMap[index]['post_likes']
-                                              .toString(),
-                                          postMap[index]['post_dislikes']
-                                              .toString(),
-                                          postMap[index]['post_comments']
-                                              .toString(),
-                                          postMap[index]['post_title']
-                                              .toString(),
-                                          name.toString(),
-                                          profileId.toString(),
-                                          false,
-                                          postMap[index]['is_sensitive']);
-                                    });
-                                // return ListView.builder(
-                                //     itemCount: snapshot.data.length,
-                                //     itemBuilder: (context, index) {});
-                              } else {
-                                return Container();
-                              }
-                            },
+                                      itemCount: postMap.length,
+                                      itemBuilder: (context, index) {
+                                        return PostTile(
+                                            postMap[index]['post_id']
+                                                .toString(),
+                                            postMap[index]['profile_id']
+                                                .toString(),
+                                            postMap[index]['description']
+                                                .toString(),
+                                            postMap[index]['topic_id']
+                                                .toString(),
+                                            postMap[index]['post_img']
+                                                .toString(),
+                                            postMap[index]['creation_date']
+                                                .toString(),
+                                            postMap[index]['post_likes']
+                                                .toString(),
+                                            postMap[index]['post_dislikes']
+                                                .toString(),
+                                            postMap[index]['post_comments']
+                                                .toString(),
+                                            postMap[index]['post_title']
+                                                .toString(),
+                                            name.toString(),
+                                            profileId.toString(),
+                                            false,
+                                            postMap[index]['is_sensitive']);
+                                      });
+                                  // return ListView.builder(
+                                  //     itemCount: snapshot.data.length,
+                                  //     itemBuilder: (context, index) {});
+                                } else {
+                                  return Container();
+                                }
+                              },
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),
