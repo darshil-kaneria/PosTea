@@ -4,9 +4,35 @@
  * For testing the server locally, hardcode the password to the password variable. For example, see the PORT variable in main.js
  */
 
+ /*****************
+  * DO          ***
+  * NOT         ***
+  * ADD         ***
+  * THE         ***
+  * HARDCODED   ***
+  * PASSWORD    ***
+  * HERE        ***
+  * PLEASE      ***
+  *****************/
 const mysql = require('mysql');
-const password = process.env.DB_ACCESS || "e3TxsUd6da66m2D"; // DO NOT FORGET to remove the hardcoded password (if used) before pushing to Github or Heroku.
 
+/**
+ * I WILL CHANGE THE DATABASE PASSWORD IF I SEE THE HARDCODED PASSWORD HERE
+ */
+                                                                                                                                                                                                                                                                                                                                                                                                                   const password = process.env.DB_ACCESS; // DO NOT ADD THE HARDCODED PASSWORD HERE OR I WILL CHANGE THE PASSWORD
+/**
+ * I WILL CHANGE THE DATABASE PASSWORD IF I SEE THE HARDCODED PASSWORD HERE
+ */
+/*****************
+  * DO          ***
+  * NOT         ***
+  * ADD         ***
+  * THE         ***
+  * HARDCODED   ***
+  * PASSWORD    ***
+  * HERE        ***
+  * PLEASE      ***
+  *****************/
 var conn = mysql.createPool({
     host: "postea-business.mysql.database.azure.com", 
     user: "posteabusiness@postea-business", 
