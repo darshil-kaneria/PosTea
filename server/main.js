@@ -87,7 +87,7 @@ else {
       else if(receivedMessage['comment'] !== null){
         engagement = " commented on your post.";
       }
-      else if(receivedMessage['followReg'] == true){
+      else if(receivedMessage['followReq'] == true){
         engagement = " is following you.";
       }
       var sender = String(receivedMessage['senderClient']);
