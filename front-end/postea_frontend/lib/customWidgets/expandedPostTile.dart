@@ -6,8 +6,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_mentions/flutter_mentions.dart';
 import 'package:postea_frontend/colors.dart';
 import 'package:postea_frontend/customWidgets/postTile.dart';
+import 'package:postea_frontend/pages/followingList.dart';
 import 'package:postea_frontend/pages/profile.dart';
 import './comments.dart';
+import 'package:postea_frontend/colors.dart';
 import 'package:http/http.dart' as http;
 
 class ExpandedPostTile extends StatefulWidget {
@@ -77,7 +79,7 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
   PageController pg = PageController();
   List<String> comments = [];
   ValueNotifier<String> comment_string = ValueNotifier<String>("Add comment");
-  ValueNotifier<bool> showNameSuggestions = ValueNotifier<bool>(false);
+  ValueNotifier<bool> showNameSuggestions = new ValueNotifier(false);
   var checkCommVal = false;
   Color like_color = Colors.black;
   Color dislike_color = Colors.black;
@@ -89,6 +91,24 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
         post_id.toString();
     resp = await http.get(url);
     return resp;
+  }
+
+  getFollowingList() async {
+    print("hello before taking following data list");
+    http.Response resp = await http.get(
+      "http://postea-server.herokuapp.com/followdata?profile_id=" +
+          widget.profile_id.toString() +
+          "&flag=following_list",
+    );
+    print("following list is " + json.decode(resp.body).toString());
+
+    var followingData = json.decode(resp.body);
+    // for (var i = 0; i < followingData.length; i++) {
+    //   followingList.add(followingData['name']);
+    //   followingProfileIDs.add(followingData['profile_id']);
+    // }
+
+    return followingData;
   }
 
   Future<http.Response> getComments() async {
@@ -198,138 +218,235 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
               width: screenWidth,
               margin: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
               child: PageView(
-                  physics: NeverScrollableScrollPhysics(),
-                  controller: pg,
-                  children: [
-                    FutureBuilder(
-                      future: getComments(),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<dynamic> snapshot) {
-                        comments = [];
-                        List<Map> commEngagement = [];
-                        if (snapshot.hasData &&
-                            snapshot.data.body != "Post does not exist") {
-                          bool myComm = false;
-                          var myCommId = 0;
-                          print("response");
-                          Map temp = {};
-                          var jsonDecodedEng = jsonDecode(snapshot.data.body);
-                          var engagements = jsonDecodedEng['message'];
-                          for (int i = 0; i < engagements.length; i++) {
-                            if (engagements[i]['comment'] == null) {
-                              continue;
-                            }
-
-                            print(
-                                engagements[i]['comment'].toString() != null &&
-                                    engagements[i]['profile_id'].toString() ==
-                                        myPID.toString());
-                            if (engagements[i]['comment'].toString() != null) {
-                              print("IN HERE");
-
-                              // temp['profile_id'] = engagements[i]['profile_id'];
-
-                              // temp['name'] = engagements[i]['name'];
-
-                              // print("temp is " + temp.toString());
-                              print("engagements[i] is " +
-                                  engagements[i].toString());
-                              if (engagements[i]['flag']
-                                  .contains("Tag exists")) {
-                                commEngagement.add(
-                                  {
-                                    "profile_id": engagements[i]['profile_id'],
-                                    "name": engagements[i]['name'],
-                                    "tag": engagements[i]['tag'],
-                                    "tag_id": engagements[i]['tag_id'],
-                                    "flag": engagements[i]['flag'],
-                                  },
-                                );
-                              } else {
-                                commEngagement.add(
-                                  {
-                                    "profile_id": engagements[i]['profile_id'],
-                                    "name": engagements[i]['name'],
-                                    "tag": null,
-                                    "tag_id": null,
-                                    "flag": engagements[i]['flag'],
-                                  },
-                                );
-                              }
-
-                              print("commEngagement[i] is " +
-                                  commEngagement.toString());
-                              commentController.text =
-                                  engagements[i]['comment'];
-                              // comment_string.value = "Edit comment";
-                              checkCommVal = true;
-                            }
-                            comments.add(engagements[i]['comment'].toString());
+                physics: NeverScrollableScrollPhysics(),
+                controller: pg,
+                children: [
+                  FutureBuilder(
+                    future: getComments(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<dynamic> snapshot) {
+                      comments = [];
+                      List<Map> commEngagement = [];
+                      if (snapshot.hasData &&
+                          snapshot.data.body != "Post does not exist") {
+                        bool myComm = false;
+                        var myCommId = 0;
+                        print("response");
+                        Map temp = {};
+                        var jsonDecodedEng = jsonDecode(snapshot.data.body);
+                        var engagements = jsonDecodedEng['message'];
+                        for (int i = 0; i < engagements.length; i++) {
+                          if (engagements[i]['comment'] == null) {
+                            continue;
                           }
 
-                          if (comments.length == 0 || comments == null) {
-                            return Container();
-                          }
+                          print(engagements[i]['comment'].toString() != null &&
+                              engagements[i]['profile_id'].toString() ==
+                                  myPID.toString());
+                          if (engagements[i]['comment'].toString() != null) {
+                            print("IN HERE");
 
-                          return ListView.builder(
-                            itemCount: commEngagement.length,
-                            shrinkWrap: true,
-                            itemBuilder: (BuildContext context, int index) {
-                              print(commEngagement[index]);
-                              print("Now printing comment");
-                              print(comments.elementAt(index));
-                              if (comments.elementAt(index) == null) {
-                                return Container(
-                                  width: 0,
-                                  height: 0,
-                                );
-                              } else {
-                                if (commEngagement[index]['flag']
-                                    .contains("Tag exists")) {
-                                  return Comments(
-                                    profileID: commEngagement[index]
-                                        ['profile_id'],
-                                    comment: comments.elementAt(index),
-                                    personName: commEngagement[index]['name']
-                                        .toString(),
-                                    flag: commEngagement[index]['flag']
-                                        .toString(),
-                                    tag:
-                                        commEngagement[index]['tag'].toString(),
-                                    tagID: commEngagement[index]['tag_id']
-                                        .toString(),
-                                  );
-                                } else {
-                                  return Comments(
-                                    profileID: commEngagement[index]
-                                        ['profile_id'],
-                                    comment: comments.elementAt(index),
-                                    personName: commEngagement[index]['name']
-                                        .toString(),
-                                    flag: commEngagement[index]['flag']
-                                        .toString(),
-                                  );
-                                }
-                              }
-                            },
-                          );
-                        } else {
+                            // temp['profile_id'] = engagements[i]['profile_id'];
+
+                            // temp['name'] = engagements[i]['name'];
+
+                            // print("temp is " + temp.toString());
+                            print("engagements[i] is " +
+                                engagements[i].toString());
+                            if (engagements[i]['flag'].contains("Tag exists")) {
+                              commEngagement.add(
+                                {
+                                  "profile_id": engagements[i]['profile_id'],
+                                  "name": engagements[i]['name'],
+                                  "tag": engagements[i]['tag'],
+                                  "tag_id": engagements[i]['tag_id'],
+                                  "flag": engagements[i]['flag'],
+                                },
+                              );
+                            } else {
+                              commEngagement.add(
+                                {
+                                  "profile_id": engagements[i]['profile_id'],
+                                  "name": engagements[i]['name'],
+                                  "tag": null,
+                                  "tag_id": null,
+                                  "flag": engagements[i]['flag'],
+                                },
+                              );
+                            }
+
+                            print("commEngagement[i] is " +
+                                commEngagement.toString());
+                            commentController.text = engagements[i]['comment'];
+                            // comment_string.value = "Edit comment";
+                            checkCommVal = true;
+                          }
+                          comments.add(engagements[i]['comment'].toString());
+                        }
+
+                        if (comments.length == 0 || comments == null) {
                           return Container();
                         }
-                      },
+
+                        return ListView.builder(
+                          itemCount: commEngagement.length,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            print(commEngagement[index]);
+                            print("Now printing comment");
+                            print(comments.elementAt(index));
+                            if (comments.elementAt(index) == null) {
+                              return Container(
+                                width: 0,
+                                height: 0,
+                              );
+                            } else {
+                              if (commEngagement[index]['flag']
+                                  .contains("Tag exists")) {
+                                return Comments(
+                                  profileID: commEngagement[index]
+                                      ['profile_id'],
+                                  comment: comments.elementAt(index),
+                                  personName:
+                                      commEngagement[index]['name'].toString(),
+                                  flag:
+                                      commEngagement[index]['flag'].toString(),
+                                  tag: commEngagement[index]['tag'].toString(),
+                                  tagID: commEngagement[index]['tag_id']
+                                      .toString(),
+                                );
+                              } else {
+                                return Comments(
+                                  profileID: commEngagement[index]
+                                      ['profile_id'],
+                                  comment: comments.elementAt(index),
+                                  personName:
+                                      commEngagement[index]['name'].toString(),
+                                  flag:
+                                      commEngagement[index]['flag'].toString(),
+                                );
+                              }
+                            }
+                          },
+                        );
+                      } else {
+                        return Container();
+                      }
+                    },
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(left: 15, right: 15),
+                    child: Column(
+                      children: [
+                        TextField(
+                          cursorColor: Theme.of(context).accentColor,
+                          style: Theme.of(context).textTheme.headline2,
+                          controller: commentController,
+                          onChanged: (text) {
+                            if (text.endsWith("@")) {
+                              showNameSuggestions.value = true;
+                            } else if (!text.contains("@")) {
+                              showNameSuggestions.value = false;
+                            }
+                          },
+                          decoration: InputDecoration(
+                              labelText: "Your comment:",
+                              labelStyle:
+                                  Theme.of(context).textTheme.headline1),
+                        ),
+                        Container(
+                          child: ValueListenableBuilder(
+                            valueListenable: showNameSuggestions,
+                            builder: (_, value, __) {
+                              var followingData = getFollowingList();
+                              if (value) {
+                                return FutureBuilder(
+                                  future: getFollowingList(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      var followingData = snapshot.data;
+                                      return Container(
+                                        width: screenWidth,
+                                        height: screenHeight / 2,
+                                        child: ListView.builder(
+                                          itemCount: followingData.length,
+                                          itemBuilder: (context, index) {
+                                            return ListTile(
+                                              onTap: () {
+                                                String currComment =
+                                                    commentController.text;
+
+                                                int indexOfAt =
+                                                    currComment.indexOf("@");
+
+                                                commentController.text =
+                                                    commentController
+                                                        .text
+                                                        .replaceFirst(
+                                                            currComment
+                                                                .substring(
+                                                                    indexOfAt +
+                                                                        1,
+                                                                    currComment
+                                                                        .length),
+                                                            followingData[index]
+                                                                ['name']);
+                                              },
+                                              leading: FutureBuilder(
+                                                future: FirebaseStorageService
+                                                    .getImage(
+                                                  context,
+                                                  followingData[index]
+                                                          ['profile_id']
+                                                      .toString(),
+                                                ),
+                                                builder: (context,
+                                                    AsyncSnapshot<dynamic>
+                                                        snapshot) {
+                                                  if (snapshot.hasData) {
+                                                    return CircleAvatar(
+                                                      backgroundImage:
+                                                          NetworkImage(
+                                                              snapshot.data),
+                                                      maxRadius:
+                                                          screenWidth / 20,
+                                                    );
+                                                  } else {
+                                                    return CircleAvatar(
+                                                      backgroundImage: NetworkImage(
+                                                          "https://picsum.photos/250?image=18"),
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                              title: Text(
+                                                followingData[index]['name'],
+                                              ),
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    } else {
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation(bgGradEnd),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                );
+                              } else {
+                                return Container();
+                              }
+                            },
+                          ),
+                        )
+                      ],
                     ),
-                    Container(
-                      margin: EdgeInsets.only(left: 15, right: 15),
-                      child: TextField(
-                        cursorColor: Theme.of(context).accentColor,
-                        style: Theme.of(context).textTheme.headline2,
-                        controller: commentController,
-                        decoration: InputDecoration(
-                            labelText: "Your comment:",
-                            labelStyle: Theme.of(context).textTheme.headline1),
-                      ),
-                    )
-                  ]),
+                  ),
+                ],
+              ),
             ),
             // ButtonTheme(
             //   child: RaisedButton(
@@ -363,5 +480,16 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
         ),
       ),
     );
+  }
+}
+
+class FirebaseStorageService extends ChangeNotifier {
+  FirebaseStorageService();
+  static Future<dynamic> getImage(BuildContext context, String image) async {
+    return await FirebaseStorage.instance
+        .ref()
+        .child("profile")
+        .child(image)
+        .getDownloadURL();
   }
 }

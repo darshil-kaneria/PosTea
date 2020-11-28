@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/main.dart';
+import 'package:http/http.dart' as http;
 import 'package:postea_frontend/pages/profile.dart';
 import 'package:postea_frontend/pages/topic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,6 +37,9 @@ class _CommentsState extends State<Comments> {
   String personName;
   var screenWidth;
   SharedPreferences prefs;
+  List followingList = [];
+  List followingProfileIDs = [];
+  ValueNotifier<bool> showList = new ValueNotifier(false);
 
   _CommentsState(this.comment, this.personName);
 
