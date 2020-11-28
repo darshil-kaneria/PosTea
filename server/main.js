@@ -99,7 +99,6 @@ else {
         "postID": receivedMessage['postID']
       };
       var sendMessageJson = JSON.stringify(sendJSON);
-      console.log("SENT MESSAGE TO WEBSOCKET");
       ws.send(sendMessageJson);
     });
 
@@ -256,7 +255,6 @@ app.route("/followdata")
 
       var publishInfoJsonString = JSON.stringify(publishInfo);
       publisher.publish(String(req.body.follower_id), publishInfoJsonString, function(){
-        console.log("Finished");
         res.send(String(message));
       });
     });
