@@ -39,6 +39,7 @@ if (cluster.isMaster) {
 else {
   const clients = new Clients();
   const server = app.listen(PORT, ()=>console.log("listening on port "+PORT+", PID: "+process.pid));
+  var publisher = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
 
   app.use(cors({
     origin: ["http://localhost:23556"],
@@ -183,7 +184,7 @@ app.route("/engagement")
     const handleEngagements = fork('./func/add_engagement.js');
     handleEngagements.send(req.body);
     handleEngagements.on("message", message => {
-      var publisher = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
+      
       var publishInfo = {
         "senderClient": req.body.engagement_profile_id,
         "affectedClient": message['affectedClient'],
