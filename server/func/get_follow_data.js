@@ -104,7 +104,7 @@ const getFollowers = async(user_id, connection) => {
 }
 
 const convert_to_id_and_name = async(flag, current_user, ids, connection) => {
-    var query1 = "SELECT profile_id, name FROM profile WHERE";
+    var query1 = "SELECT profile_id, name, username FROM profile WHERE";
     var profile_ids = [];
     if (flag == "following") {
         for (var i = 0; i < ids.length; i++) {
