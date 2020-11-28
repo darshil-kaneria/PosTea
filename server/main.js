@@ -72,33 +72,33 @@ else {
       if(clients.clientList[profile_id] == undefined){
         clients.saveClient(profile_id, ws);
         clients.clientList[profile_id].send("HELLO CLIENT");
-        
-        
-        subscriber.on("message", (channel, message) => {
-          var receivedMessage = JSON.parse(message);
-          var engagement = "";
-          if(receivedMessage['like_dislike'] == 1){
-            engagement = " liked your post.";
-          }
-          else if(receivedMessage['comment'] !== null){
-            engagement = " commented on your post.";
-          }
-          var sender = String(receivedMessage['senderClient']);
-          var senderName = String(receivedMessage['senderName']);
-          var sendJSON = {
-            "senderName": senderName,
-            "senderID": sender,
-            "engagement": engagement,
-            "postID": receivedMessage['postID']
-          };
-          var sendMessageJson = JSON.stringify(sendJSON);
-          ws.send(sendMessageJson);
-        });
         subscriber.subscribe(String(profile_id));
         console.log("Subscribed to: " + String(profile_id));
       }
     });
     
+
+    subscriber.on("message", (channel, message) => {
+      var receivedMessage = JSON.parse(message);
+      var engagement = "";
+      if(receivedMessage['like_dislike'] == 1){
+        engagement = " liked your post.";
+      }
+      else if(receivedMessage['comment'] !== null){
+        engagement = " commented on your post.";
+      }
+      var sender = String(receivedMessage['senderClient']);
+      var senderName = String(receivedMessage['senderName']);
+      var sendJSON = {
+        "senderName": senderName,
+        "senderID": sender,
+        "engagement": engagement,
+        "postID": receivedMessage['postID']
+      };
+      var sendMessageJson = JSON.stringify(sendJSON);
+      ws.send(sendMessageJson);
+    });
+
   });
   
   server.on('upgrade', (request, socket, head) => {
