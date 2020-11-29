@@ -178,6 +178,27 @@ app.route('/profile/:pID?')
     handleUpdate.on("message", message => res.send(message));
   });
 
+// Settings methods
+app.route('/profile/:pID')
+.get((req, res) => {
+  const handleGetSettings = fork('./func/get_settings.js');
+  var data = {
+    profile: req.params.pID,
+  };
+  handleGetSettings.send(data);
+  handleGetSettings.on("message", message => res.send(message));
+})
+.post((req, res) => {
+  const handleAddSettings = fork('./func/add_settings.js');
+  handleAddSettings.send(req.body);
+  handleAddSettings.on("message", message => res.send(message));
+})
+.put((req, res) => {
+  const handleUpdateSettings = fork('./func/update_settings.js');
+  handleUpdateSettings.send(req.body);
+  handleUpdateSettings.on("message", message => res.send(message));
+});
+
 // Post methods
 app.route("/post")
   .get((req, res) => {
