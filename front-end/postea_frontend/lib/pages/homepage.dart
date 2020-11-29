@@ -191,7 +191,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     //  });
     initializeSharedPref();
     initializeWebSocket();
-    _audioCache = AudioCache(prefix: "assets/audio/", fixedPlayer: AudioPlayer()..setReleaseMode(ReleaseMode.STOP));
+    _audioCache = AudioCache(
+        prefix: "assets/audio/",
+        fixedPlayer: AudioPlayer()..setReleaseMode(ReleaseMode.STOP));
     getUserData();
     checkPosScrollController.addListener(_scrollListener);
     //  setState(() {
@@ -1421,129 +1423,120 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
             ),
           ),
         ),
-        Container(
-          width: screenWidth,
-          height: screenHeight,
-          color: Theme.of(context).canvasColor,
-          child: Column(
-            children: [
-              Container(
-                margin: EdgeInsets.only(top: 30, left: 10, right: 10),
-                child: Material(
-                  child: Row(
-                    children: [
-                      IconButton(
-                          icon: Icon(Icons.arrow_back_ios),
-                          onPressed: () {
-                            pageController.jumpToPage(0);
-                          }),
-                      Text(
-                        "Notifications",
-                        style: TextStyle(
-                            fontSize: 30, fontWeight: FontWeight.bold),
-                      ),
-                      Spacer(),
-                      Icon(Icons.notifications)
-                    ],
+        SafeArea(
+          child: Container(
+            width: screenWidth,
+            height: screenHeight,
+            color: Theme.of(context).canvasColor,
+            child: Column(
+              children: [
+                Container(
+                  // margin: EdgeInsets.only(top: 30, left: 10, right: 10),
+                  child: Material(
+                    child: Row(
+                      children: [
+                        IconButton(
+                            icon: Icon(Icons.arrow_back),
+                            onPressed: () {
+                              pageController.jumpToPage(0);
+                            }),
+                        Text(
+                          "Notifications",
+                          style: Theme.of(context).textTheme.headline4),
+                        Spacer(),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                width: screenWidth,
-                height: screenHeight / 1.129,
-                child: ListView(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Material(
-                        clipBehavior: Clip.antiAlias,
-                        child: Row(
-                          children: [
-                            Expanded(
-                              flex: 1,
-                              child: Container(
-                                width: screenWidth / 1.4,
-                                height: screenHeight / 1.1,
-                                child: notifList.length == 0
-                                    ? Center(
-                                        child: Container(
-                                        margin: EdgeInsets.only(bottom: 100),
-                                        child: Text(
-                                            "You do not have any notifications!"),
-                                      ))
-                                    : ListView.builder(
-                                        itemCount: notifList.length,
-                                        itemBuilder: (context, index) {
-                                          print(notifList[index]);
-                                          return ListTile(
-                                            leading: FutureBuilder(
-                                              future: FirebaseStorageService
-                                                  .getImage(
-                                                      context,
-                                                      notifList[index]
-                                                          ['senderID']),
-                                              builder: (BuildContext context,
-                                                  AsyncSnapshot<dynamic>
-                                                      snapshot) {
-                                                if (snapshot.hasData) {
-                                                  return CircleAvatar(
-                                                    backgroundImage:
-                                                        NetworkImage(
-                                                            snapshot.data),
-                                                  );
-                                                } else {
-                                                  return CircularProgressIndicator(
-                                                    valueColor:
-                                                        AlwaysStoppedAnimation(
-                                                            bgGradEnd),
-                                                  );
-                                                }
-                                              },
-                                            ),
-                                            title: Text(
-                                                notifList[index]['senderName']),
-                                            subtitle: Text(
-                                                notifList[index]['engagement']),
-                                          );
-                                          // return FutureBuilder(
-                                          //   future: FirebaseStorageService.getImage(
-                                          //       context,
-                                          //       notifList[index]['senderID']),
-                                          //   builder: (context, snapshot) {
-                                          //     if (snapshot.hasData) {
-                                          //       return ListTile(
-                                          //         leading: CircleAvatar(
-                                          //           backgroundImage:
-                                          //               NetworkImage(snapshot.data),
-                                          //         ),
-                                          //         title: Text(
-                                          //             notifList[index]['senderName']),
-                                          //         subtitle: Text(
-                                          //             notifList[index]['engagement']),
-                                          //       );
-                                          //     } else {
-                                          //       return Center(
-                                          //         child: CircularProgressIndicator(
-                                          //           valueColor:
-                                          //               AlwaysStoppedAnimation(
-                                          //                   bgGradEnd),
-                                          //         ),
-                                          //       );
-                                          //     }
-                                          //   },
-                                          // );
+                Expanded(
+                  child: Container(
+                    width: screenWidth,
+                    // height: screenHeight / 1.129,
+                    child: Material(
+                      clipBehavior: Clip.antiAlias,
+                      child: ValueListenableBuilder(
+                        valueListenable: showBadge,
+                        builder: (context, value, child) {
+                          return Container(
+                          width: screenWidth / 1.4,
+                          child: notifList.length == 0
+                              ? Center(
+                                  child: Container(
+                                  margin: EdgeInsets.only(bottom: 100),
+                                  child: Text(
+                                      "You do not have any notifications!"),
+                                ))
+                              : ListView.builder(
+                                  itemCount: notifList.length,
+                                  itemBuilder: (context, index) {
+                                    print(notifList[index]);
+                                    return ListTile(
+                                      leading: FutureBuilder(
+                                        future: FirebaseStorageService
+                                            .getImage(
+                                                context,
+                                                notifList[index]
+                                                    ['senderID']),
+                                        builder: (BuildContext context,
+                                            AsyncSnapshot<dynamic>
+                                                snapshot) {
+                                          if (snapshot.hasData) {
+                                            return CircleAvatar(
+                                              backgroundImage:
+                                                  NetworkImage(
+                                                      snapshot.data),
+                                            );
+                                          } else {
+                                            return CircularProgressIndicator(
+                                              valueColor:
+                                                  AlwaysStoppedAnimation(
+                                                      bgGradEnd),
+                                            );
+                                          }
                                         },
                                       ),
-                              ),
-                            ),
-                          ],
-                        ),
+                                      title: Text(
+                                          notifList[index]['senderName']),
+                                      subtitle: Text(
+                                          notifList[index]['engagement']),
+                                    );
+                                    // return FutureBuilder(
+                                    //   future: FirebaseStorageService.getImage(
+                                    //       context,
+                                    //       notifList[index]['senderID']),
+                                    //   builder: (context, snapshot) {
+                                    //     if (snapshot.hasData) {
+                                    //       return ListTile(
+                                    //         leading: CircleAvatar(
+                                    //           backgroundImage:
+                                    //               NetworkImage(snapshot.data),
+                                    //         ),
+                                    //         title: Text(
+                                    //             notifList[index]['senderName']),
+                                    //         subtitle: Text(
+                                    //             notifList[index]['engagement']),
+                                    //       );
+                                    //     } else {
+                                    //       return Center(
+                                    //         child: CircularProgressIndicator(
+                                    //           valueColor:
+                                    //               AlwaysStoppedAnimation(
+                                    //                   bgGradEnd),
+                                    //         ),
+                                    //       );
+                                    //     }
+                                    //   },
+                                    // );
+                                  },
+                                ),
+                        );
+                        },
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ],
