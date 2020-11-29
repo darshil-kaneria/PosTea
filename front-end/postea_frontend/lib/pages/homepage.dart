@@ -652,22 +652,26 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
               ValueListenableBuilder(
                 valueListenable: showBadge,
                 builder: (context, value, child) {
-                  print("VALUE IS: "+value.toString());
+                  print("VALUE IS: " + value.toString());
                   return Badge(
-                  showBadge: value ? (notifString.value == "HELLO CLIENT" ? false : true) : false,
-                  animationType: BadgeAnimationType.fade,
-                  badgeColor: Colors.deepOrange[200],
-                  position: BadgePosition.topEnd(top: 10, end: 10),
-                  child: IconButton(
-                    icon: Icon(Icons.notifications, size: 20,),
-                    onPressed: () {
-                      showBadge.value = false;
-                      pageController.jumpToPage(2);
-                    },
-                  ),
-                );
+                    showBadge: value
+                        ? (notifString.value == "HELLO CLIENT" ? false : true)
+                        : false,
+                    animationType: BadgeAnimationType.fade,
+                    badgeColor: Colors.deepOrange[200],
+                    position: BadgePosition.topEnd(top: 10, end: 10),
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.notifications,
+                        size: 20,
+                      ),
+                      onPressed: () {
+                        showBadge.value = false;
+                        pageController.jumpToPage(2);
+                      },
+                    ),
+                  );
                 },
-                
               ),
               // StreamBuilder(
               //     stream: webSocketChannel.stream.asBroadcastStream(),
@@ -1222,21 +1226,23 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                   itemBuilder: (context, index) {
                                     print(notifList[index]);
                                     return FutureBuilder(
-                                      future: FirebaseStorageService.getImage(context, notifList[index]['senderID']),
+                                      future: FirebaseStorageService.getImage(
+                                          context,
+                                          notifList[index]['senderID']),
                                       builder: (context, snapshot) {
                                         return ListTile(
-                                      leading: CircleAvatar(
-                                          backgroundImage: NetworkImage(
-                                              snapshot.data),
-                                        ),
-                                      title: Text(notifList[index]['senderName']),
-                                      subtitle: Text(notifList[index]['engagement']),
-                                  );
+                                          leading: CircleAvatar(
+                                            backgroundImage:
+                                                NetworkImage(snapshot.data),
+                                          ),
+                                          title: Text(
+                                              notifList[index]['senderName']),
+                                          subtitle: Text(
+                                              notifList[index]['engagement']),
+                                        );
                                       },
-                                      
                                     );
                                   },
-                                  
                                 ),
                               ),
                             ),
