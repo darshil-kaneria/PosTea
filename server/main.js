@@ -24,15 +24,14 @@ var lastWorkerPID = -1;
 app.use(bearerToken());
 app.use(function (req, res, next) {
   try {
-    const KEY = process.env.KEY || 'Bearer';
-    const TOKEN = process.env.TOKEN || 'posteaadmin';
+    const TOKEN = process.env.TOKEN;
       let error;
 
       // Check if the received request has an authorization header
       if (req.headers) {
         if (req.headers.authorization) {
           const splits = req.headers.authorization.split(' ');
-          if (splits.length === 2 && splits[0] === KEY) {
+          if (splits.length === 2 && splits[0] === 'Bearer') {
             if (splits[1] === TOKEN) {
               error = false;
             } else {
