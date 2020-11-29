@@ -35,6 +35,8 @@ import 'topic.dart';
 import 'settingsPage.dart';
 import '../data_models/process_search.dart';
 import 'package:linkwell/linkwell.dart';
+import 'package:audioplayers/audio_cache.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class HomePage extends StatefulWidget {
   int profileID;
@@ -73,12 +75,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   ValueNotifier<bool> showBadge = ValueNotifier<bool>(false);
   ValueNotifier<String> notifString = ValueNotifier<String>("");
   var notifList = [];
+  AudioCache _audioCache;
   // var searchResults = [];
 
   Future getNotifs(Stream stream) async {
     await for (var notif in stream) {
       if (notif != "__ping__" && notif != "HELLO CLIENT") {
         showBadge.value = true;
+        _audioCache.play('eventually-590.mp3');
         Map<String, dynamic> notifMap = jsonDecode(notif);
         notifString.value = notif;
         notifList.add(notifMap);
@@ -187,6 +191,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     //  });
     initializeSharedPref();
     initializeWebSocket();
+    _audioCache = AudioCache(prefix: "assets/audio/", fixedPlayer: AudioPlayer()..setReleaseMode(ReleaseMode.STOP));
     getUserData();
     checkPosScrollController.addListener(_scrollListener);
     //  setState(() {

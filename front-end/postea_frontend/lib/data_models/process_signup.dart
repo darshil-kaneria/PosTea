@@ -121,7 +121,7 @@ class ProcessSignUp {
           "newUser": username
         });
         Response response = await post(
-          "http://postea-server.herokuapp.com/adduser",
+          "http://postea-server.herokuapp.com/user",
           headers: {'Content-Type': 'application/json'},
           body: reqBody
           );
