@@ -108,6 +108,15 @@ class _PostTileState extends State<PostTile> {
     return resp;
   }
 
+  Future<http.Response> getPostInfo() async {
+    var url =
+        "http://postea-server.herokuapp.com/post?post_id=" + post_id.toString();
+
+    http.Response resp = await http.get(url);
+
+    return resp;
+  }
+
   initializeSharedPref() async {
     pref = await SharedPreferences.getInstance();
   }
@@ -129,6 +138,10 @@ class _PostTileState extends State<PostTile> {
     int post_likes = int.parse(widget.post_likes);
     int post_dislikes = int.parse(widget.post_dislikes);
     int post_comments = int.parse(widget.post_comments);
+    String tag = "";
+    int atIndex;
+    String firstHalf = "";
+    String secondHalf = "";
 
     // print("post likes = " + widget.post_likes);
     Future.delayed(Duration(seconds: 2)).then((value) {
@@ -230,32 +243,63 @@ class _PostTileState extends State<PostTile> {
               top: BorderSide(width: 0.5, color: Colors.grey),
             )),
             child: ListTile(
-                onTap: () => {
-                      Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ExpandedPostTile(
-                                  post_id,
-                                  profile_id,
-                                  post_description,
-                                  topic_id,
-                                  post_img,
-                                  creation_date,
-                                  post_likes.toString(),
-                                  post_dislikes.toString(),
-                                  post_comments.toString(),
-                                  post_title,
-                                  name,
-                                  myPID)))
-                    },
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-                title: Text(post_title,
-                    style: Theme.of(context).textTheme.headline2),
-                subtitle: LinkWell(
-                  post_description,
-                  style: Theme.of(context).textTheme.headline3,
-                )),
+              onTap: () => {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ExpandedPostTile(
+                            post_id,
+                            profile_id,
+                            post_description,
+                            topic_id,
+                            post_img,
+                            creation_date,
+                            post_likes.toString(),
+                            post_dislikes.toString(),
+                            post_comments.toString(),
+                            post_title,
+                            name,
+                            myPID)))
+              },
+              contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+              title: Text(post_title,
+                  style: Theme.of(context).textTheme.headline2),
+              subtitle: LinkWell(
+                post_description,
+                style: Theme.of(context).textTheme.headline3,
+              ),
+              // FutureBuilder(
+              //   future: getPostInfo(),
+              //   builder: (BuildContext context,
+              //       AsyncSnapshot<http.Response> snapshot) {
+              //     if (snapshot.hasData) {
+              //       var postData = json.decode(snapshot.data.body);
+              //       if (postData['flag'].contains("Tag exists")) {
+              //         atIndex = post_description.indexOf("@");
+              //         firstHalf = post_description.substring(0, atIndex);
+              //         String tempString = post_description.substring(
+              //             atIndex, post_description.length);
+              //         if (post_description.lastIndexOf(" ") + 1 == atIndex) {
+              //           tag = tempString;
+              //         } else {
+              //           var spaceIndex = tempString.indexOf(" ");
+              //           secondHalf = post_description.substring(
+              //               atIndex + spaceIndex, post_description.length);
+              //           tag = post_description.substring(
+              //               atIndex, atIndex + spaceIndex);
+              //         }
+              //         print("tag is " + tag);
+              //       }
+              //       return LinkWell(
+              //         post_description,
+              //         style: Theme.of(context).textTheme.headline3,
+              //       );
+              //     } else {
+              //       return Container();
+              //     }
+              //   },
+              // ),
+            ),
           ),
           Container(
               child: FutureBuilder(
