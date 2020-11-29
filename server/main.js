@@ -17,12 +17,42 @@ const ws = require('ws');
 const db = require('./func/db_connection.js');
 const { send } = require('process');
 var redis = db.redis_conn;
+const bearerToken = require('express-bearer-token');
 
 var lastWorkerPID = -1;
 
+app.use(bearerToken());
+app.use(function (req, res, next) {
+  try {
+    const KEY = process.env.KEY || 'Bearer';
+    const TOKEN = process.env.TOKEN || 'posteaadmin';
+      let error;
 
-
-
+      // Check if the received request has an authorization header
+      if (req.headers) {
+        if (req.headers.authorization) {
+          const splits = req.headers.authorization.split(' ');
+          if (splits.length === 2 && splits[0] === KEY) {
+            if (splits[1] === TOKEN) {
+              error = false;
+            } else {
+              error = true;
+            }
+          } else {
+            error = true;
+          }
+        }
+      }
+      // If there is no auth header
+      if (error) {
+        res.status(401).send('Unauthorized!');
+      } else {
+        next();
+      } 
+  } catch (e) {
+    console.error(e);
+  }
+});
 
 if (cluster.isMaster) {
   console.log(`Master ${process.pid} is running`);
