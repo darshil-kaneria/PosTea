@@ -179,11 +179,11 @@ app.route('/profile/:pID?')
   });
 
 // Settings methods
-app.route('/profile/:pID')
+app.route('/settings/:pID')
 .get((req, res) => {
   const handleGetSettings = fork('./func/get_settings.js');
   var data = {
-    profile: req.params.pID,
+    profile: req.params.pID
   };
   handleGetSettings.send(data);
   handleGetSettings.on("message", message => res.send(message));
