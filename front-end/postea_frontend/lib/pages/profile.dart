@@ -994,7 +994,8 @@ class _ProfileState extends State<Profile> {
                                                       .toString(),
                                                   postData[index]['post_title']
                                                       .toString(),
-                                                  name.toString(),
+                                                  postData[index]['name']
+                                                      .toString(),
                                                   profileId.toString(),
                                                   false);
                                             },
@@ -1003,7 +1004,13 @@ class _ProfileState extends State<Profile> {
                                           //     itemCount: snapshot.data.length,
                                           //     itemBuilder: (context, index) {});
                                         } else {
-                                          return Container();
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                              valueColor:
+                                                  AlwaysStoppedAnimation(
+                                                      bgGradEnd),
+                                            ),
+                                          );
                                         }
                                       },
                                     );
@@ -1053,7 +1060,13 @@ class _ProfileState extends State<Profile> {
                                           //     itemCount: snapshot.data.length,
                                           //     itemBuilder: (context, index) {});
                                         } else {
-                                          return Container();
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                              valueColor:
+                                                  AlwaysStoppedAnimation(
+                                                      bgGradEnd),
+                                            ),
+                                          );
                                         }
                                       },
                                     );

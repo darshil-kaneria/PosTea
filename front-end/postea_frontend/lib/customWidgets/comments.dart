@@ -49,6 +49,7 @@ class _CommentsState extends State<Comments> {
     int atIndex;
     String firstHalf = "";
     String secondHalf = "";
+    screenWidth = MediaQuery.of(context).size.width;
 
     if (widget.flag.contains("Tag exists")) {
       atIndex = comment.indexOf("@");
@@ -102,59 +103,63 @@ class _CommentsState extends State<Comments> {
                             style: Theme.of(context).textTheme.headline2,
                           ),
                   ),
-                  this.comment == null
-                      ? Container()
-                      : widget.flag.contains("No tag")
-                          ? AutoSizeText(this.comment,
-                              style: Theme.of(context).textTheme.headline3)
-                          : RichText(
-                              text: TextSpan(
-                                text: firstHalf,
-                                style: TextStyle(
-                                  color: Colors.black,
+                  Container(
+                    width: screenWidth / 1.25,
+                    child: this.comment == null
+                        ? Container()
+                        : widget.flag.contains("No tag")
+                            ? AutoSizeText(this.comment,
+                                style: Theme.of(context).textTheme.headline3)
+                            : RichText(
+                                text: TextSpan(
+                                  text: firstHalf,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                        text: tag,
+                                        style:
+                                            TextStyle(color: Colors.lightBlue),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            if (widget.flag
+                                                .contains("profile_id")) {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => Profile(
+                                                    profileId:
+                                                        int.parse(widget.tagID),
+                                                    isOwner: widget.profileID ==
+                                                            int.parse(
+                                                                widget.tagID)
+                                                        ? true
+                                                        : false,
+                                                  ),
+                                                ),
+                                              );
+                                            } else {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => Topic(
+                                                    topicId: widget.tagID,
+                                                    profileId: widget.profileID,
+                                                    isOwner: false,
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          }),
+                                    TextSpan(
+                                      text: secondHalf,
+                                      style: TextStyle(color: Colors.black),
+                                    )
+                                  ],
                                 ),
-                                children: [
-                                  TextSpan(
-                                      text: tag,
-                                      style: TextStyle(color: Colors.lightBlue),
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = () {
-                                          if (widget.flag
-                                              .contains("profile_id")) {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => Profile(
-                                                  profileId:
-                                                      int.parse(widget.tagID),
-                                                  isOwner: widget.profileID ==
-                                                          int.parse(
-                                                              widget.tagID)
-                                                      ? true
-                                                      : false,
-                                                ),
-                                              ),
-                                            );
-                                          } else {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => Topic(
-                                                  topicId: widget.tagID,
-                                                  profileId: widget.profileID,
-                                                  isOwner: false,
-                                                ),
-                                              ),
-                                            );
-                                          }
-                                        }),
-                                  TextSpan(
-                                    text: secondHalf,
-                                    style: TextStyle(color: Colors.black),
-                                  )
-                                ],
                               ),
-                            )
+                  )
                   // : AutoSizeText(
                   //     this.comment,
                   //     // "{\"post retrieved\": \"success\"}",
