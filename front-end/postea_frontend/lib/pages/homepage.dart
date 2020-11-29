@@ -3,6 +3,7 @@ import 'dart:convert';
 // import 'dart:html';
 import 'dart:io';
 import 'dart:math';
+import 'package:badges/badges.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flappy_search_bar/flappy_search_bar.dart';
 import 'package:flutter/cupertino.dart';
@@ -68,18 +69,25 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   List<dynamic> engagementInfo = [];
   WebSocketChannel webSocketChannel;
   SharedPreferences pref;
+  ValueNotifier<bool> showBadge = ValueNotifier<bool>(false);
+  ValueNotifier<String> notifString = ValueNotifier<String>("");
+  var notifList = [];
   // var searchResults = [];
 
   Future getNotifs(Stream stream) async {
-    await for(var notif in stream){
-      if(notif != "__ping__"){
-        print(notif);
-      }
-      else{
+    await for (var notif in stream) {
+      if (notif != "__ping__" && notif != "HELLO CLIENT") {
+        showBadge.value = true;
+        Map<String, dynamic> notifMap = jsonDecode(notif);
+        notifString.value = notif;
+        notifList.add(notifMap);
+        print("notif is: ");
+        print(notifList[0]['senderID']);
+      } else {
         webSocketChannel.sink.add("__pong__");
         print("Sent pong");
       }
-    } 
+    }
   }
 
   getUserData() async {
@@ -130,8 +138,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       if (!timeLine.isEnd && timeLine.postRetrieved)
         // setState(() {
         print("SETSTATE CALLED");
-      if(timeLine.postList.length != 0)  
-      offset.value = offset.value + 10;
+      if (timeLine.postList.length != 0) offset.value = offset.value + 10;
       updatePost();
       // });
     }
@@ -261,7 +268,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     webSocketChannel.sink.add(widget.profileID.toString());
 
     print("WEB SOCKET: Profile ID " + widget.profileID.toString() + " sent");
-    getNotifs(webSocketChannel.stream);
+    getNotifs(webSocketChannel.stream.asBroadcastStream());
   }
 
   @override
@@ -642,14 +649,55 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       curve: Curves.bounceInOut);
                 },
               ),
-              IconButton(
-                  icon: Icon(
-                    Icons.notifications,
-                    size: 20,
+              ValueListenableBuilder(
+                valueListenable: showBadge,
+                builder: (context, value, child) {
+                  print("VALUE IS: "+value.toString());
+                  return Badge(
+                  showBadge: value ? (notifString.value == "HELLO CLIENT" ? false : true) : false,
+                  animationType: BadgeAnimationType.fade,
+                  badgeColor: Colors.deepOrange[200],
+                  position: BadgePosition.topEnd(top: 10, end: 10),
+                  child: IconButton(
+                    icon: Icon(Icons.notifications, size: 20,),
+                    onPressed: () {
+                      showBadge.value = false;
+                      pageController.jumpToPage(2);
+                    },
                   ),
-                  onPressed: () {
-                    pageController.jumpToPage(2);
-                  }),
+                );
+                },
+                
+              ),
+              // StreamBuilder(
+              //     stream: webSocketChannel.stream.asBroadcastStream(),
+              //     builder: (context, snapshot) {
+              //       if(snapshot.hasData){
+              //         print(snapshot.data);
+              //         if(snapshot.data == "__ping__"){
+              //           webSocketChannel.sink.add("__pong__");
+              //         }
+              //       }
+              //       ValueNotifier<bool> showBadge = ValueNotifier<bool>(snapshot.hasData);
+              //         return ValueListenableBuilder(
+              //           valueListenable: showBadge,
+              //           builder: (context, value, child) => Badge(
+              //             showBadge: showBadge.value ? (snapshot.data == "__ping__" || snapshot.data == "HELLO CLIENT" ? false : true) : false,
+              //             badgeColor: Colors.deepOrange[200],
+              //             position: BadgePosition.topEnd(top: 10, end: 10),
+              //             animationType: BadgeAnimationType.fade,
+              //             child: IconButton(
+              //                 icon: Icon(
+              //                   Icons.notifications,
+              //                   size: 20,
+              //                 ),
+              //                 onPressed: () {
+              //                   showBadge.value = false;
+              //                   pageController.jumpToPage(2);
+              //                 }),
+              //           ),
+              //         );
+              //     }),
               IconButton(
                   icon: Icon(
                     Icons.account_circle,
@@ -781,7 +829,9 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                 timeLine.postList.elementAt(index).post_name,
                                 widget.profileID.toString(),
                                 0,
-                                timeLine.postList.elementAt(index).is_sensitive);
+                                timeLine.postList
+                                    .elementAt(index)
+                                    .is_sensitive);
                           }),
                     );
                     // } else
@@ -838,9 +888,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                   size: 20,
                                 ),
                                 onPressed: () {
-                                  pageController.animateToPage(0,
-                                      duration: Duration(milliseconds: 100),
-                                      curve: Curves.bounceInOut);
+                                  pageController.jumpToPage(0);
 
                                   searchTextController.clear();
                                 }),
@@ -1141,9 +1189,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                       IconButton(
                           icon: Icon(Icons.arrow_back_ios),
                           onPressed: () {
-                            pageController.animateToPage(0,
-                                duration: Duration(milliseconds: 200),
-                                curve: Curves.bounceInOut);
+                            pageController.jumpToPage(0);
                           }),
                       Text(
                         "Notifications",
@@ -1167,147 +1213,31 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         clipBehavior: Clip.antiAlias,
                         child: Row(
                           children: [
-                            Container(
-                              width: screenWidth / 1.4,
-                              child: ListTile(
-                                leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                      "https://picsum.photos/250?image=18"),
+                            Expanded(
+                              flex: 1,
+                              child: Container(
+                                width: screenWidth / 1.4,
+                                child: ListView.builder(
+                                  itemCount: notifList.length,
+                                  itemBuilder: (context, index) {
+                                    print(notifList[index]);
+                                    return FutureBuilder(
+                                      future: FirebaseStorageService.getImage(context, notifList[index]['senderID']),
+                                      builder: (context, snapshot) {
+                                        return ListTile(
+                                      leading: CircleAvatar(
+                                          backgroundImage: NetworkImage(
+                                              snapshot.data),
+                                        ),
+                                      title: Text(notifList[index]['senderName']),
+                                      subtitle: Text(notifList[index]['engagement']),
+                                  );
+                                      },
+                                      
+                                    );
+                                  },
+                                  
                                 ),
-                                title: Text("Darshil Kaneria"),
-                                subtitle: Text("commented on your post"),
-                              ),
-                            ),
-                            Spacer(),
-                            Text("3s ago")
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Material(
-                        child: Row(
-                          children: [
-                            Container(
-                              width: screenWidth / 1.4,
-                              child: ListTile(
-                                leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                      "https://picsum.photos/250?image=18"),
-                                ),
-                                title: Text("Darshil Kaneria"),
-                                subtitle: Text("commented on your post"),
-                              ),
-                            ),
-                            Spacer(),
-                            Text("3s ago")
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Material(
-                        child: Row(
-                          children: [
-                            Container(
-                              width: screenWidth / 1.4,
-                              child: ListTile(
-                                leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                      "https://picsum.photos/250?image=18"),
-                                ),
-                                title: Text("Darshil Kaneria"),
-                                subtitle: Text("commented on your post"),
-                              ),
-                            ),
-                            Spacer(),
-                            Text("3s ago")
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Material(
-                        child: Row(
-                          children: [
-                            Container(
-                              width: screenWidth / 1.4,
-                              child: ListTile(
-                                leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                      "https://picsum.photos/250?image=18"),
-                                ),
-                                title: Text("Darshil Kaneria"),
-                                subtitle: Text("commented on your post"),
-                              ),
-                            ),
-                            Spacer(),
-                            Text("3s ago")
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Material(
-                        child: Row(
-                          children: [
-                            Container(
-                              width: screenWidth / 1.4,
-                              child: ListTile(
-                                leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                      "https://picsum.photos/250?image=18"),
-                                ),
-                                title: Text("Darshil Kaneria"),
-                                subtitle: Text("commented on your post"),
-                              ),
-                            ),
-                            Spacer(),
-                            Text("3s ago")
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Material(
-                        child: Row(
-                          children: [
-                            Container(
-                              width: screenWidth / 1.4,
-                              child: ListTile(
-                                leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                      "https://picsum.photos/250?image=18"),
-                                ),
-                                title: Text("Darshil Kaneria"),
-                                subtitle: Text("commented on your post"),
-                              ),
-                            ),
-                            Spacer(),
-                            Text("3s ago")
-                          ],
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Material(
-                        child: Row(
-                          children: [
-                            Container(
-                              width: screenWidth / 1.4,
-                              child: ListTile(
-                                leading: CircleAvatar(
-                                  backgroundImage: NetworkImage(
-                                      "https://picsum.photos/250?image=18"),
-                                ),
-                                title: Text("Darshil Kaneria"),
-                                subtitle: Text("commented on your post"),
                               ),
                             ),
                             Spacer(),
