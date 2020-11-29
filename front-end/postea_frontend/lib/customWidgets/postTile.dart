@@ -111,6 +111,15 @@ class _PostTileState extends State<PostTile> {
     return resp;
   }
 
+  Future<http.Response> getPostInfo() async {
+    var url =
+        "http://postea-server.herokuapp.com/post?post_id=" + post_id.toString();
+
+    http.Response resp = await http.get(url);
+
+    return resp;
+  }
+
   initializeSharedPref() async {
     pref = await SharedPreferences.getInstance();
   }
@@ -132,6 +141,10 @@ class _PostTileState extends State<PostTile> {
     int post_likes = int.parse(widget.post_likes);
     int post_dislikes = int.parse(widget.post_dislikes);
     int post_comments = int.parse(widget.post_comments);
+    String tag = "";
+    int atIndex;
+    String firstHalf = "";
+    String secondHalf = "";
 
     // print("post likes = " + widget.post_likes);
     Future.delayed(Duration(seconds: 2)).then((value) {

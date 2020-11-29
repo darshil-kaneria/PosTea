@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/main.dart';
+import 'package:http/http.dart' as http;
 import 'package:postea_frontend/pages/profile.dart';
 import 'package:postea_frontend/pages/topic.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -34,6 +37,9 @@ class _CommentsState extends State<Comments> {
   String personName;
   var screenWidth;
   SharedPreferences prefs;
+  List followingList = [];
+  List followingProfileIDs = [];
+  ValueNotifier<bool> showList = new ValueNotifier(false);
 
   _CommentsState(this.comment, this.personName);
 
@@ -43,11 +49,12 @@ class _CommentsState extends State<Comments> {
     int atIndex;
     String firstHalf = "";
     String secondHalf = "";
+    screenWidth = MediaQuery.of(context).size.width;
 
     if (widget.flag.contains("Tag exists")) {
       atIndex = comment.indexOf("@");
       firstHalf = comment.substring(0, atIndex);
-      String tempString = comment.substring(atIndex, comment.length - 1);
+      String tempString = comment.substring(atIndex, comment.length);
       if (comment.lastIndexOf(" ") + 1 == atIndex) {
         tag = tempString;
       } else {
@@ -96,59 +103,63 @@ class _CommentsState extends State<Comments> {
                             style: Theme.of(context).textTheme.headline2,
                           ),
                   ),
-                  this.comment == null
-                      ? Container()
-                      : widget.flag.contains("No tag")
-                          ? AutoSizeText(this.comment,
-                              style: Theme.of(context).textTheme.headline3)
-                          : RichText(
-                              text: TextSpan(
-                                text: firstHalf,
-                                style: TextStyle(
-                                  color: Colors.black,
+                  Container(
+                    width: screenWidth / 1.25,
+                    child: this.comment == null
+                        ? Container()
+                        : widget.flag.contains("No tag")
+                            ? AutoSizeText(this.comment,
+                                style: Theme.of(context).textTheme.headline3)
+                            : RichText(
+                                text: TextSpan(
+                                  text: firstHalf,
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                  ),
+                                  children: [
+                                    TextSpan(
+                                        text: tag,
+                                        style:
+                                            TextStyle(color: Colors.lightBlue),
+                                        recognizer: TapGestureRecognizer()
+                                          ..onTap = () {
+                                            if (widget.flag
+                                                .contains("profile_id")) {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => Profile(
+                                                    profileId:
+                                                        int.parse(widget.tagID),
+                                                    isOwner: widget.profileID ==
+                                                            int.parse(
+                                                                widget.tagID)
+                                                        ? true
+                                                        : false,
+                                                  ),
+                                                ),
+                                              );
+                                            } else {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => Topic(
+                                                    topicId: widget.tagID,
+                                                    profileId: widget.profileID,
+                                                    isOwner: false,
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          }),
+                                    TextSpan(
+                                      text: secondHalf,
+                                      style: TextStyle(color: Colors.black),
+                                    )
+                                  ],
                                 ),
-                                children: [
-                                  TextSpan(
-                                      text: tag,
-                                      style: TextStyle(color: Colors.lightBlue),
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = () {
-                                          if (widget.flag
-                                              .contains("profile_id")) {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => Profile(
-                                                  profileId:
-                                                      int.parse(widget.tagID),
-                                                  isOwner: widget.profileID ==
-                                                          int.parse(
-                                                              widget.tagID)
-                                                      ? true
-                                                      : false,
-                                                ),
-                                              ),
-                                            );
-                                          } else {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => Topic(
-                                                  topicId: widget.tagID,
-                                                  profileId: widget.profileID,
-                                                  isOwner: false,
-                                                ),
-                                              ),
-                                            );
-                                          }
-                                        }),
-                                  TextSpan(
-                                    text: secondHalf,
-                                    style: TextStyle(color: Colors.black),
-                                  )
-                                ],
                               ),
-                            )
+                  )
                   // : AutoSizeText(
                   //     this.comment,
                   //     // "{\"post retrieved\": \"success\"}",
