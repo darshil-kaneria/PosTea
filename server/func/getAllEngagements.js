@@ -35,7 +35,7 @@ const getAllEngagements = async (profile_id, connection) => {
             var postIDs = "(";
             for (var i = 0; i < result.length; i++) {
                 if (i == result.length - 1) {
-                    postIDs = postIDs + String(result[i]['post_id']) + ")";
+                    postIDs = postIDs + String(result[i]['post_id']) + ") ORDER BY u.creation_date DESC";
                 } else {
                     postIDs = postIDs + String(result[i]['post_id']) + ", ";
                 }
