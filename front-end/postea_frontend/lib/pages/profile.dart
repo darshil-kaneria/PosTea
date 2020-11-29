@@ -67,7 +67,8 @@ class _ProfileState extends State<Profile> {
         "http://postea-server.herokuapp.com/getAllPostsWithEngagement?profile_id=" +
             widget.profileId.toString();
 
-    http.get(url).then((resp) => {});
+    http.Response response = await http.get(url);
+    return json.decode(response.body);
   }
 
   getFollowing() async {
@@ -954,48 +955,108 @@ class _ProfileState extends State<Profile> {
                               width: screenWidth,
                               height: screenHeight / 1.41,
                               margin: EdgeInsets.only(top: 10),
-                              child: FutureBuilder(
-                                future: getUserPosts(widget.myPID),
-                                builder: (context, snapshot) {
-                                  if (snapshot.hasData &&
-                                      snapshot.data !=
-                                          "No posts made by this user") {
-                                    http.Response resp = snapshot.data;
-                                    var postData = json.decode(resp.body);
-                                    return ListView.builder(
-                                        itemCount: postData.length,
-                                        itemBuilder: (context, index) {
-                                          return PostTile(
-                                              postData[index]['post_id']
-                                                  .toString(),
-                                              postData[index]['profile_id']
-                                                  .toString(),
-                                              postData[index]
-                                                      ['post_description']
-                                                  .toString(),
-                                              postData[index]['topic_id']
-                                                  .toString(),
-                                              postData[index]['post_img']
-                                                  .toString(),
-                                              postData[index]['creation_date']
-                                                  .toString(),
-                                              postData[index]['post_likes']
-                                                  .toString(),
-                                              postData[index]['post_dislikes']
-                                                  .toString(),
-                                              postData[index]['post_comments']
-                                                  .toString(),
-                                              postData[index]['post_title']
-                                                  .toString(),
-                                              name.toString(),
-                                              profileId.toString(),
-                                              false);
-                                        });
-                                    // return ListView.builder(
-                                    //     itemCount: snapshot.data.length,
-                                    //     itemBuilder: (context, index) {});
+                              child: ValueListenableBuilder(
+                                valueListenable: viewEngagements,
+                                builder: (context, value, child) {
+                                  if (value) {
+                                    return FutureBuilder(
+                                      future: getAllPostsWithEngagements(),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasData &&
+                                            snapshot.data !=
+                                                "No posts made by this user") {
+                                          var postData = snapshot.data;
+                                          return ListView.builder(
+                                            itemCount: postData.length,
+                                            itemBuilder: (context, index) {
+                                              return PostTile(
+                                                  postData[index]['post_id']
+                                                      .toString(),
+                                                  postData[index]['profile_id']
+                                                      .toString(),
+                                                  postData[index]
+                                                          ['post_description']
+                                                      .toString(),
+                                                  postData[index]['topic_id']
+                                                      .toString(),
+                                                  postData[index]['post_img']
+                                                      .toString(),
+                                                  postData[index]
+                                                          ['creation_date']
+                                                      .toString(),
+                                                  postData[index]['post_likes']
+                                                      .toString(),
+                                                  postData[index]
+                                                          ['post_dislikes']
+                                                      .toString(),
+                                                  postData[index]
+                                                          ['post_comments']
+                                                      .toString(),
+                                                  postData[index]['post_title']
+                                                      .toString(),
+                                                  name.toString(),
+                                                  profileId.toString(),
+                                                  false);
+                                            },
+                                          );
+                                          // return ListView.builder(
+                                          //     itemCount: snapshot.data.length,
+                                          //     itemBuilder: (context, index) {});
+                                        } else {
+                                          return Container();
+                                        }
+                                      },
+                                    );
                                   } else {
-                                    return Container();
+                                    return FutureBuilder(
+                                      future: getUserPosts(widget.myPID),
+                                      builder: (context, snapshot) {
+                                        if (snapshot.hasData &&
+                                            snapshot.data !=
+                                                "No posts made by this user") {
+                                          http.Response resp = snapshot.data;
+                                          var postData = json.decode(resp.body);
+                                          return ListView.builder(
+                                            itemCount: postData.length,
+                                            itemBuilder: (context, index) {
+                                              return PostTile(
+                                                  postData[index]['post_id']
+                                                      .toString(),
+                                                  postData[index]['profile_id']
+                                                      .toString(),
+                                                  postData[index]
+                                                          ['post_description']
+                                                      .toString(),
+                                                  postData[index]['topic_id']
+                                                      .toString(),
+                                                  postData[index]['post_img']
+                                                      .toString(),
+                                                  postData[index]
+                                                          ['creation_date']
+                                                      .toString(),
+                                                  postData[index]['post_likes']
+                                                      .toString(),
+                                                  postData[index]
+                                                          ['post_dislikes']
+                                                      .toString(),
+                                                  postData[index]
+                                                          ['post_comments']
+                                                      .toString(),
+                                                  postData[index]['post_title']
+                                                      .toString(),
+                                                  name.toString(),
+                                                  profileId.toString(),
+                                                  false);
+                                            },
+                                          );
+                                          // return ListView.builder(
+                                          //     itemCount: snapshot.data.length,
+                                          //     itemBuilder: (context, index) {});
+                                        } else {
+                                          return Container();
+                                        }
+                                      },
+                                    );
                                   }
                                 },
                               ),
