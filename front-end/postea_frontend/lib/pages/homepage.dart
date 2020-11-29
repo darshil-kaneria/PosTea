@@ -1458,33 +1458,79 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                               flex: 1,
                               child: Container(
                                 width: screenWidth / 1.4,
-                                child: ListView.builder(
-                                  itemCount: notifList.length,
-                                  itemBuilder: (context, index) {
-                                    print(notifList[index]);
-                                    return FutureBuilder(
-                                      future: FirebaseStorageService.getImage(
-                                          context,
-                                          notifList[index]['senderID']),
-                                      builder: (context, snapshot) {
-                                        return ListTile(
-                                          leading: CircleAvatar(
-                                            backgroundImage:
-                                                NetworkImage(snapshot.data),
-                                          ),
-                                          title: Text(
-                                              notifList[index]['senderName']),
-                                          subtitle: Text(
-                                              notifList[index]['engagement']),
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
+                                height: screenHeight / 1.1,
+                                child: notifList.length == 0
+                                    ? Center(
+                                        child: Container(
+                                        margin: EdgeInsets.only(bottom: 100),
+                                        child: Text(
+                                            "You do not have any notifications!"),
+                                      ))
+                                    : ListView.builder(
+                                        itemCount: notifList.length,
+                                        itemBuilder: (context, index) {
+                                          print(notifList[index]);
+                                          return ListTile(
+                                            leading: FutureBuilder(
+                                              future: FirebaseStorageService
+                                                  .getImage(
+                                                      context,
+                                                      notifList[index]
+                                                          ['senderID']),
+                                              builder: (BuildContext context,
+                                                  AsyncSnapshot<dynamic>
+                                                      snapshot) {
+                                                if (snapshot.hasData) {
+                                                  return CircleAvatar(
+                                                    backgroundImage:
+                                                        NetworkImage(
+                                                            snapshot.data),
+                                                  );
+                                                } else {
+                                                  return CircularProgressIndicator(
+                                                    valueColor:
+                                                        AlwaysStoppedAnimation(
+                                                            bgGradEnd),
+                                                  );
+                                                }
+                                              },
+                                            ),
+                                            title: Text(
+                                                notifList[index]['senderName']),
+                                            subtitle: Text(
+                                                notifList[index]['engagement']),
+                                          );
+                                          // return FutureBuilder(
+                                          //   future: FirebaseStorageService.getImage(
+                                          //       context,
+                                          //       notifList[index]['senderID']),
+                                          //   builder: (context, snapshot) {
+                                          //     if (snapshot.hasData) {
+                                          //       return ListTile(
+                                          //         leading: CircleAvatar(
+                                          //           backgroundImage:
+                                          //               NetworkImage(snapshot.data),
+                                          //         ),
+                                          //         title: Text(
+                                          //             notifList[index]['senderName']),
+                                          //         subtitle: Text(
+                                          //             notifList[index]['engagement']),
+                                          //       );
+                                          //     } else {
+                                          //       return Center(
+                                          //         child: CircularProgressIndicator(
+                                          //           valueColor:
+                                          //               AlwaysStoppedAnimation(
+                                          //                   bgGradEnd),
+                                          //         ),
+                                          //       );
+                                          //     }
+                                          //   },
+                                          // );
+                                        },
+                                      ),
                               ),
                             ),
-                            Spacer(),
-                            Text("3s ago")
                           ],
                         ),
                       ),
