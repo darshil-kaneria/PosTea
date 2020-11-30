@@ -40,7 +40,11 @@ app.use(function (req, res, next) {
           } else {
             error = true;
           }
+        } else {
+          error = true;
         }
+      } else {
+        error = true;
       }
       // If there is no auth header
       if (error) {
@@ -183,7 +187,7 @@ app.route('/settings/:pID')
 .get((req, res) => {
   const handleGetSettings = fork('./func/get_settings.js');
   var data = {
-    profile: req.params.pID
+    profile_id: req.params.pID
   };
   handleGetSettings.send(data);
   handleGetSettings.on("message", message => res.send(message));

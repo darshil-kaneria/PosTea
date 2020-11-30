@@ -31,16 +31,19 @@ process.on("message", message => {
     var addSettingsQuery = "INSERT INTO user_settings (privacy, dark_theme, accessibility, profile_id, settings_id) VALUES ?";
     var values = [[privacy, dark_theme, accessibility, pid, settings_id]];
     return new Promise(function(resolve, reject) {
-      connection.query(selectQuery,[user],  function (err, result) {
+      connection.query(selectQuery,[pid], async function (err, result) {
         if (err) {
           reject(err.message);
         }
         try {
           if (result.length == 1) {
-            resolve("Account already exists");
+            reject("Account already exists");
           } else {
-            connection.query(addSettingsQuery, [values], function (err, result) {
-                resolve({"settings_id": settings_id});
+            await connection.query(addSettingsQuery, [values], function (err, result) {
+                if (err) {
+                    reject(err.message);
+                  }
+                resolve(result);
               });
           }
         }

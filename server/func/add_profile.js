@@ -38,7 +38,7 @@ process.on("message", message => {
         }
         try {
           if (result.length == 1) {
-            resolve("Account already exists");
+            reject("Account already exists");
           } else {
             connection.query(addProfileQuery, [values], function (err, result) {
               // if (err) {
