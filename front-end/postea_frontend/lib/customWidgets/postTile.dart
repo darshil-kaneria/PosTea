@@ -205,9 +205,10 @@ class _PostTileState extends State<PostTile> {
   Widget build(BuildContext context) {
     ValueNotifier<bool> isOwnerTopic = ValueNotifier<bool>(false);
     ValueNotifier<Color> like_color =
-        ValueNotifier<Color>(Theme.of(context).buttonColor);
+    ValueNotifier<Color>(Theme.of(context).buttonColor);
     ValueNotifier<Color> dislike_color =
-        ValueNotifier<Color>(Theme.of(context).buttonColor);
+    ValueNotifier<Color>(Theme.of(context).buttonColor);
+    ValueNotifier<String> isSensitiveVN = ValueNotifier<String>(widget.is_sensitive);
     int post_likes = int.parse(widget.post_likes);
     int post_dislikes = int.parse(widget.post_dislikes);
     int post_comments = int.parse(widget.post_comments);
@@ -315,40 +316,60 @@ class _PostTileState extends State<PostTile> {
                 border: Border(
               top: BorderSide(width: 0.5, color: Colors.grey),
             )),
-            child: ListTile(
-                onTap: () => {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => ExpandedPostTile(
-                            post_id,
-                            profile_id,
-                            post_description,
-                            topic_id,
-                            post_img,
-                            creation_date,
-                            post_likes.toString(),
-                            post_dislikes.toString(),
-                            post_comments.toString(),
-                            post_title,
-                            name,
-                            myPID,
-                            widget.is_sensitive,
-                            widget.isAccessibilityOn,
+            child: ValueListenableBuilder(
+              valueListenable: isSensitiveVN,
+              builder: (context, value, child) {
+                return ListTile(
+                  onTap: () => {
+                    if(isSensitiveVN.value != "1")
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ExpandedPostTile(
+                              post_id,
+                              profile_id,
+                              post_description,
+                              topic_id,
+                              post_img,
+                              creation_date,
+                              post_likes.toString(),
+                              post_dislikes.toString(),
+                              post_comments.toString(),
+                              post_title,
+                              name,
+                              myPID,
+                              widget.is_sensitive,
+                              widget.isAccessibilityOn,
+                            ),
                           ),
-                        ),
-                      )
+                        )
+                      },
+                  contentPadding:
+                      EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                  title: isSensitiveVN.value == "1"
+                      ? Text("")
+                      : Text(post_title,
+                          style: Theme.of(context).textTheme.headline2),
+                  subtitle: GestureDetector(
+                    child: Container(
+                      child: isSensitiveVN.value != "1" ? LinkWell(
+                        isSensitiveVN.value == "1" ? "" : post_description,
+                        style: Theme.of(context).textTheme.headline3,
+                      ) : Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                        Icon(Icons.announcement, color: Colors.red[300],),
+                        Padding(padding: EdgeInsets.only(left: 20),),
+                        Text("Sensitive Information.", style: TextStyle(color: Colors.red[300]),)
+                      ],),
+                    ),  
+                    onTap: () {
+                      isSensitiveVN.value = "0";
                     },
-                contentPadding:
-                    EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-                title: widget.is_sensitive == 1
-                    ? Text("")
-                    : Text(post_title,
-                        style: Theme.of(context).textTheme.headline2),
-                subtitle: LinkWell(
-                  widget.is_sensitive == 1 ? Text("") : post_description,
-                  style: Theme.of(context).textTheme.headline3,
-                )),
+                  ));
+              },
+              
+            ),
           ),
           Container(
               child: FutureBuilder(

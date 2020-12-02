@@ -79,7 +79,8 @@ class _PosTeaState extends State<PosTea> {
               fontSize: 15, fontWeight: FontWeight.bold, color: Colors.black),
           headline3: TextStyle(fontSize: 13, color: Colors.black),
           headline4: TextStyle(fontSize: 18, color: Colors.black),
-          headline5: TextStyle(fontSize: 16, color: Colors.black)),
+          headline5: TextStyle(fontSize: 16, color: Colors.black),
+          headline6: TextStyle(fontSize: 16, color: Colors.white),),
     );
 
     ThemeData darkTheme = ThemeData(
@@ -98,7 +99,8 @@ class _PosTeaState extends State<PosTea> {
               fontSize: 15, fontWeight: FontWeight.bold, color: Colors.white),
           headline3: TextStyle(fontSize: 13, color: Colors.white),
           headline4: TextStyle(fontSize: 18, color: Colors.white),
-          headline5: TextStyle(fontSize: 16, color: Colors.white)),
+          headline5: TextStyle(fontSize: 16, color: Colors.white),
+          headline6: TextStyle(fontSize: 16, color: Colors.white),)
     );
 
     return Consumer<ProcessTheme>(

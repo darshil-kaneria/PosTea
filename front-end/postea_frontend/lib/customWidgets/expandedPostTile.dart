@@ -178,12 +178,12 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
       ),
       floatingActionButton: FloatingActionButton.extended(
           backgroundColor: barrier,
-          icon: Icon(Icons.add),
+          icon: Icon(Icons.add, color: Theme.of(context).accentColor,),
           label: ValueListenableBuilder(
             valueListenable: comment_string,
             builder: (_, value, __) => Text(
               value.toString(),
-              style: TextStyle(fontSize: 15),
+              style: Theme.of(context).textTheme.headline6,
             ),
           ),
           onPressed: () async {
