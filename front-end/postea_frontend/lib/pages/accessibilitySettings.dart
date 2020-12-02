@@ -9,6 +9,7 @@ class AccessibilitySettings extends StatefulWidget {
 
 class _AccessibilitySettingsState extends State<AccessibilitySettings> {
   ValueNotifier<bool> accessibilityToggle = new ValueNotifier(false);
+  ValueNotifier<String> fontSize = new ValueNotifier("normal");
   Color accessibilityColor = Colors.redAccent[100].withOpacity(0.5);
   SharedPreferences prefs;
 
@@ -38,12 +39,12 @@ class _AccessibilitySettingsState extends State<AccessibilitySettings> {
     return Scaffold(
         extendBodyBehindAppBar: true,
         appBar: new AppBar(
-          iconTheme: IconThemeData(color: Colors.black),
+          iconTheme: IconThemeData(color: Theme.of(context).buttonColor),
           elevation: 0,
           backgroundColor: Colors.transparent,
           title: Text(
             "Security",
-            style: TextStyle(color: Colors.black),
+            style: Theme.of(context).textTheme.headline4,
           ),
         ),
         body: Container(
@@ -57,9 +58,14 @@ class _AccessibilitySettingsState extends State<AccessibilitySettings> {
                 child: Row(
                   children: [
                     Padding(
-                        padding: const EdgeInsets.only(right: 10),
-                        child: Icon(CupertinoIcons.volume_up)),
-                    Text("Turn on Text to Speech"),
+                      padding: const EdgeInsets.only(right: 10),
+                      child: Icon(
+                        CupertinoIcons.volume_up,
+                        color: Theme.of(context).buttonColor,
+                      ),
+                    ),
+                    Text("Turn on Text to Speech",
+                        style: Theme.of(context).textTheme.headline3),
                     Spacer(),
                     ValueListenableBuilder(
                       valueListenable: accessibilityToggle,
@@ -135,10 +141,83 @@ class _AccessibilitySettingsState extends State<AccessibilitySettings> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(right: 10),
-                      child: Icon(Icons.clear),
+                      child: Text(
+                        "A",
+                        style: TextStyle(
+                            fontSize: 25,
+                            fontWeight: FontWeight.bold,
+                            color: Theme.of(context).buttonColor),
+                      ),
                     ),
-                    Text("Clear Search History",
-                        style: TextStyle(fontSize: 20)),
+                    Text("Change Font Size",
+                        style: Theme.of(context).textTheme.headline3),
+                    Spacer(),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: InkWell(
+                        onTap: () {
+                          fontSize.value = "large";
+                        },
+                        child: ValueListenableBuilder(
+                          valueListenable: fontSize,
+                          builder: (context, value, child) {
+                            return Text(
+                              "A",
+                              style: TextStyle(
+                                  fontSize: 30,
+                                  fontWeight: FontWeight.bold,
+                                  color: value == "large"
+                                      ? Colors.blue
+                                      : Theme.of(context).buttonColor),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: InkWell(
+                        onTap: () {
+                          fontSize.value = "normal";
+                        },
+                        child: ValueListenableBuilder(
+                          valueListenable: fontSize,
+                          builder: (context, value, child) {
+                            return Text(
+                              "A",
+                              style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: value == "normal"
+                                      ? Colors.blue
+                                      : Theme.of(context).buttonColor),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: InkWell(
+                        onTap: () {
+                          fontSize.value = "small";
+                        },
+                        child: ValueListenableBuilder(
+                          valueListenable: fontSize,
+                          builder: (context, value, child) {
+                            return Text(
+                              "A",
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: value == "small"
+                                      ? Colors.blue
+                                      : Theme.of(context).buttonColor),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),
