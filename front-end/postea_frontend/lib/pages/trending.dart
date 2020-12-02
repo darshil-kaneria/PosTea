@@ -7,8 +7,9 @@ import '../colors.dart';
 
 class Trending extends StatefulWidget {
   int profileId;
+  bool isAccessibilityOn;
 
-  Trending({this.profileId});
+  Trending({this.profileId, this.isAccessibilityOn});
   @override
   _TrendingState createState() => _TrendingState();
 }
@@ -32,7 +33,10 @@ class _TrendingState extends State<Trending> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: new AppBar(
-        title: Text("Trending", style: Theme.of(context).textTheme.headline4,),
+        title: Text(
+          "Trending",
+          style: Theme.of(context).textTheme.headline4,
+        ),
         elevation: 0,
         backgroundColor: Colors.transparent,
         iconTheme: IconThemeData(color: Theme.of(context).buttonColor),
@@ -79,7 +83,8 @@ class _TrendingState extends State<Trending> {
                               trending.postList.elementAt(index).post_name,
                               widget.profileId.toString(),
                               0,
-                              trending.postList.elementAt(index).is_sensitive);
+                              trending.postList.elementAt(index).is_sensitive,
+                              widget.isAccessibilityOn);
                         },
                       );
                     } else {

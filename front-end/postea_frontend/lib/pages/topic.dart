@@ -12,6 +12,7 @@ import 'package:postea_frontend/main.dart';
 import 'package:postea_frontend/data_models/process_topic.dart';
 import 'package:http/http.dart' as http;
 import 'package:postea_frontend/pages/homepage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../colors.dart';
 
@@ -35,6 +36,9 @@ class _TopicState extends State<Topic> {
 
   TextEditingController topicNameController = new TextEditingController();
   TextEditingController topicDescController = new TextEditingController();
+
+  SharedPreferences prefs;
+  bool isAccessibilityOn = false;
 
   File topicPic;
   // var isOwner;
@@ -69,6 +73,8 @@ class _TopicState extends State<Topic> {
   Map<String, dynamic> topicInfo;
 
   getTopicInfo() async {
+    prefs = await SharedPreferences.getInstance();
+    isAccessibilityOn = prefs.getInt("accessibility") == 1;
     topic.getTopicInfo().then((value) {
       topicInfo = value;
       topicNameNotifier.value = topicInfo['name'];
@@ -484,7 +490,8 @@ class _TopicState extends State<Topic> {
                                   topic.postList.elementAt(index).post_name,
                                   widget.profileId.toString(),
                                   0,
-                                  topic.postList.elementAt(index).is_sensitive);
+                                  topic.postList.elementAt(index).is_sensitive,
+                                  isAccessibilityOn);
                             },
                           );
                         else

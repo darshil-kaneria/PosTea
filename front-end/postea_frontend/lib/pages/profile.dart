@@ -35,6 +35,7 @@ class _ProfileState extends State<Profile> {
   List<dynamic> listFollowing;
   SharedPreferences prefs;
   String username;
+  bool isAccessibilityOn = false;
 
   var _nameController = TextEditingController();
   var _biodataController = TextEditingController();
@@ -117,6 +118,7 @@ class _ProfileState extends State<Profile> {
 
   getProfile() async {
     prefs = await SharedPreferences.getInstance();
+    isAccessibilityOn = prefs.getInt("accessibility") == 1;
     username = prefs.getString('username') ?? "";
     var queryString;
     if (widget.isOwner) {
@@ -997,7 +999,9 @@ class _ProfileState extends State<Profile> {
                                                       .toString(),
                                                   profileId.toString(),
                                                   false,
-                                                  postData[index]['is_sensitive']);
+                                                  postData[index]
+                                                      ['is_sensitive'],
+                                                  isAccessibilityOn);
                                             },
                                           );
                                           // return ListView.builder(
@@ -1054,7 +1058,9 @@ class _ProfileState extends State<Profile> {
                                                   name.toString(),
                                                   profileId.toString(),
                                                   false,
-                                                  postData[index]['is_sensitive']);
+                                                  postData[index]
+                                                      ['is_sensitive'],
+                                                  isAccessibilityOn);
                                             },
                                           );
                                           // return ListView.builder(
@@ -1149,7 +1155,8 @@ class _ProfileState extends State<Profile> {
                                             name.toString(),
                                             profileId.toString(),
                                             false,
-                                            postMap[index]['is_sensitive']);
+                                            postMap[index]['is_sensitive'],
+                                            isAccessibilityOn);
                                       });
                                   // return ListView.builder(
                                   //     itemCount: snapshot.data.length,

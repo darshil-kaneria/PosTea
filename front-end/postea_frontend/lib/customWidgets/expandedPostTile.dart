@@ -26,6 +26,7 @@ class ExpandedPostTile extends StatefulWidget {
   var name;
   var myPID;
   var is_sensitive;
+  var isAccessibilityOn;
 
   List<String> comments;
 
@@ -42,7 +43,8 @@ class ExpandedPostTile extends StatefulWidget {
       this.post_title,
       this.name,
       this.myPID,
-      this.is_sensitive);
+      this.is_sensitive,
+      this.isAccessibilityOn);
 
   @override
   _ExpandedPostTileState createState() => _ExpandedPostTileState(
@@ -229,9 +231,9 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
                   name,
                   myPID,
                   1,
-                  widget.is_sensitive),
-            )
-            ,
+                  widget.is_sensitive,
+                  widget.isAccessibilityOn),
+            ),
             Container(
               height: screenHeight / 1.5,
               width: screenWidth,

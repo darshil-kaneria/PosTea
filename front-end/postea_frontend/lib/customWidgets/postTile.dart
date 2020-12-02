@@ -1,12 +1,13 @@
 import 'dart:convert';
 import 'dart:ui';
 
-import 'package:auto_size_text/auto_size_text.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+// import 'package:flutter_tts/flutter_tts_web.dart';
 import 'package:http/http.dart' as http;
 import 'package:postea_frontend/customWidgets/topic_pill.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 import '../colors.dart';
 import './expandedPostTile.dart';
@@ -32,6 +33,7 @@ class PostTile extends StatefulWidget {
   var myPID;
   var isExpanded;
   var is_sensitive;
+  var isAccessibilityOn;
 
   PostTile(
       this.post_id,
@@ -47,7 +49,8 @@ class PostTile extends StatefulWidget {
       this.name,
       this.myPID,
       this.isExpanded,
-      this.is_sensitive);
+      this.is_sensitive,
+      this.isAccessibilityOn);
 
   @override
   _PostTileState createState() => _PostTileState(
@@ -65,6 +68,8 @@ class PostTile extends StatefulWidget {
       this.myPID,
       this.isExpanded);
 }
+
+enum TtsState { playing, stopped, paused, continued }
 
 class _PostTileState extends State<PostTile> {
   var post_id;
@@ -109,6 +114,71 @@ class _PostTileState extends State<PostTile> {
     resp = await http.get(url);
     // print(resp.body);
     return resp;
+  }
+
+  FlutterTts tts = FlutterTts();
+  TtsState ttsState = TtsState.stopped;
+  String languages;
+
+  String voiceText = "";
+  double volume = 20.0;
+  double pitch = 1.0;
+  double rate = 1;
+
+  initTts() {
+    tts = FlutterTts();
+
+    tts.setStartHandler(() {
+      setState(() {
+        print("Playing");
+        ttsState = TtsState.playing;
+      });
+    });
+
+    tts.setCompletionHandler(() {
+      setState(() {
+        print("Complete");
+        ttsState = TtsState.stopped;
+      });
+    });
+
+    tts.setCancelHandler(() {
+      setState(() {
+        print("Cancel");
+        ttsState = TtsState.stopped;
+      });
+    });
+
+    tts.setErrorHandler((msg) {
+      setState(() {
+        print("error: $msg");
+        ttsState = TtsState.stopped;
+      });
+    });
+  }
+
+  Future speak() async {
+    await tts.setVolume(volume);
+    await tts.setSpeechRate(rate);
+    await tts.setPitch(pitch);
+
+    if (voiceText != null) {
+      if (voiceText.isNotEmpty) {
+        await tts.awaitSpeakCompletion(true);
+        await tts.speak(voiceText);
+      }
+    }
+  }
+
+  Future stop() async {
+    var result = await tts.stop();
+    if (result == 1) setState(() => ttsState = TtsState.stopped);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    tts.stop();
   }
 
   Future<http.Response> getPostInfo() async {
@@ -248,22 +318,26 @@ class _PostTileState extends State<PostTile> {
             child: ListTile(
                 onTap: () => {
                       Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => ExpandedPostTile(
-                                  post_id,
-                                  profile_id,
-                                  post_description,
-                                  topic_id,
-                                  post_img,
-                                  creation_date,
-                                  post_likes.toString(),
-                                  post_dislikes.toString(),
-                                  post_comments.toString(),
-                                  post_title,
-                                  name,
-                                  myPID,
-                                  widget.is_sensitive)))
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ExpandedPostTile(
+                            post_id,
+                            profile_id,
+                            post_description,
+                            topic_id,
+                            post_img,
+                            creation_date,
+                            post_likes.toString(),
+                            post_dislikes.toString(),
+                            post_comments.toString(),
+                            post_title,
+                            name,
+                            myPID,
+                            widget.is_sensitive,
+                            widget.isAccessibilityOn,
+                          ),
+                        ),
+                      )
                     },
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 0, horizontal: 0),
@@ -451,7 +525,10 @@ class _PostTileState extends State<PostTile> {
                 ),
               ),
               IconButton(
-                icon: Icon(Icons.file_download),
+                icon: Icon(
+                  Icons.file_download,
+                  color: Theme.of(context).buttonColor,
+                ),
                 onPressed: () {
                   ProcessSavePost processSavePost = new ProcessSavePost(
                       post_title: post_title,
@@ -468,6 +545,19 @@ class _PostTileState extends State<PostTile> {
                   processSavePost.savePost();
                 },
               ),
+              widget.isAccessibilityOn
+                  ? IconButton(
+                      icon: Icon(CupertinoIcons.volume_up,
+                          color: Theme.of(context).buttonColor),
+                      onPressed: () {
+                        voiceText = post_description.toString();
+                        speak();
+                      },
+                    )
+                  : Container(
+                      width: 0,
+                      height: 0,
+                    ),
               Expanded(
                 child: Container(
                   padding: EdgeInsets.only(right: 15),

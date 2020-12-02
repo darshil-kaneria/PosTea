@@ -116,6 +116,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
       pref.setStringList('postIDList', post_id_list);
       pref.setStringList('topicIDList', topic_id_list);
       pref.setString('engagementInfo', json.encode(engagementInfo));
+      pref.setInt("accessibility", 0);
 
       // var val = pref.getString('engagementInfo');
       // List<dynamic> engagementInfoJSON = jsonDecode(val);
@@ -386,7 +387,10 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => Trending(profileId: widget.profileID)));
+                        builder: (_) => Trending(
+                            profileId: widget.profileID,
+                            isAccessibilityOn:
+                                pref.getInt("accessibility") == 1)));
               } else if (value == 3) {
                 Navigator.push(
                     context,
@@ -1077,9 +1081,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                                 timeLine.postList.elementAt(index).post_name,
                                 widget.profileID.toString(),
                                 0,
-                                timeLine.postList
-                                    .elementAt(index)
-                                    .is_sensitive);
+                                timeLine.postList.elementAt(index).is_sensitive,
+                                pref.getInt('accessibility') == 1);
                           }),
                     );
                     // } else
@@ -1440,9 +1443,8 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             onPressed: () {
                               pageController.jumpToPage(0);
                             }),
-                        Text(
-                          "Notifications",
-                          style: Theme.of(context).textTheme.headline4),
+                        Text("Notifications",
+                            style: Theme.of(context).textTheme.headline4),
                         Spacer(),
                       ],
                     ),
@@ -1458,78 +1460,75 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         valueListenable: showBadge,
                         builder: (context, value, child) {
                           return Container(
-                          width: screenWidth / 1.4,
-                          child: notifList.length == 0
-                              ? Center(
-                                  child: Container(
-                                  margin: EdgeInsets.only(bottom: 100),
-                                  child: Text(
-                                      "You do not have any notifications!"),
-                                ))
-                              : ListView.builder(
-                                  itemCount: notifList.length,
-                                  itemBuilder: (context, index) {
-                                    print(notifList[index]);
-                                    return ListTile(
-                                      leading: FutureBuilder(
-                                        future: FirebaseStorageService
-                                            .getImage(
-                                                context,
-                                                notifList[index]
-                                                    ['senderID']),
-                                        builder: (BuildContext context,
-                                            AsyncSnapshot<dynamic>
-                                                snapshot) {
-                                          if (snapshot.hasData) {
-                                            return CircleAvatar(
-                                              backgroundImage:
-                                                  NetworkImage(
-                                                      snapshot.data),
-                                            );
-                                          } else {
-                                            return CircularProgressIndicator(
-                                              valueColor:
-                                                  AlwaysStoppedAnimation(
-                                                      bgGradEnd),
-                                            );
-                                          }
-                                        },
-                                      ),
-                                      title: Text(
-                                          notifList[index]['senderName']),
-                                      subtitle: Text(
-                                          notifList[index]['engagement']),
-                                    );
-                                    // return FutureBuilder(
-                                    //   future: FirebaseStorageService.getImage(
-                                    //       context,
-                                    //       notifList[index]['senderID']),
-                                    //   builder: (context, snapshot) {
-                                    //     if (snapshot.hasData) {
-                                    //       return ListTile(
-                                    //         leading: CircleAvatar(
-                                    //           backgroundImage:
-                                    //               NetworkImage(snapshot.data),
-                                    //         ),
-                                    //         title: Text(
-                                    //             notifList[index]['senderName']),
-                                    //         subtitle: Text(
-                                    //             notifList[index]['engagement']),
-                                    //       );
-                                    //     } else {
-                                    //       return Center(
-                                    //         child: CircularProgressIndicator(
-                                    //           valueColor:
-                                    //               AlwaysStoppedAnimation(
-                                    //                   bgGradEnd),
-                                    //         ),
-                                    //       );
-                                    //     }
-                                    //   },
-                                    // );
-                                  },
-                                ),
-                        );
+                            width: screenWidth / 1.4,
+                            child: notifList.length == 0
+                                ? Center(
+                                    child: Container(
+                                    margin: EdgeInsets.only(bottom: 100),
+                                    child: Text(
+                                        "You do not have any notifications!"),
+                                  ))
+                                : ListView.builder(
+                                    itemCount: notifList.length,
+                                    itemBuilder: (context, index) {
+                                      print(notifList[index]);
+                                      return ListTile(
+                                        leading: FutureBuilder(
+                                          future:
+                                              FirebaseStorageService.getImage(
+                                                  context,
+                                                  notifList[index]['senderID']),
+                                          builder: (BuildContext context,
+                                              AsyncSnapshot<dynamic> snapshot) {
+                                            if (snapshot.hasData) {
+                                              return CircleAvatar(
+                                                backgroundImage:
+                                                    NetworkImage(snapshot.data),
+                                              );
+                                            } else {
+                                              return CircularProgressIndicator(
+                                                valueColor:
+                                                    AlwaysStoppedAnimation(
+                                                        bgGradEnd),
+                                              );
+                                            }
+                                          },
+                                        ),
+                                        title: Text(
+                                            notifList[index]['senderName']),
+                                        subtitle: Text(
+                                            notifList[index]['engagement']),
+                                      );
+                                      // return FutureBuilder(
+                                      //   future: FirebaseStorageService.getImage(
+                                      //       context,
+                                      //       notifList[index]['senderID']),
+                                      //   builder: (context, snapshot) {
+                                      //     if (snapshot.hasData) {
+                                      //       return ListTile(
+                                      //         leading: CircleAvatar(
+                                      //           backgroundImage:
+                                      //               NetworkImage(snapshot.data),
+                                      //         ),
+                                      //         title: Text(
+                                      //             notifList[index]['senderName']),
+                                      //         subtitle: Text(
+                                      //             notifList[index]['engagement']),
+                                      //       );
+                                      //     } else {
+                                      //       return Center(
+                                      //         child: CircularProgressIndicator(
+                                      //           valueColor:
+                                      //               AlwaysStoppedAnimation(
+                                      //                   bgGradEnd),
+                                      //         ),
+                                      //       );
+                                      //     }
+                                      //   },
+                                      // );
+                                    },
+                                  ),
+                          );
                         },
                       ),
                     ),

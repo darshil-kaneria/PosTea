@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:postea_frontend/colors.dart';
 import 'package:postea_frontend/data_models/process_theme.dart';
 import 'package:postea_frontend/pages/homepage.dart';
-import 'package:postea_frontend/pages/loggedIn.dart';
+// import 'package:postea_frontend/pages/loggedIn.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'data_models/timer.dart';
+// import 'data_models/timer.dart';
 // import 'pages/homepage.dart';
 import 'data_models/route_generator.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'pages/wrapper.dart';
-import './pages/login.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
