@@ -64,7 +64,6 @@ function getProfile(flag, user, connection) {
      if (result.length == 0) {
         resolve("Account does not exist");
       } else {
-        //console.log(result);
         resolve(result);
       }
       

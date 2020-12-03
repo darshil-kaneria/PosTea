@@ -1,68 +1,78 @@
 <!DOCTYPE html>
 <html>
-
 <head>
-    <h1>Postea App</h1>
-    <!-- <script type="text/javascript" src="index.js"></script> -->
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    Fore more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+  -->
+  <base href="/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="postea_frontend">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>postea_frontend</title>
+  <link rel="manifest" href="manifest.json">
 </head>
-
 <body>
-    <h2>Add a new User</h2>
-    <input id="newUser" placeholder="username"><br><br>
-    <button id="newUserBtn">Add User</button>
-    
-    <h2>Make a new Post</h2>
-    <!-- <input id="postID" placeholder="Post ID"> -->
-    <input id="profileID" placeholder="Profile ID">
-    <input id="topicID" placeholder="Topic ID">
-    <input id="likes" placeholder="Likes">
-    <input id="dislikes" placeholder="Dislikes"><br><br>
-    <input id="postTitle" placeholder="Post Title"><br><br>
-    <input id="text" placeholder="Enter your post"><br><br>
-    <input id="img" placeholder="Post image"><br><br>
-    <input id="topicText" placeholder="Enter topic to post to"><br><br>
-    <input id="postComments" placeholder="Comment"><br><br>
-    <button type="button" id="btn1">Make Post</button><br>
+  <!-- This script installs service_worker.js to provide PWA functionality to
+       application. For more information, see:
+       https://developers.google.com/web/fundamentals/primers/service-workers -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('flutter-first-frame', function () {
+        navigator.serviceWorker.register('flutter_service_worker.js?v=3788769055');
+      });
+    }
+  </script>
+  <!-- <script src="https://www.gstatic.com/firebasejs/7.5.0/firebase-app.js"></script> -->
 
-    <h2>Delete Post</h2>
-    <input id="deletePostID" placeholder="Post ID of post"><br><br>
-    <input id="deleteProfileID" placeholder="Profile ID related to post"><br><br>
-    <button id="deletePost">Delete Post</button><br>
+  <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-analytics.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.20.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/7.14.6/firebase-storage.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.1.1/firebase-auth.js"></script>
 
-    <h2>Create a new Topic</h2>
-    <input id="topic_id" placeholder="Enter Topic ID">
-    <input id="topic_creator_id" placeholder="Enter Topic Creator ID">
-    <input id="newTopicText" placeholder="Enter topic name"><br><br>
-    <input id="topic_description" placeholder="Enter topic description"><br><br>
-    <button id="btn2">Add Topic</button><br>
+  <!-- TODO: Add SDKs for Firebase products that you want to use
+       https://firebase.google.com/docs/web/setup#available-libraries -->
+  
+  
+  <script>
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    var firebaseConfig = {
+      apiKey: "AIzaSyBhSWOgP5NJ9wRCCIKgqTKDE4eJeqMvlfE",
+      authDomain: "postea-eabea.firebaseapp.com",
+      databaseURL: "https://postea-eabea.firebaseio.com",
+      projectId: "postea-eabea",
+      storageBucket: "postea-eabea.appspot.com",
+      messagingSenderId: "896343519724",
+      appId: "1:896343519724:web:b1e0270ab398dd51eb10c9",
+      measurementId: "G-K70VPR4JV8"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    firebase.analytics();
+  </script>
 
-    <h2>Add Profile</h2>
-    <input id="username" placeholder="Username"><br><br>
-    <input id="privateAcc" placeholder="is_private (1=Private)" type="number"><br><br> 
-    <input id="name" placeholder="Name" type="text"><br><br>
-    <input id="biodata" placeholder="Bio Data"><br><br>
-    <input id="profilePic" placeholder="Profile Picture"><br><br>
-    <button id="addProfile">Add Profile</button>
+</script>
 
-    <h2>Update Profile</h2>
-    <input id="original_username" placeholder="Username"><br><br>
-    <input id="update_privateAcc" placeholder="is_private (1=Private)" type="number"><br><br> 
-    <input id="update_name" placeholder="New Display Name" type="text"><br><br>
-    <input id="update_biodata" placeholder="New Bio Data"><br><br>
-    <input id="update_profilePic" placeholder="New Profile Picture"><br><br>
-    <button id="updateAddProfile">Update Profile</button>
-
-    <h2>Engagements</h2>
-    <input id="engagement_post_id" type="number" placeholder="Enter Post ID">
-    <input id="engagement_profile_id" type="number" placeholder="Enter Profile ID"><br><br>
-    <button id="likeBtn">Like</button>
-    <button id="dislikeBtn">Dislike</button><br><br>
-    <input id="engagement_comment" placeholder="Comment"><br><br>
-    <button id="commentBtn">Add Comment</button>
-
-    <script src="index.js"></script>
-
+  <script src="main.dart.js" type="application/javascript"></script>
+  <script src="main.dart.js" type="application/javascript"></script>
 </body>
-<!-- <script type="text/javascript" src="index.js"></script> -->
-
 </html>

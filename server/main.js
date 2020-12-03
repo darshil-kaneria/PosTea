@@ -6,17 +6,60 @@
  */
 const cluster = require('cluster');
 const express = require('express');
+const Clients = require("./clients")
 const app = express();
 app.use(express.static("dir"));
 app.use(express.json({limit: '2mb'}));
 const PORT = process.env.PORT || 23556;
 const numCPUs = require('os').cpus().length;
+var cors = require('cors');
+const ws = require('ws');
+const db = require('./func/db_connection.js');
+const { send } = require('process');
+var redis = db.redis_conn;
+const bearerToken = require('express-bearer-token');
 
 var lastWorkerPID = -1;
 
+app.use(bearerToken());
+app.use(function (req, res, next) {
+  try {
+    const TOKEN = process.env.TOKEN;
+      let error;
+
+      // Check if the received request has an authorization header
+      if (req.headers) {
+        if (req.headers.authorization) {
+          const splits = req.headers.authorization.split(' ');
+          if (splits.length === 2 && splits[0] === 'Bearer') {
+            if (splits[1] === TOKEN) {
+              error = false;
+            } else {
+              error = true;
+            }
+          } else {
+            error = true;
+          }
+        } else {
+          error = true;
+        }
+      } else {
+        error = true;
+      }
+      // If there is no auth header
+      if (error) {
+        res.status(401).send('Unauthorized!');
+      } else {
+        next();
+      } 
+  } catch (e) {
+    console.error(e);
+  }
+});
+
 if (cluster.isMaster) {
   console.log(`Master ${process.pid} is running`);
-
+  
   // Fork workers.
   for (let i = 0; i < numCPUs; i++) {
     cluster.fork();
@@ -27,15 +70,79 @@ if (cluster.isMaster) {
   });
 }
 else {
-  const fork = require("child_process").fork;
-app.get('/', (req, res)=>{
-    
-    console.log("request received on home");
-    const child = fork('./test_concurrency_one.js');
-    child.send({"number": parseInt(req.query.number)});
-    child.on("message", message => res.send(message));
+  const clients = new Clients();
+  const server = app.listen(PORT, ()=>console.log("listening on port "+PORT+", PID: "+process.pid));
+  var publisher = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
 
-});
+  app.use(cors({
+    origin: ["http://postea-server.herokuapp.com"],
+    credentials: true
+  }));
+
+  const fork = require("child_process").fork;
+
+  // Setup websocket for notifications and activity tab
+
+  const wsServer = new ws.Server({ noServer: true });
+  wsServer.on('connection', (ws) => {
+    console.log("Websocket initiated by: "+ws._socket.remoteAddress + " on PID: "+process.pid);
+    setInterval(ping, 30000);
+    var subscriber = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
+    var tm;
+    function ping() {
+      ws.send('__ping__');
+      tm = setTimeout(function () {  
+        subscriber.quit();
+      }, 5000);
+    }
+    function pong() {
+      clearTimeout(tm);
+    }
+    ws.on('message', (profile_id) => {
+      if(profile_id == "__pong__"){
+        pong();
+        return
+      }
+      if(clients.clientList[profile_id] == undefined){
+        clients.saveClient(profile_id, ws);
+        clients.clientList[profile_id].send("HELLO CLIENT");
+        subscriber.subscribe(String(profile_id));
+        console.log("Subscribed to: " + String(profile_id));
+      }
+    });
+    
+
+    subscriber.on("message", (channel, message) => {
+      var receivedMessage = JSON.parse(message);
+      var engagement = "";
+      if(receivedMessage['like_dislike'] == 1){
+        engagement = " liked your post.";
+      }
+      else if(receivedMessage['comment'] !== null){
+        engagement = " commented on your post.";
+      }
+      else if(receivedMessage['followReq'] == true){
+        engagement = " is following you.";
+      }
+      var sender = String(receivedMessage['senderClient']);
+      var senderName = String(receivedMessage['senderName']);
+      var sendJSON = {
+        "senderName": senderName,
+        "senderID": sender,
+        "engagement": engagement,
+        "postID": receivedMessage['postID']
+      };
+      var sendMessageJson = JSON.stringify(sendJSON);
+      ws.send(sendMessageJson);
+    });
+
+  });
+  
+  server.on('upgrade', (request, socket, head) => {
+    wsServer.handleUpgrade(request, socket, head, socket => {
+      wsServer.emit('connection', socket, request);
+    });
+  });
 
 /**
  * User endpoints
@@ -75,6 +182,27 @@ app.route('/profile/:pID?')
     handleUpdate.on("message", message => res.send(message));
   });
 
+// Settings methods
+app.route('/settings/:pID')
+.get((req, res) => {
+  const handleGetSettings = fork('./func/get_settings.js');
+  var data = {
+    profile_id: req.params.pID
+  };
+  handleGetSettings.send(data);
+  handleGetSettings.on("message", message => res.send(message));
+})
+.post((req, res) => {
+  const handleAddSettings = fork('./func/add_settings.js');
+  handleAddSettings.send(req.body);
+  handleAddSettings.on("message", message => res.send(message));
+})
+.put((req, res) => {
+  const handleUpdateSettings = fork('./func/update_settings.js');
+  handleUpdateSettings.send(req.body);
+  handleUpdateSettings.on("message", message => res.send(message));
+});
+
 // Post methods
 app.route("/post")
   .get((req, res) => {
@@ -109,15 +237,27 @@ app.route("/engagement")
   .post((req, res) => {
     const handleEngagements = fork('./func/add_engagement.js');
     handleEngagements.send(req.body);
-    handleEngagements.on("message", message => res.send(message));
-  });
-  // TODO
-  /*.delete((req, res)=> {
-    const handle = fork("./func/delete_engagement.js");
-    handle.send(req.body);
-    handle.on("message", message => res.send(message));
+    handleEngagements.on("message", message => {
+      
+      var publishInfo = {
+        "senderClient": req.body.engagement_profile_id,
+        "affectedClient": message['affectedClient'],
+        "senderName": message['senderName'],
+        "like_dislike": req.body.like_dislike,
+        "comment": req.body.comment,
+        "followReq": null,
+        "postID": req.body.engagement_post_id
+      }
 
-  });*/
+      var publishInfoJsonString = JSON.stringify(publishInfo);
+      publisher.publish(String(message['affectedClient']), publishInfoJsonString, function(){
+        console.log("Finished");
+        res.send(String(message));
+      });
+      // clients.clientList[message].send("YOU HAVE A MESSAGE FROM " + req.body.engagement_profile_id);
+      
+    });
+  });
 
 // Topic follow data methods
 app.route("/topicfollowdata")
@@ -140,7 +280,7 @@ app.route("/topicfollowdata")
   const handle = fork("./func/delete_topic_follower.js");
   handle.send(req.body);
   handle.on("message", message => res.send(message));
-})
+});
 
 // User Follow data methods
 app.route("/followdata")
@@ -156,7 +296,23 @@ app.route("/followdata")
   .post((req, res) => {
     const handle = fork("./func/add_followers.js");
     handle.send(req.body);
-    handle.on("message", message => res.send(message));
+    handle.on("message", message => {
+      var publisher = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
+      var publishInfo = {
+        "senderClient": req.body.profile_id,
+        "affectedClient": req.body.follower_id,
+        "senderName": String(message),
+        "like_dislike": null,
+        "comment": null,
+        "followReq": true,
+        "postID": null
+      }
+      console.log(message);
+      var publishInfoJsonString = JSON.stringify(publishInfo);
+      publisher.publish(String(req.body.follower_id), publishInfoJsonString, function(){
+        res.send(String(message));
+      });
+    });
   })
   .delete((req, res)=> {
     const handle = fork("./func/delete_followers.js");
@@ -164,6 +320,7 @@ app.route("/followdata")
     handle.on("message", message => res.send(message));
   });
 
+//Topic methods  
 app.route("/topic")
   .get((req, res) => {
     const handleTopics = fork("./func/get_topic.js");
@@ -182,7 +339,27 @@ app.route("/topic")
     const handtopic = fork('./func/delete_topic.js');
     handtopic.send(req.body);
     handtopic.on("message", message => res.send(message));
-  })
+  });
+
+app.route("/profileMode")
+    .post((req, res) => {
+      const handleProfileMode = fork('./func/update_profile_mode.js');
+      handleProfileMode.send(req.body);
+      handleProfileMode.on("message", message => res.send(message));
+    });
+
+// User methods
+app.route("/user")
+.post((req, res) => {
+  const handleUser = fork('./func/add_user.js');
+  handleUser.send(req.body);
+  handleUser.on("message", message => res.send(message));
+})
+.delete((req, res) => {
+  const handleUser = fork('./func/delete_user.js');
+  handleUser.send(req.body);
+  handleUser.on("message", message => res.send(message));
+})
 
 /**
  * Individual end points
@@ -196,12 +373,15 @@ app.get('/selectposts', (req, res) => {
     select.on("message", message => res.send(message));
   });
 
-// Add new user
-app.post('/adduser', (req, res) => {
-  const handlePosts = fork('./func/add_user.js');
-  handlePosts.send(req.body);
-  handlePosts.on("message", message => res.send(message));
-});
+// User Follow data methods
+app.get("/search",(req, res) =>{
+  const handle = fork("./func/search.js");
+  var data = {
+    text: req.query.text
+  }
+  handle.send(data);
+  handle.on("message", message => res.send(message));
+})
 
 // Add engagement for a comment
 app.post('/addcommeng', (req, res) => {
@@ -291,14 +471,48 @@ app.get("/refreshTopicTimeline", (req, res) => {
     topicID: req.query.topic_id,
     offset: req.query.post_offset,
     time: req.query.post_time
-  }
+  };
   handleTopicRefreshTimeline.send(data);
   handleTopicRefreshTimeline.on("message", message => {
     res.send(message);
   });
 });
 
-app.listen(PORT, ()=>console.log("listening on port "+PORT+", PID: "+process.pid));
+app.get("/getUserInfo", (req, res) => {
+  const handleGetUserInfo = fork("./func/getUserInfo.js");
+  var data = {
+    profile_id: req.query.profile_id
+  };
+  handleGetUserInfo.send(data);
+  handleGetUserInfo.on("message", message => res.send(message));
+});
+
+app.get("/getAllUserPosts", (req, res) => {
+  const handleGetAllUserPosts = fork("./func/getAllUserPosts.js");
+  var data = {
+    profile_id: req.query.profile_id
+  }
+  handleGetAllUserPosts.send(data);
+  handleGetAllUserPosts.on("message", message => res.send(message));
+});
+
+app.get("/getFollowingTopics", (req, res) => {
+  const handleGetFollowingTopics = fork("./func/getFollowingTopics.js");
+  var data = {
+    profile_id: req.query.profile_id
+  }
+  handleGetFollowingTopics.send(data);
+  handleGetFollowingTopics.on("message", message => res.send(message));
+});
+
+app.get("/getAllPostsWithEngagement", (req, res) => {
+  const handleGetAllEngagements = fork("./func/getAllEngagements");
+  var data = {
+    profile_id: req.query.profile_id
+  }
+  handleGetAllEngagements.send(data);
+  handleGetAllEngagements.on("message", message => res.send(message));
+});
 
 /**
  * Dev endpoints - use with caution.
@@ -325,9 +539,8 @@ app.get('/gettrending', (req, res) => {
     trending.send(data);
     trending.on("message", message => res.send(message));
 
-
-
 });
+
 if(cluster.worker.id == 2){
   var trendingInterval = setInterval(() => {
     console.log("retrieving trending posts...")

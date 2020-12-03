@@ -7,34 +7,38 @@ process.on("message", message => {
             return console.error('error: ' + err.message);
           }
           console.log('Database connection established');
-          getEngagement(message.post_id, connection).then((value)=> {
-                process.send(value);
-                connection.release();
-                process.exit();
-          }) .catch(function(result) {
+          await getPosts(message.profile_id, connection).then((result) => {
             process.send(result);
             connection.release();
             process.exit();
+          }).catch((reject) => {
+            process.send(reject);
+            connection.release();
+            process.exit();
           });
+          
         });
 });
 
-const getEngagement = async(postId, connection) => {
-    var query = "select * from engagement as e join profile as p where e.post_id = ? and p.profile_id = e.profile_id ";
-    console.log(postId);
+const getPosts = async(profile_id, connection) => {
+    var query = "SELECT * FROM user_post WHERE user_post.profile_id = " + String(profile_id) + " ORDER BY user_post.creation_date DESC";
     return new Promise(function(resolve, reject) {
-       connection.query(query,[postId],function(err, result)  {
+       connection.query(query, function(err, result)  {
             if (err) {
                 console.log("error:" + err.message);
                 reject(err.message);
             }
-            //console.log(result)
             if (result.length == 0) {
-                reject("Post does not exist");
+                console.log("No posts made by this user");
+                reject("No posts made by this user");
             } else {
-                console.log("Post retrieved");
+                console.log("Posts retrieved");
+                //console.log(result);
+                result = JSON.stringify(result);
+                result = JSON.parse(result);
                 console.log(result);
                 resolve(result);
+
                 // return result;  
             }
         });
