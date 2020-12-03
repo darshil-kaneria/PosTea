@@ -68,7 +68,9 @@ class ProcessTimeline {
                 "&post_time='" +
                 firstPostTime +
                 "'";
-        resp = await http.get(url);
+        resp = await http.get(url, headers: {
+            HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+          },);
 
         postRetrieved = true;
         print("POST RETRIEVED IS: " + postRetrieved.toString());
