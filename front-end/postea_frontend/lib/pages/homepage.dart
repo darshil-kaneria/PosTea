@@ -87,7 +87,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
         notifString.value = notif;
         notifList.add(notifMap);
         print("notif is: ");
-        print(notifList[0]['senderID']);
+        print(notifList[0]);
       } else {
         webSocketChannel.sink.add("__pong__");
         print("Sent pong");

@@ -205,10 +205,11 @@ class _PostTileState extends State<PostTile> {
   Widget build(BuildContext context) {
     ValueNotifier<bool> isOwnerTopic = ValueNotifier<bool>(false);
     ValueNotifier<Color> like_color =
-    ValueNotifier<Color>(Theme.of(context).buttonColor);
+        ValueNotifier<Color>(Theme.of(context).buttonColor);
     ValueNotifier<Color> dislike_color =
-    ValueNotifier<Color>(Theme.of(context).buttonColor);
-    ValueNotifier<String> isSensitiveVN = ValueNotifier<String>(widget.is_sensitive);
+        ValueNotifier<Color>(Theme.of(context).buttonColor);
+    ValueNotifier<String> isSensitiveVN =
+        ValueNotifier<String>(widget.is_sensitive);
     int post_likes = int.parse(widget.post_likes);
     int post_dislikes = int.parse(widget.post_dislikes);
     int post_comments = int.parse(widget.post_comments);
@@ -320,53 +321,69 @@ class _PostTileState extends State<PostTile> {
               valueListenable: isSensitiveVN,
               builder: (context, value, child) {
                 return ListTile(
-                  onLongPress: () {
-                    isSensitiveVN.value = "0";
-                  },
-                  onTap: () => {
-                    if(isSensitiveVN.value != "1")
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => ExpandedPostTile(
-                              post_id,
-                              profile_id,
-                              post_description,
-                              topic_id,
-                              post_img,
-                              creation_date,
-                              post_likes.toString(),
-                              post_dislikes.toString(),
-                              post_comments.toString(),
-                              post_title,
-                              name,
-                              myPID,
-                              widget.is_sensitive,
-                              widget.isAccessibilityOn,
+                    onLongPress: () {
+                      if (widget.isAccessibilityOn) {
+                        voiceText = post_description.toString();
+                        speak();
+                      }
+                      isSensitiveVN.value = "0";
+                    },
+                    onTap: () => {
+                          if (isSensitiveVN.value != "1")
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ExpandedPostTile(
+                                  post_id,
+                                  profile_id,
+                                  post_description,
+                                  topic_id,
+                                  post_img,
+                                  creation_date,
+                                  post_likes.toString(),
+                                  post_dislikes.toString(),
+                                  post_comments.toString(),
+                                  post_title,
+                                  name,
+                                  myPID,
+                                  widget.is_sensitive,
+                                  widget.isAccessibilityOn,
+                                ),
+                              ),
+                            )
+                        },
+                    contentPadding:
+                        EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                    title: isSensitiveVN.value == "1"
+                        ? Text("")
+                        : Text(post_title,
+                            style: Theme.of(context).textTheme.headline2),
+                    subtitle: Container(
+                      child: isSensitiveVN.value != "1"
+                          ? LinkWell(
+                              isSensitiveVN.value == "1"
+                                  ? ""
+                                  : post_description,
+                              style: Theme.of(context).textTheme.headline3,
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(
+                                  Icons.announcement,
+                                  color: Colors.red[300],
+                                ),
+                                Padding(
+                                  padding: EdgeInsets.only(left: 20),
+                                ),
+                                Text(
+                                  "Sensitive Information.",
+                                  style: TextStyle(color: Colors.red[300]),
+                                )
+                              ],
                             ),
-                          ),
-                        )
-                      },
-                  contentPadding:
-                      EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-                  title: isSensitiveVN.value == "1"
-                      ? Text("")
-                      : Text(post_title,
-                          style: Theme.of(context).textTheme.headline2),
-                  subtitle: Container(
-                    child: isSensitiveVN.value != "1" ? LinkWell(
-                      isSensitiveVN.value == "1" ? "" : post_description,
-                      style: Theme.of(context).textTheme.headline3,
-                    ) : Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                      Icon(Icons.announcement, color: Colors.red[300],),
-                      Padding(padding: EdgeInsets.only(left: 20),),
-                      Text("Sensitive Information.", style: TextStyle(color: Colors.red[300]),)
-                    ],),
-                  ));
+                    ));
               },
-              
             ),
           ),
           Container(
@@ -564,19 +581,6 @@ class _PostTileState extends State<PostTile> {
                   processSavePost.savePost();
                 },
               ),
-              widget.isAccessibilityOn
-                  ? IconButton(
-                      icon: Icon(CupertinoIcons.volume_up,
-                          color: Theme.of(context).buttonColor),
-                      onPressed: () {
-                        voiceText = post_description.toString();
-                        speak();
-                      },
-                    )
-                  : Container(
-                      width: 0,
-                      height: 0,
-                    ),
               Expanded(
                 child: Container(
                   padding: EdgeInsets.only(right: 15),
