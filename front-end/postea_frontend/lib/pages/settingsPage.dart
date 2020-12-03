@@ -6,6 +6,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/data_models/process_theme.dart';
 import 'package:postea_frontend/pages/accessibilitySettings.dart';
+import 'package:postea_frontend/pages/notificationsSettings.dart';
 import 'package:provider/provider.dart';
 import './login.dart';
 import '../data_models/delete_user.dart';
@@ -372,19 +373,27 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
               Container(
                 margin: EdgeInsets.only(top: 30),
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: Icon(Icons.notifications,
-                          color: Theme.of(context).buttonColor),
-                    ),
-                    Text("Notifications",
-                        style: Theme.of(context).textTheme.headline5),
-                    Spacer(),
-                    Icon(Icons.arrow_forward_ios,
-                        color: Theme.of(context).buttonColor)
-                  ],
+                child: InkWell(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => NotificationsSettings()));
+                  },
+                  child: Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(right: 10),
+                        child: Icon(Icons.notifications,
+                            color: Theme.of(context).buttonColor),
+                      ),
+                      Text("Notifications",
+                          style: Theme.of(context).textTheme.headline5),
+                      Spacer(),
+                      Icon(Icons.arrow_forward_ios,
+                          color: Theme.of(context).buttonColor)
+                    ],
+                  ),
                 ),
               ),
               Container(

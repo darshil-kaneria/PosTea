@@ -45,7 +45,7 @@ class _AccessibilitySettingsState extends State<AccessibilitySettings> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         title: Text(
-          "Security",
+          "Accessibility",
           style: Theme.of(context).textTheme.headline4,
         ),
       ),
