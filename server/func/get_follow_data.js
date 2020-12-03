@@ -67,6 +67,9 @@ const getFollowing = async(user_id, connection) => {
                 result = JSON.parse(result);
                 await convert_to_id_and_name("following", user_id, result, connection).then((value)=> {
                     result = value;
+                    if (result == "Requested relationship does not exist.") {
+                        reject("User following record does not exist");
+                    }
                 });
                 console.log("Following retrieved");
                 resolve(result);
@@ -94,6 +97,9 @@ const getFollowers = async(user_id, connection) => {
                 console.log(result);
                 await convert_to_id_and_name("followers", user_id, result, connection).then((value)=> {
                     result = value;
+                    if (result == "Requested relationship does not exist.") {
+                        reject("User followers record does not exist");
+                    }
                 });
                 console.log("Followers retrieved");
                 resolve(result);
@@ -124,6 +130,9 @@ const convert_to_id_and_name = async(flag, current_user, ids, connection) => {
     
     query1 = query1.substr(0, query1.length-2);
     console.log(query1);
+    if (query1.substr(query1.length-2, query1.length-1) != "?") {
+        return "Requested relationship does not exist.";
+    }
     console.log(profile_ids);
     return new Promise(function(resolve, reject) {
        connection.query(query1,profile_ids,function(err, result)  {
