@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/cupertino.dart';
@@ -111,7 +112,12 @@ class _PostTileState extends State<PostTile> {
     http.Response resp;
     var url = "http://postea-server.herokuapp.com/engagement?post_id=" +
         post_id.toString();
-    resp = await http.get(url);
+    resp = await http.get(
+      url,
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    );
     // print(resp.body);
     return resp;
   }
@@ -185,7 +191,12 @@ class _PostTileState extends State<PostTile> {
     var url =
         "http://postea-server.herokuapp.com/post?post_id=" + post_id.toString();
 
-    http.Response resp = await http.get(url);
+    http.Response resp = await http.get(
+      url,
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    );
 
     return resp;
   }
@@ -209,7 +220,7 @@ class _PostTileState extends State<PostTile> {
     ValueNotifier<Color> dislike_color =
         ValueNotifier<Color>(Theme.of(context).buttonColor);
     ValueNotifier<String> isSensitiveVN =
-        ValueNotifier<String>(widget.is_sensitive);
+        ValueNotifier<String>(widget.is_sensitive.toString());
     int post_likes = int.parse(widget.post_likes);
     int post_dislikes = int.parse(widget.post_dislikes);
     int post_comments = int.parse(widget.post_comments);
@@ -481,7 +492,11 @@ class _PostTileState extends State<PostTile> {
                             print(sendAnswer);
                             Future<http.Response> resp = http.post(
                                 'http://postea-server.herokuapp.com/engagement',
-                                headers: {'Content-Type': 'application/json'},
+                                headers: {
+                                  'Content-Type': 'application/json',
+                                  HttpHeaders.authorizationHeader:
+                                      "Bearer posteaadmin",
+                                },
                                 body: sendAnswer);
                           },
                         );
@@ -535,7 +550,11 @@ class _PostTileState extends State<PostTile> {
                         var sendAnswer = JsonEncoder().convert(data);
                         Future<http.Response> resp = http.post(
                             'http://postea-server.herokuapp.com/engagement',
-                            headers: {'Content-Type': 'application/json'},
+                            headers: {
+                              'Content-Type': 'application/json',
+                              HttpHeaders.authorizationHeader:
+                                  "Bearer posteaadmin",
+                            },
                             body: sendAnswer);
                       },
                     );

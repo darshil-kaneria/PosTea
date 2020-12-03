@@ -43,7 +43,11 @@ class _CreateTopicState extends State<CreateTopic> {
 
     print("sending " + topic_info_json.toString());
     http.Response response = await http.post(url,
-        headers: {"Content-Type": "application/json"}, body: topic_info_json);
+        headers: {
+          "Content-Type": "application/json",
+          HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+        },
+        body: topic_info_json);
 
     print(response.body);
 

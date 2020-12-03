@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
@@ -68,7 +69,12 @@ class _ProfileState extends State<Profile> {
         "http://postea-server.herokuapp.com/getAllPostsWithEngagement?profile_id=" +
             widget.profileId.toString();
 
-    http.Response response = await http.get(url);
+    http.Response response = await http.get(
+      url,
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    );
     return json.decode(response.body);
   }
 
@@ -76,11 +82,14 @@ class _ProfileState extends State<Profile> {
     prefs = await SharedPreferences.getInstance();
     widget.myPID = prefs.getInt('profileID') ?? 0;
     print("MY ID" + widget.profileId.toString());
-    http
-        .get("http://postea-server.herokuapp.com/followdata?profile_id=" +
-            widget.profileId.toString() +
-            "&flag=following_list")
-        .then((resp) {
+    http.get(
+      "http://postea-server.herokuapp.com/followdata?profile_id=" +
+          widget.profileId.toString() +
+          "&flag=following_list",
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    ).then((resp) {
       listFollowing = jsonDecode(resp.body);
       print("LIST FOLLOWING" + listFollowing.toString());
       for (int i = 0; i < listFollowing.length; i++) {
@@ -105,10 +114,13 @@ class _ProfileState extends State<Profile> {
       "update_profilePic": "random"
     });
 
-    http.Response resp = await http.post(
-        "http://postea-server.herokuapp.com/profile",
-        headers: {'Content-Type': 'application/json'},
-        body: sendAnswer);
+    http.Response resp =
+        await http.post("http://postea-server.herokuapp.com/profile",
+            headers: {
+              'Content-Type': 'application/json',
+              HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+            },
+            body: sendAnswer);
     print(resp.body);
     if (resp.statusCode == 200)
       print("success");
@@ -131,7 +143,12 @@ class _ProfileState extends State<Profile> {
           widget.profileId.toString();
     }
     print(username);
-    http.Response resp = await http.get(queryString);
+    http.Response resp = await http.get(
+      queryString,
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    );
     profile = jsonDecode(resp.body);
     setState(() {
       _nameController.text = profile["message"]["name"];
@@ -166,25 +183,27 @@ class _ProfileState extends State<Profile> {
   List<String> followerList = [];
 
   getCount() async {
-    http
-        .get(
+    http.get(
       "http://postea-server.herokuapp.com/followdata?profile_id=" +
           widget.profileId.toString() +
           "&flag=following_count",
-    )
-        .then((value) {
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    ).then((value) {
       var followingCount = jsonDecode(value.body);
 
       followingCountNotifier.value = followingCount['followingCount'];
       // followingCountNotifier.value
     });
-    http
-        .get(
+    http.get(
       "http://postea-server.herokuapp.com/followdata?profile_id=" +
           widget.profileId.toString() +
           "&flag=follower_count",
-    )
-        .then((value) {
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    ).then((value) {
       var followerCount = jsonDecode(value.body);
 
       followerCountNotifier.value = followerCount['followerCount'];
@@ -207,7 +226,12 @@ class _ProfileState extends State<Profile> {
     var url = "http://postea-server.herokuapp.com/getAllUserPosts?profile_id=" +
         widget.profileId.toString();
 
-    http.Response resp = await http.get(url);
+    http.Response resp = await http.get(
+      url,
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    );
     print("retrieved posts");
     // print(resp.body);
     return resp;
@@ -484,7 +508,9 @@ class _ProfileState extends State<Profile> {
                                               );
                                               request.headers.addAll({
                                                 'Content-Type':
-                                                    'application/json'
+                                                    'application/json',
+                                                HttpHeaders.authorizationHeader:
+                                                    "Bearer posteaadmin",
                                               });
                                               request.body = jsonEncode({
                                                 "profile_id": widget.myPID,
@@ -507,7 +533,10 @@ class _ProfileState extends State<Profile> {
                                                   "http://postea-server.herokuapp.com/followdata",
                                                   headers: {
                                                     'Content-Type':
-                                                        'application/json'
+                                                        'application/json',
+                                                    HttpHeaders
+                                                            .authorizationHeader:
+                                                        "Bearer posteaadmin",
                                                   },
                                                   body: addfollowingJson);
                                             }

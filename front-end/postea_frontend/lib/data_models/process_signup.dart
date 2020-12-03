@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -117,19 +119,19 @@ class ProcessSignUp {
             .child(username)
             .set(email);
 
-        var reqBody = JsonEncoder().convert({
-          "newUser": username
-        });
-        Response response = await post(
-          "http://postea-server.herokuapp.com/user",
-          headers: {'Content-Type': 'application/json'},
-          body: reqBody
-          );
+        var reqBody = JsonEncoder().convert({"newUser": username});
+        Response response =
+            await post("http://postea-server.herokuapp.com/user",
+                headers: {
+                  'Content-Type': 'application/json',
+                  HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+                },
+                body: reqBody);
 
-        if(response.statusCode == 200){
+        if (response.statusCode == 200) {
           print("FINISHED");
         }
-        
+
         return [errCode, errMsg];
         // Navigator.push(
         //     context, MaterialPageRoute(builder: (context) => LoggedIn()));

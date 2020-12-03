@@ -17,7 +17,11 @@ class EditProfile extends StatefulWidget {
   var profile_id;
 
   EditProfile(
-      {@required this.nameText, this.biodata, this.privacy, this.username, this.profile_id});
+      {@required this.nameText,
+      this.biodata,
+      this.privacy,
+      this.username,
+      this.profile_id});
 
   @override
   _EditProfileState createState() => _EditProfileState();
@@ -50,8 +54,10 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   Future uploadProfilePic(File file, String username) async {
-    StorageReference storageReference =
-        FirebaseStorage.instance.ref().child("profile").child(widget.profile_id.toString());
+    StorageReference storageReference = FirebaseStorage.instance
+        .ref()
+        .child("profile")
+        .child(widget.profile_id.toString());
     print("before query");
     await storageReference.putFile(file).onComplete;
     print("after query");
@@ -67,10 +73,13 @@ class _EditProfileState extends State<EditProfile> {
       "update_profilePic": "random"
     });
 
-    http.Response resp = await http.put(
-        "http://postea-server.herokuapp.com/profile",
-        headers: {'Content-Type': 'application/json'},
-        body: sendAnswer);
+    http.Response resp =
+        await http.put("http://postea-server.herokuapp.com/profile",
+            headers: {
+              'Content-Type': 'application/json',
+              HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+            },
+            body: sendAnswer);
     print(resp.body);
     if (resp.statusCode == 200)
       print("success");
@@ -250,7 +259,7 @@ class _EditProfileState extends State<EditProfile> {
                     child: Material(
                       color: Theme.of(context).accentColor,
                       shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
+                          borderRadius: BorderRadius.circular(20)),
                       child: ListTile(
                           title: Text("Private profile"),
                           trailing: Switch(

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
@@ -93,7 +94,9 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
     http.Response resp;
     var url = "http://postea-server.herokuapp.com/engagement?post_id=" +
         post_id.toString();
-    resp = await http.get(url);
+    resp = await http.get(url, headers: {
+      HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+    });
     return resp;
   }
 
@@ -103,6 +106,9 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
       "http://postea-server.herokuapp.com/followdata?profile_id=" +
           widget.profile_id.toString() +
           "&flag=following_list",
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
     );
     print("following list is " + json.decode(resp.body).toString());
 
@@ -110,8 +116,12 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
 
     print("hello before taking topic list");
     http.Response response = await http.get(
-        "http://postea-server.herokuapp.com/getFollowingTopics?profile_id=" +
-            widget.profile_id.toString());
+      "http://postea-server.herokuapp.com/getFollowingTopics?profile_id=" +
+          widget.profile_id.toString(),
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    );
     print("topic following list is " + json.decode(resp.body).toString());
 
     var topicFollowData = json.decode(response.body);
@@ -135,7 +145,12 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
     var url = "http://postea-server.herokuapp.com/getcomments?post_id=" +
         post_id.toString();
 
-    http.Response response = await http.get(url);
+    http.Response response = await http.get(
+      url,
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    );
     return response;
   }
 
@@ -178,7 +193,10 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
       ),
       floatingActionButton: FloatingActionButton.extended(
           backgroundColor: barrier,
-          icon: Icon(Icons.add, color: Theme.of(context).accentColor,),
+          icon: Icon(
+            Icons.add,
+            color: Theme.of(context).accentColor,
+          ),
           label: ValueListenableBuilder(
             valueListenable: comment_string,
             builder: (_, value, __) => Text(
@@ -204,7 +222,10 @@ class _ExpandedPostTileState extends State<ExpandedPostTile>
               var reqBodyJson = jsonEncode(reqBody);
               http
                   .post("http://postea-server.herokuapp.com/engagement",
-                      headers: {"Content-Type": "application/json"},
+                      headers: {
+                        "Content-Type": "application/json",
+                        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+                      },
                       body: reqBodyJson)
                   .then((value) => print(value.body));
             }

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
@@ -36,7 +37,12 @@ class _SettingsPageState extends State<SettingsPage> {
     queryString = "http://postea-server.herokuapp.com/profile/" +
         prefs.getInt('profileID').toString();
 
-    http.Response resp = await http.get(queryString);
+    http.Response resp = await http.get(
+      queryString,
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    );
     var profile = jsonDecode(resp.body);
     profileMode =
         profile["message"]["privacy"].toString().toLowerCase() == "true";
@@ -59,7 +65,11 @@ class _SettingsPageState extends State<SettingsPage> {
     });
 
     http.Response resp = await http.post(url,
-        headers: {'Content-Type': 'application/json'}, body: sendAnswer);
+        headers: {
+          'Content-Type': 'application/json',
+          HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+        },
+        body: sendAnswer);
     print(resp.body);
     if (resp.statusCode == 200)
       print("success");
@@ -529,15 +539,21 @@ class _SettingsPageState extends State<SettingsPage> {
                                                         Uri.parse(
                                                             "http://postea-server.herokuapp.com/user"),
                                                       );
-                                                      request.headers.addAll({
-                                                        'Content-Type':
-                                                            'application/json'
-                                                      });
-                                                      request.body =
-                                                          jsonEncode({
-                                                        "account_username":
-                                                            username,
-                                                      });
+                                                      request.headers.addAll(
+                                                        {
+                                                          'Content-Type':
+                                                              'application/json',
+                                                          HttpHeaders
+                                                                  .authorizationHeader:
+                                                              "Bearer posteaadmin",
+                                                        },
+                                                      );
+                                                      request.body = jsonEncode(
+                                                        {
+                                                          "account_username":
+                                                              username,
+                                                        },
+                                                      );
                                                       request.send();
                                                       Navigator.push(
                                                           context,

@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -32,8 +34,12 @@ class _TopicFollowingListState extends State<TopicFollowingList> {
     followingList = [];
     print("hello before taking topic list");
     http.Response resp = await http.get(
-        "http://postea-server.herokuapp.com/getFollowingTopics?profile_id=" +
-            widget.profileId.toString());
+      "http://postea-server.herokuapp.com/getFollowingTopics?profile_id=" +
+          widget.profileId.toString(),
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    );
     print("topic following list is " + json.decode(resp.body).toString());
     return resp;
   }
@@ -155,11 +161,18 @@ class _TopicFollowingListState extends State<TopicFollowingList> {
                                       Uri.parse(
                                           "http://postea-server.herokuapp.com/topicfollowdata"));
                                   request.headers.addAll(
-                                      {'Content-Type': 'application/json'});
-                                  request.body = jsonEncode({
-                                    "topic_id": topicIDs[index],
-                                    "follower_id": widget.profileId
-                                  });
+                                    {
+                                      'Content-Type': 'application/json',
+                                      HttpHeaders.authorizationHeader:
+                                          "Bearer posteaadmin",
+                                    },
+                                  );
+                                  request.body = jsonEncode(
+                                    {
+                                      "topic_id": topicIDs[index],
+                                      "follower_id": widget.profileId
+                                    },
+                                  );
                                   request.send();
                                 } else {
                                   buttonColor.value = Colors.redAccent[100];
@@ -174,7 +187,9 @@ class _TopicFollowingListState extends State<TopicFollowingList> {
                                   http.post(
                                       "http://postea-server.herokuapp.com/topicfollowdata",
                                       headers: {
-                                        'Content-Type': 'application/json'
+                                        'Content-Type': 'application/json',
+                                        HttpHeaders.authorizationHeader:
+                                            "Bearer posteaadmin",
                                       },
                                       body: addfollowingJson);
                                 }

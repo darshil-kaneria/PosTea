@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:postea_frontend/colors.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/customWidgets/customNavBar.dart';
+import 'package:postea_frontend/customWidgets/expandedPostTile.dart';
 import 'package:postea_frontend/customWidgets/postTile.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:postea_frontend/data_models/process_topic.dart';
@@ -96,10 +97,13 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   }
 
   getUserData() async {
-    http
-        .get("http://postea-server.herokuapp.com/getUserInfo?profile_id=" +
-            widget.profileID.toString())
-        .then((result) {
+    http.get(
+      "http://postea-server.herokuapp.com/getUserInfo?profile_id=" +
+          widget.profileID.toString(),
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    ).then((result) {
       var results = jsonDecode(result.body);
       // List<int> post_id_list = results['postIDs'].cast<int>();
 
@@ -210,12 +214,28 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     print(imgToUpload);
   }
 
+  getPost(String postID) async {
+    var url = "http://postea-server.herokuapp.com/post?post_id=" + postID;
+    http.Response response = await http.get(
+      url,
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    );
+    print("body is " + response.body.toString());
+    var body = json.decode(response.body);
+    return body;
+  }
+
   getFollowingList() async {
     print("hello before taking following data list");
     http.Response resp = await http.get(
       "http://postea-server.herokuapp.com/followdata?profile_id=" +
           widget.profileID.toString() +
           "&flag=following_list",
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
     );
     print("following list is " + json.decode(resp.body).toString());
 
@@ -223,8 +243,12 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
 
     print("hello before taking topic list");
     http.Response response = await http.get(
-        "http://postea-server.herokuapp.com/getFollowingTopics?profile_id=" +
-            widget.profileID.toString());
+      "http://postea-server.herokuapp.com/getFollowingTopics?profile_id=" +
+          widget.profileID.toString(),
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    );
     print("topic following list is " + json.decode(resp.body).toString());
 
     var topicFollowData = json.decode(response.body);
@@ -271,7 +295,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     print("sending" + reqBodyJson);
     http
         .post("http://postea-server.herokuapp.com/post",
-            headers: {"Content-Type": "application/json"}, body: reqBodyJson)
+            headers: {
+              "Content-Type": "application/json",
+              HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+            },
+            body: reqBodyJson)
         .then((value) => print(value.body));
   }
 
@@ -1445,7 +1473,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             }),
                         Text("Notifications",
                             style: Theme.of(context).textTheme.headline4),
-                        Spacer(),
                       ],
                     ),
                   ),
@@ -1464,15 +1491,78 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             child: notifList.length == 0
                                 ? Center(
                                     child: Container(
-                                    margin: EdgeInsets.only(bottom: 100),
-                                    child: Text(
-                                        "You do not have any notifications!"),
-                                  ))
+                                      margin: EdgeInsets.only(bottom: 100),
+                                      child: Text(
+                                          "You do not have any notifications!"),
+                                    ),
+                                  )
                                 : ListView.builder(
                                     itemCount: notifList.length,
                                     itemBuilder: (context, index) {
                                       print(notifList[index]);
                                       return ListTile(
+                                        onTap: () async {
+                                          if (notifList[index]['postID'] !=
+                                              null) {
+                                            var postData = await getPost(
+                                                notifList[index]['postID']
+                                                    .toString());
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    ExpandedPostTile(
+                                                  postData[0]['post_id']
+                                                      .toString(),
+                                                  postData[0]['profile_id']
+                                                      .toString(),
+                                                  postData[0]
+                                                          ['post_description']
+                                                      .toString(),
+                                                  postData[0]['topic_id']
+                                                      .toString(),
+                                                  postData[0]['post_img']
+                                                      .toString(),
+                                                  postData[0]['creation_date']
+                                                      .toString(),
+                                                  postData[0]['post_likes']
+                                                      .toString(),
+                                                  postData[0]['post_dislikes']
+                                                      .toString(),
+                                                  postData[0]['post_comments']
+                                                      .toString(),
+                                                  postData[0]['post_title']
+                                                      .toString(),
+                                                  postData[0]['name']
+                                                      .toString(),
+                                                  postData[0]['myPID']
+                                                      .toString(),
+                                                  postData[0]['is_sensitive'],
+                                                  postData[0]
+                                                          ['isAccessibilityOn']
+                                                      .toString(),
+                                                ),
+                                              ),
+                                            );
+                                          } else {
+                                            if (notifList[index]['engagement']
+                                                .toString()
+                                                .contains("following")) {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) => Profile(
+                                                    profileId: int.parse(
+                                                      notifList[index]
+                                                          ['senderID'],
+                                                    ),
+                                                    isOwner: false,
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          }
+                                        },
                                         leading: FutureBuilder(
                                           future:
                                               FirebaseStorageService.getImage(

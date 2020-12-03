@@ -31,14 +31,17 @@ class _OnboardingState extends State<Onboarding> {
     print(imgToUpload);
     setState(() {});
   }
+
   Future uploadProfilePic(File file, String profileID) async {
     if (file == null) {
       final assetImage =
           await rootBundle.load("assets/sample_images/default-big.png");
-      print("ASSET IMG IS: "+ assetImage.buffer.toString());
+      print("ASSET IMG IS: " + assetImage.buffer.toString());
       new File(
-          '${(await getApplicationDocumentsDirectory()).path}/sample_images/default-big.png').createSync(recursive: true);
-      final fileImg = File('${(await getApplicationDocumentsDirectory()).path}/sample_images/default-big.png');
+              '${(await getApplicationDocumentsDirectory()).path}/sample_images/default-big.png')
+          .createSync(recursive: true);
+      final fileImg = File(
+          '${(await getApplicationDocumentsDirectory()).path}/sample_images/default-big.png');
       print("FILE IMG IS: " + fileImg.path);
       await fileImg.writeAsBytes(assetImage.buffer
           .asUint8List(assetImage.offsetInBytes, assetImage.lengthInBytes));
@@ -233,7 +236,11 @@ class _OnboardingState extends State<Onboarding> {
 
                           Response response = await post(
                               "https://postea-server.herokuapp.com/profile",
-                              headers: {'Content-Type': 'application/json'},
+                              headers: {
+                                'Content-Type': 'application/json',
+                                HttpHeaders.authorizationHeader:
+                                    "Bearer posteaadmin",
+                              },
                               body: reqBody);
                           // print(response.statusCode);
 

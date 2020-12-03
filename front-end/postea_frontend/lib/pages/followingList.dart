@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -25,6 +27,9 @@ class _FollowingListState extends State<FollowingList> {
       "http://postea-server.herokuapp.com/followdata?profile_id=" +
           widget.profileId.toString() +
           "&flag=following_list",
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
     );
     print("following list is " + json.decode(resp.body).toString());
     return resp;

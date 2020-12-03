@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'post.dart';
 
@@ -36,7 +37,11 @@ class ProcessTopic {
     };
     var postTopicInfo = JsonEncoder().convert(topicInfo);
     http.Response response = await http.post(url,
-        headers: {'Content-Type': 'application/json'}, body: postTopicInfo);
+        headers: {
+          'Content-Type': 'application/json',
+          HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+        },
+        body: postTopicInfo);
 
     print(response.body);
 
@@ -46,7 +51,12 @@ class ProcessTopic {
   getTopicInfo() async {
     var url = "http://postea-server.herokuapp.com/topic?topic_id=" +
         topic_id.toString();
-    http.Response response = await http.get(url);
+    http.Response response = await http.get(
+      url,
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    );
 
     var topicInfo = jsonDecode(response.body);
 
@@ -71,7 +81,12 @@ class ProcessTopic {
                 topic_id.toString() +
                 "&post_offset=" +
                 offset.toString();
-        resp = await http.get(url);
+        resp = await http.get(
+          url,
+          headers: {
+            HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+          },
+        );
 
         postRetrieved = true;
         print("POST RETRIEVED IS: " + postRetrieved.toString());
@@ -101,7 +116,12 @@ class ProcessTopic {
                 "&post_time='" +
                 firstPostTime +
                 "'";
-        resp = await http.get(url);
+        resp = await http.get(
+          url,
+          headers: {
+            HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+          },
+        );
 
         postRetrieved = true;
         print("POST RETRIEVED IS: " + postRetrieved.toString());

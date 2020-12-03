@@ -1,5 +1,6 @@
 // import 'dart:html';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -79,7 +80,11 @@ class _LoginState extends State<Login> {
 
       print("hello from logInUser()");
       Response response = await get(
-          "http://postea-server.herokuapp.com/profile?username=" + username);
+        "http://postea-server.herokuapp.com/profile?username=" + username,
+        headers: {
+          HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+        },
+      );
       var respBody = jsonDecode(response.body);
       if (respBody.containsKey("Error")) {
         Navigator.push(

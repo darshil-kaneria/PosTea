@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -13,7 +14,12 @@ class ProcessSearch {
     String url =
         "http://postea-server.herokuapp.com/search?text=" + searchString;
 
-    http.Response response = await http.get(url);
+    http.Response response = await http.get(
+      url,
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    );
 
     var searchResults = jsonDecode(response.body);
 

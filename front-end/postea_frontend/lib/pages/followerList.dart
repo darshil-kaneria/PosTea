@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -33,6 +35,9 @@ class _FollowerListState extends State<FollowerList> {
       "http://postea-server.herokuapp.com/followdata?profile_id=" +
           widget.profileId.toString() +
           "&flag=follower_list",
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
     );
 
     print("follower data is " + json.decode(resp.body).toString());
@@ -43,11 +48,14 @@ class _FollowerListState extends State<FollowerList> {
     prefs = await SharedPreferences.getInstance();
     widget.myPID = prefs.getInt('profileID') ?? 0;
     print("MY ID" + widget.profileId.toString());
-    http
-        .get("http://postea-server.herokuapp.com/followdata?profile_id=" +
-            widget.profileId.toString() +
-            "&flag=following_list")
-        .then((resp) {
+    http.get(
+      "http://postea-server.herokuapp.com/followdata?profile_id=" +
+          widget.profileId.toString() +
+          "&flag=following_list",
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    ).then((resp) {
       listFollowing = jsonDecode(resp.body);
       print("LIST FOLLOWING" + listFollowing.toString());
       for (int i = 0; i < listFollowing.length; i++) {
@@ -165,7 +173,12 @@ class _FollowerListState extends State<FollowerList> {
                                         Uri.parse(
                                             "http://postea-server.herokuapp.com/followdata"));
                                     request.headers.addAll(
-                                        {'Content-Type': 'application/json'});
+                                      {
+                                        'Content-Type': 'application/json',
+                                        HttpHeaders.authorizationHeader:
+                                            "Bearer posteaadmin",
+                                      },
+                                    );
                                     request.body = jsonEncode(
                                       {
                                         "profile_id": widget.profileId,
@@ -186,7 +199,9 @@ class _FollowerListState extends State<FollowerList> {
                                     http.post(
                                         "http://postea-server.herokuapp.com/followdata",
                                         headers: {
-                                          'Content-Type': 'application/json'
+                                          'Content-Type': 'application/json',
+                                          HttpHeaders.authorizationHeader:
+                                              "Bearer posteaadmin",
                                         },
                                         body: addfollowingJson);
                                   }

@@ -89,7 +89,12 @@ class _TopicState extends State<Topic> {
       "DELETE",
       Uri.parse("http://postea-server.herokuapp.com/topic"),
     );
-    request.headers.addAll({'Content-Type': 'application/json'});
+    request.headers.addAll(
+      {
+        'Content-Type': 'application/json',
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    );
     request.body =
         jsonEncode({"topic_id": widget.topicId, "user_id": widget.profileId});
     await request.send();
@@ -104,7 +109,11 @@ class _TopicState extends State<Topic> {
     };
     var topicDataJson = JsonEncoder().convert(topicData);
     await http.post("http://postea-server.herokuapp.com/updateTopicDesc",
-        headers: {'Content-Type': 'application/json'}, body: topicDataJson);
+        headers: {
+          'Content-Type': 'application/json',
+          HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+        },
+        body: topicDataJson);
   }
 
   Future<http.Response> createNewTopic() async {
@@ -124,7 +133,11 @@ class _TopicState extends State<Topic> {
 
     print("sending " + topic_info_json.toString());
     http.Response response = await http.post(url,
-        headers: {"Content-Type": "application/json"}, body: topic_info_json);
+        headers: {
+          "Content-Type": "application/json",
+          HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+        },
+        body: topic_info_json);
 
     print(response.body);
 
@@ -162,7 +175,12 @@ class _TopicState extends State<Topic> {
         widget.profileId.toString() +
         "&flag=topic_list";
 
-    http.get(url).then((value) {
+    http.get(
+      url,
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    ).then((value) {
       var topicList = jsonDecode(value.body);
       print(value.body);
 
@@ -301,7 +319,10 @@ class _TopicState extends State<Topic> {
                                                                     "http://postea-server.herokuapp.com/topicfollowdata"));
                                                         request.headers.addAll({
                                                           'Content-Type':
-                                                              'application/json'
+                                                              'application/json',
+                                                          HttpHeaders
+                                                                  .authorizationHeader:
+                                                              "Bearer posteaadmin",
                                                         });
                                                         request.body =
                                                             jsonEncode({
@@ -332,7 +353,10 @@ class _TopicState extends State<Topic> {
                                                             "http://postea-server.herokuapp.com/topicfollowdata",
                                                             headers: {
                                                               'Content-Type':
-                                                                  'application/json'
+                                                                  'application/json',
+                                                              HttpHeaders
+                                                                      .authorizationHeader:
+                                                                  "Bearer posteaadmin",
                                                             },
                                                             body:
                                                                 addfollowingJson);
