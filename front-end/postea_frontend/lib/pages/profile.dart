@@ -78,14 +78,15 @@ class _ProfileState extends State<Profile> {
     print("MY ID" + widget.profileId.toString());
     http
         .get("http://postea-server.herokuapp.com/followdata?profile_id=" +
-            widget.profileId.toString() +
-            "&flag=following_list")
+            widget.myPID.toString() +
+            "&flag=follower_list")
         .then((resp) {
       listFollowing = jsonDecode(resp.body);
       print("LIST FOLLOWING" + listFollowing.toString());
       for (int i = 0; i < listFollowing.length; i++) {
-        // print()
-        if (listFollowing[i]['follower_id'] == widget.profileId) {
+        print(widget.profileId.toString());
+        if (listFollowing[i]['profile_id'].toString() == widget.profileId.toString()) {
+          print("HERE");
           isFollow = true;
           buttonColor = Colors.redAccent[100];
           isFollow = true;
