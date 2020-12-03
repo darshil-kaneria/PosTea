@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'post.dart';
@@ -20,7 +22,12 @@ class ProcessTrending {
 
   Future<http.Response> getPosts() async {
     var url = "http://postea-server.herokuapp.com/getTrendingPosts";
-    await http.get(url).then((value) async {
+    await http.get(
+      url,
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    ).then((value) async {
       resp = value;
       posts = jsonDecode(value.body);
       await processPosts();
@@ -29,12 +36,15 @@ class ProcessTrending {
   }
 
   processPosts() async {
+    print("THIS IS SOMETHING HARDCODED");
+    print(posts[0]);
     for (int i = 0; i < posts.length; i++) {
-      http.Response resp = await http.get(
-          "http://postea-server.herokuapp.com/profile/" +
-              posts[i]['profile_id'].toString());
-      Map<String, dynamic> profileJson = jsonDecode(resp.body);
+      // http.Response resp = await http.get(
+      //     "http://postea-server.herokuapp.com/profile/" +
+      //         posts[i]['profile_id'].toString());
+      // Map<String, dynamic> profileJson = jsonDecode(resp.body);
       // print(profileJson['message']['name']);
+
       Post newPost = Post(
           posts[i]['post_id'].toString(),
           posts[i]['profile_id'].toString(),
@@ -47,7 +57,8 @@ class ProcessTrending {
           posts[i]['post_dislikes'].toString(),
           posts[i]['post_comments'].toString(),
           posts[i]['post_title'].toString(),
-          profileJson['message']['name']
+          posts[i]['name'].toString(),
+          posts[i]['is_sensitive']
           // "Darshil Kaneria"
           );
       print(posts[i]['post_id']);

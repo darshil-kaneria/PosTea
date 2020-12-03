@@ -39,9 +39,21 @@ dependencies:
   custom_switch:
   google_fonts: ^1.1.1
   shared_preferences:
+  web_socket_channel: ^1.1.0
+  flutter_mentions:
   badges:
+  linkwell:
+  audioplayers: any
+  flutter_tts: ^1.3.0
+  flutter_launcher_icons: "^0.8.0"
+
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/sample_images/PosTeaIcon.png"
 
 dev_dependencies:
+  flutter_launcher_icons: "^0.8.0"
   flutter_test:
     sdk: flutter
 
@@ -49,6 +61,11 @@ dev_dependencies:
 # following page: https://dart.dev/tools/pub/pubspec
 # The following section is specific to Flutter.
 flutter:
+  assets: 
+    - assets/sample_images/default-big.png
+    - assets/audio/eventually-590.mp3
+    - assets/sample_images/PosTea.png
+    - assets/sample_images/PosTeaIcon.png
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.

@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:postea_frontend/colors.dart';
 import '../pages/topic.dart';
 
 class TopicPill extends StatefulWidget {
@@ -40,10 +42,13 @@ class _TopicPillState extends State<TopicPill> {
   var name = "";
   ValueNotifier<String> pillText = ValueNotifier<String>("");
   getTopicName() async {
-    http
-        .get("http://postea-server.herokuapp.com/topic?topic_id=" +
-            widget.topicId.toString())
-        .then((value) {
+    http.get(
+      "http://postea-server.herokuapp.com/topic?topic_id=" +
+          widget.topicId.toString(),
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    ).then((value) {
       var valueString = jsonDecode(value.body);
       pillText.value = valueString[0]['topic_name'];
       // setState(() {});
@@ -55,33 +60,33 @@ class _TopicPillState extends State<TopicPill> {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
 
-    return Container(
-      margin: EdgeInsets.only(top: 10, left: 10, right: 10),
-      height: widget.height,
-      width: widget.width,
-      decoration: BoxDecoration(
-          gradient: LinearGradient(colors: [widget.col1, widget.col2]),
-          borderRadius: BorderRadius.all(Radius.circular(50))),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (_) => Topic(
-                        profileId: widget.profileId,
-                        isOwner: widget.isOwner,
-                        topicId: widget.topicId,
-                      )));
-        },
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (_) => Topic(
+                      profileId: widget.profileId,
+                      isOwner: widget.isOwner,
+                      topicId: widget.topicId,
+                    )));
+      },
+      child: Container(
+        margin: EdgeInsets.only(top: 5, left: 5, right: 5),
+        height: widget.height,
+        width: widget.width,
+        decoration: BoxDecoration(
+            // border: Border.all(color: bgColor),
+            gradient: LinearGradient(colors: [widget.col1, widget.col2]),
+            borderRadius: BorderRadius.all(Radius.circular(50))),
         child: Center(
             child: ValueListenableBuilder(
-              valueListenable: pillText,
-              builder: (_, value, __) =>
-              AutoSizeText(
-          value,
-          style: TextStyle(fontSize: 15, color: Colors.white),
-        ),
-            )),
+          valueListenable: pillText,
+          builder: (_, value, __) => AutoSizeText(
+            value,
+            style: TextStyle(fontSize: 13, color: Colors.white),
+          ),
+        )),
       ),
     );
   }

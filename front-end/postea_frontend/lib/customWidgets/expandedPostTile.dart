@@ -1,10 +1,16 @@
 import 'dart:convert';
+import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_mentions/flutter_mentions.dart';
+import 'package:postea_frontend/colors.dart';
 import 'package:postea_frontend/customWidgets/postTile.dart';
+import 'package:postea_frontend/pages/followingList.dart';
 import 'package:postea_frontend/pages/profile.dart';
 import './comments.dart';
+import 'package:postea_frontend/colors.dart';
 import 'package:http/http.dart' as http;
 
 class ExpandedPostTile extends StatefulWidget {
@@ -20,6 +26,8 @@ class ExpandedPostTile extends StatefulWidget {
   var post_title;
   var name;
   var myPID;
+  var is_sensitive;
+  var isAccessibilityOn;
 
   List<String> comments;
 
@@ -35,7 +43,9 @@ class ExpandedPostTile extends StatefulWidget {
       this.post_comments,
       this.post_title,
       this.name,
-      this.myPID);
+      this.myPID,
+      this.is_sensitive,
+      this.isAccessibilityOn);
 
   @override
   _ExpandedPostTileState createState() => _ExpandedPostTileState(
@@ -53,7 +63,8 @@ class ExpandedPostTile extends StatefulWidget {
       this.myPID);
 }
 
-class _ExpandedPostTileState extends State<ExpandedPostTile> {
+class _ExpandedPostTileState extends State<ExpandedPostTile>
+    with TickerProviderStateMixin {
   var post_id;
   var profile_id;
   var post_description;
@@ -70,9 +81,11 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
   var myPID;
   var num_likes;
   var num_dislikes;
+  PageController pg = PageController();
   List<String> comments = [];
   ValueNotifier<String> comment_string = ValueNotifier<String>("Add comment");
-
+  ValueNotifier<bool> showNameSuggestions = new ValueNotifier(false);
+  var checkCommVal = false;
   Color like_color = Colors.black;
   Color dislike_color = Colors.black;
 
@@ -81,18 +94,67 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
     http.Response resp;
     var url = "http://postea-server.herokuapp.com/engagement?post_id=" +
         post_id.toString();
-    resp = await http.get(url);
-    // print(resp.body);
+    resp = await http.get(url, headers: {
+      HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+    });
     return resp;
   }
 
-  // commentsInfo() async {
-  //   Comments comments = new Comments(post_id);
-  //   await comments.getComments();
-  //   print("please print comments");
-  //   print(comments.comments);
-  // }
-    var commentController = TextEditingController();
+  getFollowingList() async {
+    print("hello before taking following data list");
+    http.Response resp = await http.get(
+      "http://postea-server.herokuapp.com/followdata?profile_id=" +
+          widget.profile_id.toString() +
+          "&flag=following_list",
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    );
+    print("following list is " + json.decode(resp.body).toString());
+
+    var followingData = json.decode(resp.body);
+
+    print("hello before taking topic list");
+    http.Response response = await http.get(
+      "http://postea-server.herokuapp.com/getFollowingTopics?profile_id=" +
+          widget.profile_id.toString(),
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    );
+    print("topic following list is " + json.decode(resp.body).toString());
+
+    var topicFollowData = json.decode(response.body);
+
+    var finalFollowData = [];
+    for (var i = 0; i < followingData.length; i++) {
+      finalFollowData.add(followingData[i]);
+    }
+
+    for (var i = 0; i < topicFollowData.length; i++) {
+      finalFollowData.add(topicFollowData[i]);
+    }
+
+    print("final follow data is " + finalFollowData.toString());
+
+    return finalFollowData;
+  }
+
+  Future<http.Response> getComments() async {
+    comments = [];
+    var url = "http://postea-server.herokuapp.com/getcomments?post_id=" +
+        post_id.toString();
+
+    http.Response response = await http.get(
+      url,
+      headers: {
+        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      },
+    );
+    return response;
+  }
+
+  var commentController = TextEditingController();
   _ExpandedPostTileState(
       this.post_id,
       this.profile_id,
@@ -109,344 +171,421 @@ class _ExpandedPostTileState extends State<ExpandedPostTile> {
 
   @override
   Widget build(BuildContext context) {
-    engagementInfo();
+    // engagementInfo();
 
     // commentsInfo();
 
     double screenWidth = MediaQuery.of(context).size.width;
-
+    double screenHeight = MediaQuery.of(context).size.height;
+    final slideController = AnimationController(
+        vsync: this, duration: Duration(milliseconds: 2000));
+    final slideAnimation =
+        Tween(begin: Offset(0, 0), end: Offset(1, 0)).animate(slideController);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if (checkCommVal == true) comment_string.value = "Edit Comment";
+    });
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      appBar: new AppBar(),
+      appBar: new AppBar(
+        backgroundColor: Theme.of(context).canvasColor,
+        elevation: 0,
+        iconTheme: IconThemeData(color: Theme.of(context).buttonColor),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+          backgroundColor: barrier,
+          icon: Icon(
+            Icons.add,
+            color: Theme.of(context).accentColor,
+          ),
+          label: ValueListenableBuilder(
+            valueListenable: comment_string,
+            builder: (_, value, __) => Text(
+              value.toString(),
+              style: Theme.of(context).textTheme.headline6,
+            ),
+          ),
+          onPressed: () async {
+            if (pg.page == 0.0) {
+              pg.animateToPage(1,
+                  duration: Duration(milliseconds: 100),
+                  curve: Curves.easeInQuad);
+              if (checkCommVal == true) comment_string.value = "Edit Comment";
+            } else {
+              var reqBody = {
+                "engagement_post_id": post_id,
+                "engagement_profile_id": myPID,
+                "like_dislike": null,
+                "comment":
+                    commentController.text == "" ? null : commentController.text
+              };
+
+              var reqBodyJson = jsonEncode(reqBody);
+              http
+                  .post("http://postea-server.herokuapp.com/engagement",
+                      headers: {
+                        "Content-Type": "application/json",
+                        HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+                      },
+                      body: reqBodyJson)
+                  .then((value) => print(value.body));
+            }
+          }),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       body: Container(
-        color: Colors.white,
-        child: Column(
+        color: Theme.of(context).canvasColor,
+        child: ListView(
+          scrollDirection: Axis.vertical,
           children: [
-            Expanded(
-                flex: 4,
-                child: PostTile(
-                    post_id,
-                    profile_id,
-                    post_description,
-                    topic_id,
-                    post_img,
-                    creation_date,
-                    post_likes,
-                    post_dislikes,
-                    post_comments,
-                    post_title,
-                    name,
-                    myPID))
-            // Expanded(
-            //   flex: 4,
-            //   child: Column(
-            //     children: [
-            //       Container(
-            //         width: MediaQuery.of(context).size.width,
-            //         child: Card(
-            //           margin: EdgeInsets.all(10),
-            //           child: ListTile(
-            //             leading: ,
-            //             title: Text(
-            //               post_id.toString(),
-            //               style: TextStyle(fontSize: 20),
-            //             ),
-            //             subtitle: Row(
-            //               children: [
-            //                 Icon(
-            //                   Icons.location_on,
-            //                   size: 15,
-            //                   color: Colors.grey,
-            //                 ),
-            //                 Text("with Darshil Kaneria")
-            //               ],
-            //             ),
-            //           ),
-            //         ),
-            //       ),
-            //       Container(
-            //         margin: EdgeInsets.symmetric(horizontal: 16),
-            //         padding: EdgeInsets.only(top: 8),
-            //         decoration: BoxDecoration(
-            //             border: Border(
-            //           top: BorderSide(width: 0.5, color: Colors.grey),
-            //         )),
-            //         child: Card(
-            //           child: ListTile(
-            //               contentPadding:
-            //                   EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-            //               title: Text(post_title,
-            //                   style: TextStyle(
-            //                       fontSize: 18, fontWeight: FontWeight.bold)),
-            //               subtitle: AutoSizeText(
-            //                 post_description,
-            //                 style: TextStyle(fontSize: 16, color: Colors.black),
-            //               )),
-            //         ),
-            //       )
-            //     ],
-            //   ),
-            // ),
-            // Expanded(
-            //   flex: 1,
-            //   child: Row(
-            //     children: [
-            //       Column(
-            //         children: [
-            //           IconButton(
-            //             icon: Icon(
-            //               Icons.thumb_up,
-            //               color: like_color,
-            //             ),
-            //             iconSize: 20,
-            //             onPressed: () {
-            //               like_or_dislike = "1";
-            //               setState(() {
-            //                 if (dislike_color == Colors.deepOrange[200]) {
-            //                   dislike_color = Colors.black;
-            //                 }
-            //                 if (like_color == Colors.deepOrange[200]) {
-            //                   like_color = Colors.black;
-            //                 } else
-            //                   like_color = Colors.deepOrange[200];
-            //               });
-            //               print(post_id);
-            //               print(profile_id);
-            //               print(like_or_dislike);
-            //               print(comment);
-            //               var data = {
-            //                 "engagement_post_id": post_id,
-            //                 "engagement_profile_id": profile_id,
-            //                 "like_dislike": like_or_dislike,
-            //                 "comment": comment
-            //               };
-            //               var sendAnswer = JsonEncoder().convert(data);
-            //               print(sendAnswer);
-            //               Future<http.Response> resp = http.post(
-            //                   'http://postea-server.herokuapp.com/engagement',
-            //                   headers: {'Content-Type': 'application/json'},
-            //                   body: sendAnswer);
-            //             },
-            //           ),
-            //           Text("15k",
-            //               style: TextStyle(
-            //                   fontWeight: FontWeight.bold, fontSize: 15))
-            //         ],
-            //       ),
-            //       Column(
-            //         children: [
-            //           IconButton(
-            //             icon: Icon(
-            //               Icons.thumb_down,
-            //               color: dislike_color,
-            //             ),
-            //             iconSize: 20,
-            //             onPressed: () {
-            //               setState(() {
-            //                 like_or_dislike = "0";
-            //                 if (like_color == Colors.deepOrange[200]) {
-            //                   like_color = Colors.black;
-            //                 }
-            //                 if (dislike_color == Colors.deepOrange[200]) {
-            //                   dislike_color = Colors.black;
-            //                 } else
-            //                   dislike_color = Colors.deepOrange[200];
-            //               });
-
-            //               var data = {
-            //                 "engagement_post_id": post_id,
-            //                 "engagement_profile_id": profile_id,
-            //                 "like_dislike": like_or_dislike,
-            //                 "comment": comment
-            //               };
-            //               var sendAnswer = JsonEncoder().convert(data);
-            //               Future<http.Response> resp = http.post(
-            //                   'http://postea-server.herokuapp.com/engagement',
-            //                   headers: {'Content-Type': 'application/json'},
-            //                   body: sendAnswer);
-            //             },
-            //           ),
-            //           Text(
-            //             "100",
-            //             style: TextStyle(
-            //                 fontWeight: FontWeight.bold, fontSize: 15),
-            //           )
-            //         ],
-            //       ),
-            //       IconButton(
-            //         alignment: Alignment.topCenter,
-            //         icon: Icon(Icons.comment),
-            //         iconSize: 20,
-            //         onPressed: () {},
-            //       ),
-            //       Expanded(
-            //         child: Container(
-            //           padding: EdgeInsets.only(right: 15),
-            //           alignment: Alignment.centerRight,
-            //           child: Text(
-            //             "3 hours ago",
-            //             style: TextStyle(color: Colors.grey),
-            //           ),
-            //         ),
-            //       )
-            //     ],
-            //   ),
-            // ),
-            ,
-            Expanded(
-              flex: 4,
-              child: PageView(children: [
-                Card(
-                    margin: EdgeInsets.only(top: 15, left: 15),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)),
-                    child: FutureBuilder(
-                      future: engagementInfo(),
-                      builder: (BuildContext context,
-                          AsyncSnapshot<dynamic> snapshot) {
-                            comments = [];
-                        if (snapshot.hasData) {
-                          bool myComm = false;
-                          var myCommId = 0;
-                          print("response");
-                          var engagements = jsonDecode(snapshot.data.body);
-                          print(engagements[0]['comment']);
-
-                          for (int i = 0; i < engagements.length; i++) {
-                            if (engagements[i]['comment'] == null) {
-                              continue;
-                            }
-                            print(engagements[i]['comment'].toString() != null && engagements[i]['profile_id'].toString() == myPID.toString());
-                            if(engagements[i]['comment'].toString() != null && engagements[i]['profile_id'].toString() == myPID.toString()){
-                              print("IN HERE");
-
-                              commentController.text = engagements[i]['comment'];
-                              comment_string.value = "Edit comment";
-                            }
-                            comments.add(engagements[i]['comment'].toString());
+            SlideTransition(
+              position: slideAnimation,
+              child: PostTile(
+                  post_id,
+                  profile_id,
+                  post_description,
+                  topic_id,
+                  post_img,
+                  creation_date,
+                  post_likes,
+                  post_dislikes,
+                  post_comments,
+                  post_title,
+                  name,
+                  myPID,
+                  1,
+                  widget.is_sensitive,
+                  widget.isAccessibilityOn),
+            ),
+            Container(
+              height: screenHeight / 1.5,
+              width: screenWidth,
+              margin: EdgeInsets.symmetric(vertical: 10, horizontal: 5),
+              child: PageView(
+                physics: NeverScrollableScrollPhysics(),
+                controller: pg,
+                children: [
+                  FutureBuilder(
+                    future: getComments(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<dynamic> snapshot) {
+                      comments = [];
+                      List<Map> commEngagement = [];
+                      if (snapshot.hasData &&
+                          snapshot.data.body != "Post does not exist") {
+                        bool myComm = false;
+                        var myCommId = 0;
+                        print("response");
+                        Map temp = {};
+                        var jsonDecodedEng = jsonDecode(snapshot.data.body);
+                        var engagements = jsonDecodedEng['message'];
+                        for (int i = 0; i < engagements.length; i++) {
+                          if (engagements[i]['comment'] == null) {
+                            continue;
                           }
 
-                          if (comments.length == 0 || comments == null) {
-                            return Container();
-                          }
+                          print(engagements[i]['comment'].toString() != null &&
+                              engagements[i]['profile_id'].toString() ==
+                                  myPID.toString());
+                          if (engagements[i]['comment'].toString() != null) {
+                            print("IN HERE");
 
-                          return ListView.builder(
-                              itemCount: comments.length,
-                              shrinkWrap: true,
-                              itemBuilder: (BuildContext context, int index) {
-                                print('in list view builder');
-                                print(comments.elementAt(index));
-                                return Comments(
-                                    comments.elementAt(index), "Darshil");
-                              });
-                        } else {
+                            // temp['profile_id'] = engagements[i]['profile_id'];
+
+                            // temp['name'] = engagements[i]['name'];
+
+                            // print("temp is " + temp.toString());
+                            print("engagements[i] is " +
+                                engagements[i].toString());
+                            if (engagements[i]['flag'].contains("Tag exists")) {
+                              commEngagement.add(
+                                {
+                                  "profile_id": engagements[i]['profile_id'],
+                                  "name": engagements[i]['name'],
+                                  "tag": engagements[i]['tag'],
+                                  "tag_id": engagements[i]['tag_id'],
+                                  "flag": engagements[i]['flag'],
+                                },
+                              );
+                            } else {
+                              commEngagement.add(
+                                {
+                                  "profile_id": engagements[i]['profile_id'],
+                                  "name": engagements[i]['name'],
+                                  "tag": null,
+                                  "tag_id": null,
+                                  "flag": engagements[i]['flag'],
+                                },
+                              );
+                            }
+
+                            print("commEngagement[i] is " +
+                                commEngagement.toString());
+                            commentController.text = engagements[i]['comment'];
+                            // comment_string.value = "Edit comment";
+                            checkCommVal = true;
+                          }
+                          comments.add(engagements[i]['comment'].toString());
+                        }
+
+                        if (comments.length == 0 || comments == null) {
                           return Container();
                         }
-                      },
-                    )
 
-                    // Column(
-                    //   crossAxisAlignment: CrossAxisAlignment.start,
-                    //   children: [
-                    //     Container(
-                    //       child: Comments("Today is a lovely day!", "Vidit Shah"),
-                    //     ),
-                    //     Divider(
-                    //       color: Colors.grey,
-                    //       indent: 20,
-                    //       endIndent: 20,
-                    //     ),
-                    //     Container(
-                    //       child: Comments(
-                    //           "I am grateful for everything that I have!",
-                    //           "Darshil Kaneria"),
-                    //       width: screenWidth,
-                    //     ),
-                    //     Divider(
-                    //       color: Colors.grey,
-                    //       indent: 20,
-                    //       endIndent: 20,
-                    //     ),
-                    //     Container(
-                    //       child: Comments(
-                    //           "This is a very beautiful day! I am loving it...",
-                    //           "Bharat Iyer"),
-                    //       width: screenWidth,
-                    //     ),
-                    //     Divider(
-                    //       color: Colors.grey,
-                    //       indent: 20,
-                    //       endIndent: 20,
-                    //     ),
-                    //     Container(
-                    //       child: Comments(
-                    //           "You have given me the best gift of my life!\nThank you very much",
-                    //           "Vaibbavi SK"),
-                    //     ),
-                    //     Divider(
-                    //       color: Colors.grey,
-                    //       indent: 20,
-                    //       endIndent: 20,
-                    //     ),
-                    //     Container(
-                    //       child: Comments(
-                    //           "Wishing you a very happy birthday!\nMay you succeed in all your endeavors!\nRock this day and the days to come!!",
-                    //           "Pooja Bhasker"),
-                    //     ),
-                    //     Divider(
-                    //       color: Colors.grey,
-                    //       indent: 20,
-                    //       endIndent: 20,
-                    //     ),
-                    //   ],
-                    // ),
-                    ),
-                Container(
-                  margin: EdgeInsets.only(left: 15, right: 15),
-                  child: TextField(
-                    controller: commentController,
-                    decoration: InputDecoration(labelText: "Your comment:"),
+                        return ListView.builder(
+                          itemCount: commEngagement.length,
+                          shrinkWrap: true,
+                          itemBuilder: (BuildContext context, int index) {
+                            print(commEngagement[index]);
+                            print("Now printing comment");
+                            print(comments.elementAt(index));
+                            if (comments.elementAt(index) == null) {
+                              return Container(
+                                width: 0,
+                                height: 0,
+                              );
+                            } else {
+                              if (commEngagement[index]['flag']
+                                  .contains("Tag exists")) {
+                                return Comments(
+                                  profileID: commEngagement[index]
+                                      ['profile_id'],
+                                  comment: comments.elementAt(index),
+                                  personName:
+                                      commEngagement[index]['name'].toString(),
+                                  flag:
+                                      commEngagement[index]['flag'].toString(),
+                                  tag: commEngagement[index]['tag'].toString(),
+                                  tagID: commEngagement[index]['tag_id']
+                                      .toString(),
+                                );
+                              } else {
+                                return Comments(
+                                  profileID: commEngagement[index]
+                                      ['profile_id'],
+                                  comment: comments.elementAt(index),
+                                  personName:
+                                      commEngagement[index]['name'].toString(),
+                                  flag:
+                                      commEngagement[index]['flag'].toString(),
+                                );
+                              }
+                            }
+                          },
+                        );
+                      } else {
+                        return Container();
+                      }
+                    },
                   ),
-                )
-              ]),
-            ),
-            Expanded(
-                flex: 1,
-                child: ButtonTheme(
-                  child: Container(
-                    width: MediaQuery.of(context).size.width / 2.6,
-                    height: MediaQuery.of(context).size.height / 2,
-                    child: RaisedButton(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20)),
-                      child: ValueListenableBuilder(
-                        valueListenable: comment_string,
-                        builder: (_, value, __) => Text(
-                          value.toString(),
-                          style: TextStyle(fontSize: 15),
+                  Container(
+                    margin: EdgeInsets.only(left: 15, right: 15),
+                    child: Column(
+                      children: [
+                        TextField(
+                          cursorColor: Theme.of(context).accentColor,
+                          style: Theme.of(context).textTheme.headline2,
+                          controller: commentController,
+                          onChanged: (text) {
+                            if (text.endsWith("@")) {
+                              showNameSuggestions.value = true;
+                            } else if (!text.contains("@")) {
+                              showNameSuggestions.value = false;
+                            }
+                          },
+                          decoration: InputDecoration(
+                              labelText: "Your comment:",
+                              labelStyle:
+                                  Theme.of(context).textTheme.headline1),
                         ),
-                      ),
-                      onPressed: () async {
-                        var reqBody = {
-                          "engagement_post_id": post_id,
-                          "engagement_profile_id": myPID,
-                          "like_dislike": null,
-                          "comment": commentController.text == "" ? null: commentController.text
-                        };
+                        Container(
+                          child: ValueListenableBuilder(
+                            valueListenable: showNameSuggestions,
+                            builder: (_, value, __) {
+                              var followingData = getFollowingList();
+                              if (value) {
+                                return FutureBuilder(
+                                  future: getFollowingList(),
+                                  builder: (context, snapshot) {
+                                    if (snapshot.hasData) {
+                                      var followingData = snapshot.data;
+                                      return Container(
+                                        width: screenWidth,
+                                        height: screenHeight / 2,
+                                        child: ListView.builder(
+                                          itemCount: followingData.length,
+                                          itemBuilder: (context, index) {
+                                            return ListTile(
+                                              onTap: () {
+                                                String currComment =
+                                                    commentController.text;
 
-                        var reqBodyJson = jsonEncode(reqBody);
-                        http.post(
-                          "http://postea-server.herokuapp.com/engagement",
-                          headers: {"Content-Type": "application/json"},
-                          body: reqBodyJson
-                        ).then((value) => print(value.body));
-                      },
+                                                int indexOfAt =
+                                                    currComment.indexOf("@");
+
+                                                if (followingData[index]
+                                                        ['username'] !=
+                                                    null) {
+                                                  if (indexOfAt ==
+                                                      currComment.length - 1) {
+                                                    commentController.text =
+                                                        commentController.text +
+                                                            followingData[index]
+                                                                ['username'];
+                                                  } else {
+                                                    commentController.text =
+                                                        commentController
+                                                            .text
+                                                            .replaceFirst(
+                                                                currComment.substring(
+                                                                    indexOfAt +
+                                                                        1,
+                                                                    currComment
+                                                                        .length),
+                                                                followingData[
+                                                                        index][
+                                                                    'username']);
+                                                  }
+                                                } else {
+                                                  if (indexOfAt ==
+                                                      currComment.length - 1) {
+                                                    commentController.text =
+                                                        commentController.text +
+                                                            followingData[index]
+                                                                ['topic_name'];
+                                                  } else {
+                                                    commentController.text =
+                                                        commentController
+                                                            .text
+                                                            .replaceFirst(
+                                                                currComment.substring(
+                                                                    indexOfAt +
+                                                                        1,
+                                                                    currComment
+                                                                        .length),
+                                                                followingData[
+                                                                        index][
+                                                                    'topic_name']);
+                                                  }
+                                                }
+                                              },
+                                              leading: FutureBuilder(
+                                                future: followingData[index]
+                                                            ['profile_id'] ==
+                                                        null
+                                                    ? FirebaseStorageService
+                                                        .getImage(
+                                                        context,
+                                                        followingData[index]
+                                                                ['topic_id']
+                                                            .toString(),
+                                                      )
+                                                    : FirebaseStorageService
+                                                        .getImage(
+                                                        context,
+                                                        followingData[index]
+                                                                ['profile_id']
+                                                            .toString(),
+                                                      ),
+                                                builder: (context,
+                                                    AsyncSnapshot<dynamic>
+                                                        snapshot) {
+                                                  if (snapshot.hasData) {
+                                                    return CircleAvatar(
+                                                      backgroundImage:
+                                                          NetworkImage(
+                                                              snapshot.data),
+                                                      maxRadius:
+                                                          screenWidth / 20,
+                                                    );
+                                                  } else {
+                                                    return CircleAvatar(
+                                                      backgroundImage: NetworkImage(
+                                                          "https://picsum.photos/250?image=18"),
+                                                    );
+                                                  }
+                                                },
+                                              ),
+                                              title: followingData[index]
+                                                          ['username'] ==
+                                                      null
+                                                  ? Text(followingData[index]
+                                                      ['topic_name'])
+                                                  : Text(
+                                                      followingData[index]
+                                                          ['username'],
+                                                    ),
+                                              subtitle: followingData[index]
+                                                          ['username'] ==
+                                                      null
+                                                  ? Text("Topic")
+                                                  : Text("Profile"),
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    } else {
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          valueColor:
+                                              AlwaysStoppedAnimation(bgGradEnd),
+                                        ),
+                                      );
+                                    }
+                                  },
+                                );
+                              } else {
+                                return Container();
+                              }
+                            },
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ))
+                ],
+              ),
+            ),
+            // ButtonTheme(
+            //   child: RaisedButton(
+            //     shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(20)),
+            //     child: ValueListenableBuilder(
+            //       valueListenable: comment_string,
+            //       builder: (_, value, __) => Text(
+            //         value.toString(),
+            //         style: TextStyle(fontSize: 15),
+            //       ),
+            //     ),
+            //     onPressed: () async {
+            //       var reqBody = {
+            //         "engagement_post_id": post_id,
+            //         "engagement_profile_id": myPID,
+            //         "like_dislike": null,
+            //         "comment": commentController.text == "" ? null: commentController.text
+            //       };
+
+            //       var reqBodyJson = jsonEncode(reqBody);
+            //       http.post(
+            //         "http://postea-server.herokuapp.com/engagement",
+            //         headers: {"Content-Type": "application/json"},
+            //         body: reqBodyJson
+            //       ).then((value) => print(value.body));
+            //     },
+            //   ),
+            // )
           ],
         ),
       ),
     );
+  }
+}
+
+class FirebaseStorageService extends ChangeNotifier {
+  FirebaseStorageService();
+  static Future<dynamic> getImage(BuildContext context, String image) async {
+    return await FirebaseStorage.instance
+        .ref()
+        .child("profile")
+        .child(image)
+        .getDownloadURL();
   }
 }

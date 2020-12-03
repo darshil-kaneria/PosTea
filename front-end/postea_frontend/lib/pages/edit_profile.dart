@@ -4,19 +4,24 @@ import 'package:custom_switch/custom_switch.dart';
 import 'package:flutter/material.dart';
 import 'package:postea_frontend/colors.dart';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'dart:io' as io;
-import 'package:file/file.dart';
+import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'package:postea_frontend/main.dart';
 
 class EditProfile extends StatefulWidget {
   var nameText;
   var biodata;
   bool privacy;
   var username;
-  io.File profilePic;
+  File profilePic;
+  var profile_id;
 
   EditProfile(
-      {@required this.nameText, this.biodata, this.privacy, this.username});
+      {@required this.nameText,
+      this.biodata,
+      this.privacy,
+      this.username,
+      this.profile_id});
 
   @override
   _EditProfileState createState() => _EditProfileState();
@@ -25,9 +30,8 @@ class EditProfile extends StatefulWidget {
 class _EditProfileState extends State<EditProfile> {
   var nameController = TextEditingController();
   var biodataController = TextEditingController();
-  io.File profilePic;
+  File profilePic;
   var _image;
-   
 
   @override
   void initState() {
@@ -49,10 +53,14 @@ class _EditProfileState extends State<EditProfile> {
     print(profilePic);
   }
 
-  Future uploadProfilePic(File file) async {
-    StorageReference storageReference =
-        FirebaseStorage.instance.ref().child("profile").child("testUpload2");
+  Future uploadProfilePic(File file, String username) async {
+    StorageReference storageReference = FirebaseStorage.instance
+        .ref()
+        .child("profile")
+        .child(widget.profile_id.toString());
+    print("before query");
     await storageReference.putFile(file).onComplete;
+    print("after query");
     print("Uploaded image to Firebase from edit profile");
   }
 
@@ -65,10 +73,13 @@ class _EditProfileState extends State<EditProfile> {
       "update_profilePic": "random"
     });
 
-    http.Response resp = await http.put(
-        "http://postea-server.herokuapp.com/profile",
-        headers: {'Content-Type': 'application/json'},
-        body: sendAnswer);
+    http.Response resp =
+        await http.put("http://postea-server.herokuapp.com/profile",
+            headers: {
+              'Content-Type': 'application/json',
+              HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+            },
+            body: sendAnswer);
     print(resp.body);
     if (resp.statusCode == 200)
       print("success");
@@ -83,7 +94,7 @@ class _EditProfileState extends State<EditProfile> {
     var profileImgName = widget.username.toString() + ".JPG";
     return SafeArea(
       child: Scaffold(
-        backgroundColor: bgColor,
+        backgroundColor: Theme.of(context).canvasColor,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -94,6 +105,7 @@ class _EditProfileState extends State<EditProfile> {
               Navigator.pop(context);
             },
           ),
+          iconTheme: IconThemeData(color: Theme.of(context).buttonColor),
         ),
         extendBodyBehindAppBar: false,
         body: SingleChildScrollView(
@@ -138,7 +150,7 @@ class _EditProfileState extends State<EditProfile> {
                                   )
                                 : FutureBuilder(
                                     future: FirebaseStorageService.getImage(
-                                        context, "tom_and_jerry.jpeg"),
+                                        context, widget.profile_id.toString()),
                                     builder: (context,
                                         AsyncSnapshot<dynamic> snapshot) {
                                       if (snapshot.hasData) {
@@ -185,9 +197,11 @@ class _EditProfileState extends State<EditProfile> {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Card(
+                  color: Theme.of(context).accentColor,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20)),
                   child: TextField(
+                    // style: Theme.of(context).textTheme.headline5,
                     controller: nameController,
                     decoration: InputDecoration(
                         floatingLabelBehavior: FloatingLabelBehavior.auto,
@@ -211,6 +225,7 @@ class _EditProfileState extends State<EditProfile> {
               Padding(
                 padding: const EdgeInsets.all(10.0),
                 child: Card(
+                  color: Theme.of(context).accentColor,
                   elevation: 1,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20)),
@@ -241,17 +256,22 @@ class _EditProfileState extends State<EditProfile> {
                     elevation: 1,
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20)),
-                    child: ListTile(
-                        title: Text("Private profile"),
-                        trailing: Switch(
-                            value: widget.privacy,
-                            activeTrackColor: Colors.deepOrange[200],
-                            activeColor: Colors.deepOrange[700],
-                            onChanged: (value) {
-                              setState(() {
-                                widget.privacy = value;
-                              });
-                            })),
+                    child: Material(
+                      color: Theme.of(context).accentColor,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20)),
+                      child: ListTile(
+                          title: Text("Private profile"),
+                          trailing: Switch(
+                              value: widget.privacy,
+                              activeTrackColor: Colors.deepOrange[200],
+                              activeColor: Colors.deepOrange[700],
+                              onChanged: (value) {
+                                setState(() {
+                                  widget.privacy = value;
+                                });
+                              })),
+                    ),
                   )),
               Padding(
                 padding: const EdgeInsets.all(10.0),
@@ -266,7 +286,7 @@ class _EditProfileState extends State<EditProfile> {
                     onPressed: () async {
                       await updateProfile();
                       print("profile pic is " + profilePic.toString());
-                      // await uploadProfilePic(profilePic);
+                      await uploadProfilePic(profilePic, widget.username);
                       Navigator.pop(context);
                     },
                     child: Text(

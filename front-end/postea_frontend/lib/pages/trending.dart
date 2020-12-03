@@ -7,8 +7,9 @@ import '../colors.dart';
 
 class Trending extends StatefulWidget {
   int profileId;
+  bool isAccessibilityOn;
 
-  Trending({this.profileId});
+  Trending({this.profileId, this.isAccessibilityOn});
   @override
   _TrendingState createState() => _TrendingState();
 }
@@ -32,41 +33,72 @@ class _TrendingState extends State<Trending> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: new AppBar(
-        title: Text("Trending"),
+        title: Text(
+          "Trending",
+          style: Theme.of(context).textTheme.headline4,
+        ),
         elevation: 0,
-        backgroundColor: Colors.brown[100],
+        backgroundColor: Colors.transparent,
+        iconTheme: IconThemeData(color: Theme.of(context).buttonColor),
       ),
       extendBodyBehindAppBar: false,
-      body: FutureBuilder(
-        future: getTopicContent(),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return ListView.builder(
-              physics: BouncingScrollPhysics(),
-              itemCount: trending.postList.length,
-              itemBuilder: (context, index) {
-                return PostTile(
-                    trending.postList.elementAt(index).post_id,
-                    trending.postList.elementAt(index).profile_id,
-                    trending.postList.elementAt(index).post_description,
-                    trending.postList.elementAt(index).topic_id,
-                    trending.postList.elementAt(index).post_img,
-                    trending.postList.elementAt(index).creation_date,
-                    trending.postList.elementAt(index).post_likes,
-                    trending.postList.elementAt(index).post_dislikes,
-                    trending.postList.elementAt(index).post_comments,
-                    trending.postList.elementAt(index).post_title,
-                    trending.postList.elementAt(index).post_name,
-                    widget.profileId.toString());
-              },
-            );
-          } else {
-            return Center(
-                child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation(bgGradEnd),
-            ));
-          }
-        },
+      body: Container(
+        margin: EdgeInsets.all(5),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Expanded(
+            //   flex: 1,
+            //   child: Container(
+            //     margin: EdgeInsets.only(top: 15, left: 15),
+            //     child: Text("Discover...",
+            //         style:
+            //             TextStyle(fontWeight: FontWeight.bold, fontSize: 30)),
+            //   ),
+            // ),
+            Expanded(
+              flex: 10,
+              child: Container(
+                child: FutureBuilder(
+                  future: getTopicContent(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return ListView.builder(
+                        physics: BouncingScrollPhysics(),
+                        itemCount: trending.postList.length,
+                        itemBuilder: (context, index) {
+                          return PostTile(
+                              trending.postList.elementAt(index).post_id,
+                              trending.postList.elementAt(index).profile_id,
+                              trending.postList
+                                  .elementAt(index)
+                                  .post_description,
+                              trending.postList.elementAt(index).topic_id,
+                              trending.postList.elementAt(index).post_img,
+                              trending.postList.elementAt(index).creation_date,
+                              trending.postList.elementAt(index).post_likes,
+                              trending.postList.elementAt(index).post_dislikes,
+                              trending.postList.elementAt(index).post_comments,
+                              trending.postList.elementAt(index).post_title,
+                              trending.postList.elementAt(index).post_name,
+                              widget.profileId.toString(),
+                              0,
+                              trending.postList.elementAt(index).is_sensitive,
+                              widget.isAccessibilityOn);
+                        },
+                      );
+                    } else {
+                      return Center(
+                          child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation(bgGradEnd),
+                      ));
+                    }
+                  },
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
