@@ -130,7 +130,7 @@ const convert_to_id_and_name = async(flag, current_user, ids, connection) => {
     
     query1 = query1.substr(0, query1.length-2);
     console.log(query1);
-    if (query1.substr(query1.length-2, query1.length-1) != "?") {
+    if (profile_ids.length == 0) {
         return "Requested relationship does not exist.";
     }
     console.log(profile_ids);
