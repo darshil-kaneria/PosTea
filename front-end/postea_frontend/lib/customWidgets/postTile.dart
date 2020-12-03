@@ -320,6 +320,9 @@ class _PostTileState extends State<PostTile> {
               valueListenable: isSensitiveVN,
               builder: (context, value, child) {
                 return ListTile(
+                  onLongPress: () {
+                    isSensitiveVN.value = "0";
+                  },
                   onTap: () => {
                     if(isSensitiveVN.value != "1")
                         Navigator.push(
@@ -350,22 +353,17 @@ class _PostTileState extends State<PostTile> {
                       ? Text("")
                       : Text(post_title,
                           style: Theme.of(context).textTheme.headline2),
-                  subtitle: GestureDetector(
-                    child: Container(
-                      child: isSensitiveVN.value != "1" ? LinkWell(
-                        isSensitiveVN.value == "1" ? "" : post_description,
-                        style: Theme.of(context).textTheme.headline3,
-                      ) : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                        Icon(Icons.announcement, color: Colors.red[300],),
-                        Padding(padding: EdgeInsets.only(left: 20),),
-                        Text("Sensitive Information.", style: TextStyle(color: Colors.red[300]),)
-                      ],),
-                    ),  
-                    onTap: () {
-                      isSensitiveVN.value = "0";
-                    },
+                  subtitle: Container(
+                    child: isSensitiveVN.value != "1" ? LinkWell(
+                      isSensitiveVN.value == "1" ? "" : post_description,
+                      style: Theme.of(context).textTheme.headline3,
+                    ) : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                      Icon(Icons.announcement, color: Colors.red[300],),
+                      Padding(padding: EdgeInsets.only(left: 20),),
+                      Text("Sensitive Information.", style: TextStyle(color: Colors.red[300]),)
+                    ],),
                   ));
               },
               

@@ -1,6 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:postea_frontend/data_models/process_theme.dart';
 
 class AccessibilitySettings extends StatefulWidget {
   @override
@@ -65,7 +67,7 @@ class _AccessibilitySettingsState extends State<AccessibilitySettings> {
                       ),
                     ),
                     Text("Turn on Text to Speech",
-                        style: Theme.of(context).textTheme.headline3),
+                        style: Theme.of(context).textTheme.headline5),
                     Spacer(),
                     ValueListenableBuilder(
                       valueListenable: accessibilityToggle,
@@ -150,13 +152,14 @@ class _AccessibilitySettingsState extends State<AccessibilitySettings> {
                       ),
                     ),
                     Text("Change Font Size",
-                        style: Theme.of(context).textTheme.headline3),
+                        style: Theme.of(context).textTheme.headline5),
                     Spacer(),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: InkWell(
                         onTap: () {
                           fontSize.value = "large";
+                          Provider.of<ProcessTheme>(context, listen: false).font_size(1.3);
                         },
                         child: ValueListenableBuilder(
                           valueListenable: fontSize,
@@ -179,6 +182,7 @@ class _AccessibilitySettingsState extends State<AccessibilitySettings> {
                       child: InkWell(
                         onTap: () {
                           fontSize.value = "normal";
+                          Provider.of<ProcessTheme>(context, listen: false).font_size(1);
                         },
                         child: ValueListenableBuilder(
                           valueListenable: fontSize,
@@ -201,6 +205,7 @@ class _AccessibilitySettingsState extends State<AccessibilitySettings> {
                       child: InkWell(
                         onTap: () {
                           fontSize.value = "small";
+                          Provider.of<ProcessTheme>(context, listen: false).font_size(0.7);
                         },
                         child: ValueListenableBuilder(
                           valueListenable: fontSize,
