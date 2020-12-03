@@ -17,7 +17,7 @@ process.on("message", message => {
 });
 
 const getPost = async (postId, connection) => {
-  var query = "SELECT * FROM user_post WHERE user_post.post_id = ?";
+  var query = "SELECT * FROM user_post as up, profile as p WHERE up.post_id = ? and up.profile_id = p.profile_id";
   return new Promise(async function (resolve, reject) {
     await connection.query(query, [postId], async function (err, result) {
       if (err) {
@@ -73,13 +73,13 @@ const getPost = async (postId, connection) => {
                 final_result = value;
               });
             } else {
-              result[i]["flag"] = "No tag";
+              // result[i]["flag"] = "No tag";
             }
           } else {
-            result[i]["flag"] = "No tag";
+            // result[i]["flag"] = "No tag";
           }
         } else {
-          result[i]["flag"] = "No tag";
+          // result[i]["flag"] = "No tag";
         }
       }
       final_result = JSON.stringify(final_result);

@@ -301,13 +301,13 @@ app.route("/followdata")
       var publishInfo = {
         "senderClient": req.body.profile_id,
         "affectedClient": req.body.follower_id,
-        "senderName": message,
+        "senderName": String(message),
         "like_dislike": null,
         "comment": null,
         "followReq": true,
         "postID": null
       }
-
+      console.log(message);
       var publishInfoJsonString = JSON.stringify(publishInfo);
       publisher.publish(String(req.body.follower_id), publishInfoJsonString, function(){
         res.send(String(message));
