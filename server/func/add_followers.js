@@ -57,8 +57,8 @@ process.on("message", message => {
                 nameResult = JSON.stringify(nameResult);
                 nameResult = JSON.parse(nameResult);
                 
-                name = nameResult[0]['name'];
-
+                name = String(nameResult[0]['name']);
+                console.log("Name is: "+name);
                 connection.query(addFollowerQuery, [values2], function (err, result) {
               
                   if (err) {
