@@ -75,7 +75,7 @@ else {
   var publisher = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
 
   app.use(cors({
-    origin: ["http://localhost:23556"],
+    origin: ["http://postea-server.herokuapp.com"],
     credentials: true
   }));
 
