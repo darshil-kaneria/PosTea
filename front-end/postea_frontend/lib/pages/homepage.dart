@@ -360,14 +360,14 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                 DrawerHeader(
                   child: Container(
                     margin: EdgeInsets.only(top: 50),
-                    child: Text(
-                      "Vidit Shah",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 30),
-                    ),
+                    // child: Text(
+                    //   "Vidit Shah",
+                    //   textAlign: TextAlign.center,
+                    //   style: TextStyle(
+                    //       color: Colors.white,
+                    //       fontWeight: FontWeight.bold,
+                    //       fontSize: 30),
+                    // ),
                   ),
                   decoration: BoxDecoration(color: Colors.purple[900]),
                 ),
