@@ -2,6 +2,8 @@
 
 PosTea is a social media platform which is actively being developed. It is aimed at providing the users with an environment where people with similar interests can gather at a topic and share their content. We do not want this to be our main goal though, so we have a more relaxed timeline where users can post without being subscribed to a topic and see posts from different users that they follow. The topic independence allows users to customize their timeline according to their tastes, be it a particular person or an entire topic. PosTea is currently accessible on Android and Web.
 
+<img src="design/login.png" width="250"> <img src="design/homepage.png" width="250"> <img src="design/homepage_dark.png" width="250">
+
 # How to install?
 
 We do not currently have an apk file for you to install. If you want to be a contributor to this repository, please contact **Darshil Kaneria** (@imemyself2 on GitHub).
