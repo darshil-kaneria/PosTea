@@ -94,7 +94,7 @@ else {
       tm = setTimeout(function () {  
         subscriber.quit();
         ws.close();
-      }, 5000);
+      }, 10000);
     }
     function pong() {
       clearTimeout(tm);
