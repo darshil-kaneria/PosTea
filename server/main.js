@@ -92,6 +92,7 @@ else {
     function ping() {
       ws.send('__ping__');
       tm = setTimeout(function () {  
+        console.log("Closing connection for "+ws._socket.remoteAddress);
         subscriber.quit();
         ws.close();
       }, 10000);

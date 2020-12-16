@@ -35,7 +35,7 @@ process.on("message", message => {
 });
 
 const addEngagement = async (dict, connection) => {
-  console.log(dict)
+  // console.log(dict)
   var existsQuery = "SELECT * FROM engagement WHERE post_id = " + String(dict.engagement_post_id) + " AND profile_id = " + String(dict.engagement_profile_id);
   var getAffectedClient = "select profile_id from user_post as up where post_id = "+String(dict.engagement_post_id);
   var engagementID = Math.floor(Math.random() * 100000);
@@ -59,7 +59,7 @@ const addEngagement = async (dict, connection) => {
 
       result = JSON.stringify(result);
       result = JSON.parse(result);
-      console.log(result)
+      // console.log(result)
       await connection.query(getAffectedClient, async (err, affectedResult) => {
         if(err){
           reject(err);
@@ -100,7 +100,7 @@ const addEngagement = async (dict, connection) => {
               }
     
               // Update in the user_post table accordingly
-              console.log("IN HERE");
+              // console.log("IN HERE");
               if(dict.like_dislike == "1"){
                 // add like to userpost
                 var updatequery = "UPDATE user_post SET post_likes = post_likes + 1 WHERE post_id = " + String(dict.engagement_post_id);
@@ -109,7 +109,7 @@ const addEngagement = async (dict, connection) => {
                     reject(err.message);
                   }
     
-                  console.log("Like updated in userpost");
+                  // console.log("Like updated in userpost");
                   resolve(result);
                 });
               }
@@ -121,7 +121,7 @@ const addEngagement = async (dict, connection) => {
                     reject(err.message);
                   }
     
-                  console.log("Dislike updated in userpost");
+                  // console.log("Dislike updated in userpost");
                   resolve(result);
                 });
     
@@ -134,13 +134,13 @@ const addEngagement = async (dict, connection) => {
                     reject(err.message);
                   }
     
-                  console.log("Comments updated in userpost");
+                  // console.log("Comments updated in userpost");
                   resolve(result);
                 });
     
               }
     
-              console.log("like dislike: "+dict.like_dislike+", comment: "+dict.comment);
+              // console.log("like dislike: "+dict.like_dislike+", comment: "+dict.comment);
     
             });
           }
@@ -152,7 +152,7 @@ const addEngagement = async (dict, connection) => {
                 if(err){
                   reject(err.message);
                 }
-                console.log(result);
+                // console.log(result);
                 resolve(result);
               });
             }
@@ -162,7 +162,7 @@ const addEngagement = async (dict, connection) => {
                 if(err){
                   reject(err.message);
                 }
-                console.log(result);
+                // console.log(result);
                 resolve(result);
               });
             }
@@ -189,7 +189,7 @@ const addEngagement = async (dict, connection) => {
             }
             else if(String(dict.like_dislike) == result[0]['like_or_dislike']){
               // Check unlike or undislike
-              console.log("SHOULD UNLIKE");
+              // console.log("SHOULD UNLIKE");
               var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.like_or_dislike = " + String(dict.like_dislike) + ", user_post.post_dislikes = user_post.post_dislikes + 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id);
               if(result[0]['like_or_dislike'] == "1"){
                 var updateQuery = "UPDATE engagement, user_post SET engagement.creation_date='" +curr_date+"', engagement.like_or_dislike = NULL, user_post.post_likes = user_post.post_likes - 1 WHERE engagement.post_id = " + String(dict.engagement_post_id) + " AND engagement.profile_id = " + String(dict.engagement_profile_id) + " AND user_post.post_id = "+String(dict.engagement_post_id);
