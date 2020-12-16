@@ -252,6 +252,7 @@ class _PostTileState extends State<PostTile> {
       ),
       margin: EdgeInsets.only(top: 8, left: 12, right: 12),
       clipBehavior: Clip.antiAlias,
+      elevation: 1,
       child: Column(
         children: [
           ListTile(
