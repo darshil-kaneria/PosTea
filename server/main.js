@@ -86,7 +86,7 @@ else {
   const wsServer = new ws.Server({ noServer: true });
   wsServer.on('connection', (ws) => {
     console.log("Websocket initiated by: "+ws._socket.remoteAddress + " on PID: "+process.pid);
-    setInterval(ping, 30000);
+    var main_tm = setInterval(ping, 30000);
     var subscriber = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
     var tm;
     function ping() {
@@ -96,6 +96,7 @@ else {
         subscriber.quit();
         ws.close();
         clearTimeout(tm);
+        clearInterval(main_tm);
       }, 10000);
     }
     function pong() {
