@@ -93,6 +93,7 @@ else {
       ws.send('__ping__');
       tm = setTimeout(function () {  
         subscriber.quit();
+        ws.close();
       }, 5000);
     }
     function pong() {
