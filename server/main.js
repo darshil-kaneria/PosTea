@@ -95,6 +95,7 @@ else {
         console.log("Closing connection for "+ws._socket.remoteAddress);
         subscriber.quit();
         ws.close();
+        clearTimeout(tm);
       }, 10000);
     }
     function pong() {
