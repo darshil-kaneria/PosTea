@@ -15,7 +15,7 @@ const numCPUs = require('os').cpus().length;
 var cors = require('cors');
 const ws = require('ws');
 const db = require('./func/db_connection.js');
-const { send } = require('process');
+const { send, kill } = require('process');
 var redis = db.redis_conn;
 const bearerToken = require('express-bearer-token');
 
@@ -73,6 +73,7 @@ else {
   const clients = new Clients();
   const server = app.listen(PORT, ()=>console.log("listening on port "+PORT+", PID: "+process.pid));
   var publisher = redis.createClient(process.env.REDISCLOUD_URL, {no_ready_check: true});
+  var kill_process = false;
 
   app.use(cors({
     origin: ["http://postea-server.herokuapp.com"],
@@ -97,6 +98,7 @@ else {
         ws.close();
         clearTimeout(tm);
         clearInterval(main_tm);
+        kill_process = true;
       }, 10000);
     }
     function pong() {
@@ -434,9 +436,12 @@ app.get("/refreshTimeline", (req, res) => {
   const handleRefreshTimeline = fork('./func/refreshTimeline.js');
   console.log("pid forked: "+handleRefreshTimeline.pid);
   var to = setTimeout(function(){
-    console.log('Killing process: '+handleRefreshTimeline.pid);
-    // res.send("Connection killed by server");
-    handleRefreshTimeline.kill();
+    if(kill_process == true){
+      console.log('Killing process: '+handleRefreshTimeline.pid);
+      // res.send("Connection killed by server");
+      handleRefreshTimeline.kill();
+    }
+    
   }, 9000);
   data = {
     profileID: req.query.profile_id,
@@ -467,9 +472,12 @@ app.get("/refreshTopicTimeline", (req, res) => {
   const handleTopicRefreshTimeline = fork('./func/refreshTopicTimeline.js');
   console.log("pid forked: "+ handleTopicRefreshTimeline.pid);
   var to = setTimeout(function(){
-    console.log('Killing process: '+ handleTopicRefreshTimeline.pid);
-    // res.send("Connection killed by server");
-    handleTopicRefreshTimeline.kill();
+    if(kill_process == true){
+      console.log('Killing process: '+ handleTopicRefreshTimeline.pid);
+      // res.send("Connection killed by server");
+      handleTopicRefreshTimeline.kill();
+    }
+    
   }, 9000);
   data = {
     topicID: req.query.topic_id,
