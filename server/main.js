@@ -94,21 +94,24 @@ else {
       ws.send('__ping__');
       tm = setTimeout(function () {  
         console.log("Closing connection for "+ws._socket.remoteAddress);
-        subscriber.quit();
-        ws.close();
         clearTimeout(tm);
         clearInterval(main_tm);
         kill_process = true;
+        subscriber.quit();
+        ws.close();
+        
       }, 10000);
     }
     function pong() {
       clearTimeout(tm);
     }
     ws.on('message', (profile_id) => {
-      if(profile_id == "__pong__"){
-        pong();
-        return
-      }
+      // if(profile_id == "__pong__"){
+      //   pong();
+      //   console.log("pong sent");
+      //   return
+      // }
+      pong();
       if(clients.clientList[profile_id] == undefined){
         clients.saveClient(profile_id, ws);
         clients.clientList[profile_id].send("HELLO CLIENT");
