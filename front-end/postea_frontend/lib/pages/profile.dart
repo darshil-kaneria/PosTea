@@ -195,9 +195,12 @@ class _ProfileState extends State<Profile> {
         HttpHeaders.authorizationHeader: "Bearer posteaadmin",
       },
     ).then((value) {
-      var followingCount = jsonDecode(value.body);
-
-      followingCountNotifier.value = followingCount['followingCount'];
+      if (value.body == "User following record does not exist") {
+        followingCountNotifier.value = 0;
+      } else {
+        var followingCount = jsonDecode(value.body);
+        followingCountNotifier.value = followingCount['followingCount'];
+      }
       // followingCountNotifier.value
     });
     http.get(
@@ -208,9 +211,12 @@ class _ProfileState extends State<Profile> {
         HttpHeaders.authorizationHeader: "Bearer posteaadmin",
       },
     ).then((value) {
-      var followerCount = jsonDecode(value.body);
-
-      followerCountNotifier.value = followerCount['followerCount'];
+      if (value.body == "User followers record does not exist") {
+        followerCountNotifier.value = 0;
+      } else {
+        var followerCount = jsonDecode(value.body);
+        followerCountNotifier.value = followerCount['followerCount'];
+      }
       // followingCountNotifier.value
     });
   }
@@ -685,36 +691,29 @@ class _ProfileState extends State<Profile> {
                                         future: getUserPosts(widget.myPID),
                                         builder: (context, snapshot) {
                                           if (snapshot.hasData) {
-                                            var firstPost = json.decode(
-                                                snapshot.data.body)[0];
-                                            return PostTile(
-                                                firstPost['post_id']
-                                                    .toString(),
-                                                firstPost['profile_id']
-                                                    .toString(),
-                                                firstPost[
-                                                        'post_description']
-                                                    .toString(),
-                                                firstPost['topic_id']
-                                                    .toString(),
-                                                firstPost['post_img']
-                                                    .toString(),
-                                                firstPost['creation_date']
-                                                    .toString(),
-                                                firstPost['post_likes']
-                                                    .toString(),
-                                                firstPost['post_dislikes']
-                                                    .toString(),
-                                                firstPost['post_comments']
-                                                    .toString(),
-                                                firstPost['post_title']
-                                                    .toString(),
+                                            print("snapshot has data");
+                                            if (snapshot.data.body == "No posts made by this user") {
+                                              print("no posts made by this user");
+                                              return Center(child: Text("You have not made any posts yet", style: Theme.of(context).textTheme.bodyText1),);
+                                            } else {
+                                              var firstPost = json.decode(snapshot.data.body)[0];
+                                              return PostTile(
+                                                firstPost['post_id'].toString(),
+                                                firstPost['profile_id'].toString(),
+                                                firstPost['post_description'].toString(),
+                                                firstPost['topic_id'].toString(),
+                                                firstPost['post_img'].toString(),
+                                                firstPost['creation_date'].toString(),
+                                                firstPost['post_likes'].toString(),
+                                                firstPost['post_dislikes'].toString(),
+                                                firstPost['post_comments'].toString(),
+                                                firstPost['post_title'].toString(),
                                                 name,
                                                 widget.myPID.toString(),
                                                 false,
-                                                firstPost['is_sensitive']
-                                                    .toString(),
+                                                firstPost['is_sensitive'].toString(),
                                                 false);
+                                            }
                                           } else {
                                             return Card(
                                                 shape:
@@ -849,8 +848,7 @@ class _ProfileState extends State<Profile> {
                                         padding: const EdgeInsets.only(
                                             left: 15,
                                             top: 15,
-                                            right: 15,
-                                            bottom: 8,),
+                                            right: 15),
                                         child: AutoSizeText(
                                           "Topics Followed",
                                           style: TextStyle(

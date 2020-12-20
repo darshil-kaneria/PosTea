@@ -20,6 +20,7 @@ import 'package:postea_frontend/data_models/timer.dart';
 import 'package:postea_frontend/main.dart';
 import 'package:postea_frontend/pages/create_topic.dart';
 import 'package:postea_frontend/pages/discoverTopics.dart';
+import 'package:postea_frontend/pages/exploreTopics.dart';
 import 'package:postea_frontend/pages/profile.dart';
 import 'package:postea_frontend/pages/settingsPage.dart';
 import 'package:postea_frontend/pages/trending.dart';
@@ -389,6 +390,25 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                   },
                 ),
                 ListTile(
+                  title: Text(
+                    "Create a New Topic",
+                    style: TextStyle(color: Theme.of(context).buttonColor),
+                  ),
+                  leading: Icon(
+                    Icons.add,
+                    size: 20,
+                    color: Theme.of(context).buttonColor,
+                  ),
+                  onTap: () async {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => CreateTopic(
+                                  profile_id: widget.profileID,
+                                )));
+                  },
+                ),
+                ListTile(
                   title: Text("Logout",
                       style: TextStyle(color: Theme.of(context).buttonColor)),
                   leading: Icon(
@@ -419,25 +439,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                             profileId: widget.profileID,
                             isAccessibilityOn:
                                 pref.getInt("accessibility") == 1)));
-              } else if (value == 3) {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (_) => CreateTopic(
-                              profile_id: widget.profileID,
-                            )));
-                // MaterialPageRoute(
-                //     builder: (_) => Topic(
-                //           profileId: widget.profileID,
-                //           isOwner: true,
-                //           topicId: "21",
-                //         )));
               } else if (value == 4) {
                 Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (_) => CreateTopic(
-                              profile_id: widget.profileID,
+                        builder: (_) => ExploreTopics(
                             )));
               } else if (value == 1)
                 // Making a post logic

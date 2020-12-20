@@ -9,6 +9,7 @@ import 'package:http/http.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:postea_frontend/colors.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:postea_frontend/pages/exploreTopics.dart';
 import 'package:postea_frontend/pages/homepage.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:path_provider/path_provider.dart';
@@ -24,6 +25,17 @@ class _OnboardingState extends State<Onboarding> {
   var nameController = TextEditingController();
   var bioController = TextEditingController();
   File imgToUpload;
+
+  Future uploadProfilePic2(File file, String username, String profileID) async {
+    StorageReference storageReference = FirebaseStorage.instance
+        .ref()
+        .child("profile")
+        .child(profileID);
+    print("before query");
+    await storageReference.putFile(file).onComplete;
+    print("after query");
+    print("Uploaded image to Firebase from onboarding");
+  }
 
   pickImage() async {
     // PickedFile img = await ImagePicker().getImage(source: ImageSource.gallery);
@@ -245,12 +257,12 @@ class _OnboardingState extends State<Onboarding> {
                           // print(response.statusCode);
 
                           profileID = jsonDecode(response.body);
-                          uploadProfilePic(imgToUpload, widget.username);
+                          uploadProfilePic2(imgToUpload, widget.username, profileID['profile_id'].toString());
                           Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) => HomePage(
-                                      profileID: profileID['profile_id'])));
+                                  builder: (context) => ExploreTopics(
+                                      )));
                         },
                         elevation: 1,
                         color: Colors.white,
