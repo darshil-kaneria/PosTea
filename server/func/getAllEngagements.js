@@ -21,7 +21,7 @@ process.on("message", message => {
 
 const getAllEngagements = async (profile_id, connection) => {
     var engagementQuery = "SELECT * FROM engagement WHERE engagement.profile_id = " + String(profile_id);
-    var postQuery = "SELECT * FROM user_post as u, profile as p WHERE u.profile_id=p.profile_id AND u.post_id in ";
+    var postQuery = "SELECT * FROM user_post as u, profile as p, topic_info as t WHERE u.profile_id=p.profile_id AND u.topic_id = t.topic_id AND u.post_id in ";
     
     return new Promise(async (resolve, reject) => {
         await connection.query(engagementQuery, async (err, result) => {
@@ -50,6 +50,8 @@ const getAllEngagements = async (profile_id, connection) => {
                 }
                 result = JSON.stringify(result);
                 result = JSON.parse(result);
+
+                await connection.query(topicName)
 
                 resolve(result);
             });
