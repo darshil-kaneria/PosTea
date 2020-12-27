@@ -21,7 +21,7 @@ process.on("message", message => {
 });
 
 const getPosts = async(profile_id, connection) => {
-    var query = "SELECT * FROM user_post WHERE user_post.profile_id = " + String(profile_id) + " ORDER BY user_post.creation_date DESC";
+    var query = "SELECT * FROM user_post, topic_info WHERE user_post.topic_id = topic_info.topic_id AND user_post.profile_id = " + String(profile_id) + " ORDER BY user_post.creation_date DESC";
     return new Promise(function(resolve, reject) {
        connection.query(query, function(err, result)  {
             if (err) {
@@ -37,6 +37,8 @@ const getPosts = async(profile_id, connection) => {
                 result = JSON.stringify(result);
                 result = JSON.parse(result);
                 console.log(result);
+
+
                 resolve(result);
 
                 // return result;  
