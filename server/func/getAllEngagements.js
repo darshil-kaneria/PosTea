@@ -51,8 +51,6 @@ const getAllEngagements = async (profile_id, connection) => {
                 result = JSON.stringify(result);
                 result = JSON.parse(result);
 
-                await connection.query(topicName)
-
                 resolve(result);
             });
         });
