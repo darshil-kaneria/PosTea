@@ -493,6 +493,12 @@ app.get("/refreshTopicTimeline", (req, res) => {
   });
 });
 
+app.post("/addToken", (req, res) => {
+  const handleAddToken = fork("./func/add_token.js");
+  handleAddToken.send(req.body);
+  handleAddToken.on("message", message => res.send(message));
+});
+
 app.get("/getUserInfo", (req, res) => {
   const handleGetUserInfo = fork("./func/getUserInfo.js");
   var data = {
