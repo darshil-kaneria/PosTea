@@ -14,6 +14,8 @@ process.on("message", message => {
 
         await getToken(message, connection).then((value) => {
             connection.release();
+            process.send(value);
+            process.exit();
 
 
         }).catch((err) => {
@@ -36,13 +38,15 @@ const getToken = async function(message, connection) {
             var deviceTokenJSON = JSON.parse(deviceToken);
             console.log(deviceTokenJSON[0]['token']);
             var data = {
-                data: {
-                    test: "HELLO",
+                notification: {
+                    title: "Test Message",
+                    body: "Body of a test message. Nothing particularly interesting."
                 },
                 token: deviceTokenJSON[0]['token']
             }
             fcmAdmin.messaging().send(data).then((result) => {
-                resolve(deviceToken[0]);
+                console.log(result);
+                resolve(result);
             });
             
         })
