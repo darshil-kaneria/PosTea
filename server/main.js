@@ -499,6 +499,12 @@ app.post("/addToken", (req, res) => {
   handleAddToken.on("message", message => res.send(message));
 });
 
+app.get("/sendNotif", (req, res) => {
+  const handlesendNotif = fork("./func/send_notif.js");
+  handlesendNotif.send(req.body);
+  handlesendNotif.on("message", message => res.send(message));
+});
+
 app.get("/getUserInfo", (req, res) => {
   const handleGetUserInfo = fork("./func/getUserInfo.js");
   var data = {
