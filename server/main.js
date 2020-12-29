@@ -141,6 +141,16 @@ else {
         "engagement": engagement,
         "postID": receivedMessage['postID']
       };
+      const sendNotif = fork("./func/send_notif.js");
+      var data = {
+        "profileID": receivedMessage['affectedClient'],
+        "title": senderName,
+        "body": engagement
+      }
+      sendNotif.send(data);
+      sendNotif.on("message", message => {
+        console.log(message);
+      })
       var sendMessageJson = JSON.stringify(sendJSON);
       ws.send(sendMessageJson);
     });
@@ -260,6 +270,7 @@ app.route("/engagement")
 
       var publishInfoJsonString = JSON.stringify(publishInfo);
       publisher.publish(String(message['affectedClient']), publishInfoJsonString, function(){
+        
         console.log("Finished");
         res.send(String(message));
       });
@@ -501,6 +512,7 @@ app.post("/addToken", (req, res) => {
 
 app.get("/sendNotif", (req, res) => {
   const handlesendNotif = fork("./func/send_notif.js");
+  console.log(req.body);
   handlesendNotif.send(req.body);
   handlesendNotif.on("message", message => res.send(message));
 });

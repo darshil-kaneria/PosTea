@@ -20,6 +20,8 @@ process.on("message", message => {
 
         }).catch((err) => {
             connection.release();
+            process.send(err);
+            process.exit();
 
         });
     });
@@ -39,8 +41,8 @@ const getToken = async function(message, connection) {
             console.log(deviceTokenJSON[0]['token']);
             var data = {
                 notification: {
-                    title: "Test Message",
-                    body: "Body of a test message. Nothing particularly interesting."
+                    title: message.title,
+                    body: message.body
                 },
                 token: deviceTokenJSON[0]['token']
             }
