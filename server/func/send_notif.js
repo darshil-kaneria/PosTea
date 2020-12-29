@@ -1,9 +1,9 @@
 const db = require('./db_connection.js');
 var fcmAdmin = require('firebase-admin');
-var serviceAccount = require("C:\\Users\\Darshil\\Desktop\\settings.json");
+// var serviceAccount = require("C:\\Users\\Darshil\\Desktop\\settings.json");
 
 fcmAdmin.initializeApp({
-    credential: fcmAdmin.credential.cert(serviceAccount),
+    credential: fcmAdmin.credential.applicationDefault(),
     databaseURL: "https://postea-eabea.firebaseio.com"
 });
 process.on("message", message => {
@@ -44,9 +44,8 @@ const getToken = async function(message, connection) {
                     title: message.title,
                     body: message.body
                 },
-                token: deviceTokenJSON[0]['token']
             }
-            fcmAdmin.messaging().send(data).then((result) => {
+            fcmAdmin.messaging().sendToDevice(deviceTokenJSON[0]['token'], data).then((result) => {
                 console.log(result);
                 resolve(result);
             });
