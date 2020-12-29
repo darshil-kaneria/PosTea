@@ -141,16 +141,7 @@ else {
         "engagement": engagement,
         "postID": receivedMessage['postID']
       };
-      const sendNotif = fork("./func/send_notif.js");
-      var data = {
-        "profileID": receivedMessage['affectedClient'],
-        "title": senderName,
-        "body": engagement
-      }
-      sendNotif.send(data);
-      sendNotif.on("message", message => {
-        console.log(message);
-      })
+      
       var sendMessageJson = JSON.stringify(sendJSON);
       ws.send(sendMessageJson);
     });
@@ -271,6 +262,23 @@ app.route("/engagement")
       var publishInfoJsonString = JSON.stringify(publishInfo);
       publisher.publish(String(message['affectedClient']), publishInfoJsonString, function(){
         
+        const sendNotif = fork("./func/send_notif.js");
+        var engagement = "";
+        if(req.body.like_dislike == 1){
+          engagement = " liked your post.";
+        }
+        else if(req.body.comment !== null){
+          engagement = " commented on your post.";
+        }
+        var data = {
+          "profileID": message['affectedClient'],
+          "title": message['senderName'],
+          "body": engagement
+        }
+          sendNotif.send(data);
+          sendNotif.on("message", message => {
+            console.log(message);
+        });
         console.log("Finished");
         res.send(String(message));
       });
