@@ -1,6 +1,5 @@
 const db = require('./db_connection.js');
 var fcmAdmin = require('firebase-admin');
-// var serviceAccount = require("C:\\Users\\Darshil\\Desktop\\settings.json");
 
 fcmAdmin.initializeApp({
     credential: fcmAdmin.credential.applicationDefault(),
