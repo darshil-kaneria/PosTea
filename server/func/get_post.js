@@ -37,27 +37,18 @@ const getPost = async (postId, connection) => {
             result[0].username = value[0].username;
           });
         }
+
         var timeDiff = "";
         var currentDate = new Date();
-        // console.log(currentDate.getDay())
         var postDate = new Date(result[0].creation_date);
-        if (currentDate.getDay() - postDate.getDay() > 1) {
-          timeDiff = (currentDate.getDay() - postDate.getDay()) + " days ago";
-        }
-        else if (currentDate.getHours() - postDate.getHours() > 1) {
-          timeDiff = (currentDate.getHours() - postDate.getHours()) + " hours ago";
-        }
-        else if (currentDate.getMinutes() - postDate.getMinutes() > 1) {
-          timeDiff = (currentDate.getMinutes() - postDate.getMinutes()) + " min. ago";
-        }
-        else if (currentDate.getSeconds() - postDate.getSeconds() > 1) {
-          timeDiff = (currentDate.getSeconds() - postDate.getSeconds()) + "s ago";
-        }
+        timeDiff = calcTime(postDate, currentDate);
         var myJSON = JSON.stringify(result);
         var temp = myJSON.substring(0, myJSON.length - 2);
         var string = "\"time_diff\":" + "\"" + timeDiff + "\"";
         temp = temp + "," + string + "}]";
         var final_result = JSON.parse(temp);
+
+        
         var post_description = final_result[0].post_description;
         if (typeof post_description !== 'undefined' && post_description != null) {
           if (post_description.includes("@")) {
@@ -73,20 +64,16 @@ const getPost = async (postId, connection) => {
                 final_result = value;
               });
             } else {
-              // result[i]["flag"] = "No tag";
             }
           } else {
-            // result[i]["flag"] = "No tag";
           }
         } else {
-          // result[i]["flag"] = "No tag";
         }
       }
       final_result = JSON.stringify(final_result);
       final_result = JSON.parse(final_result);
       resolve(final_result);
     });
-    // return result;  
   });
 }
 
@@ -152,7 +139,6 @@ const get_updated_result1 = async (current_result, tag, connection) => {
         current_result = JSON.stringify(current_result);
         current_result = JSON.parse(current_result);
         resolve(current_result);
-        // return result;  
       }
     });
   });
@@ -171,8 +157,27 @@ const convert_to_username = async (id, connection) => {
         result = JSON.parse(result);
         console.log(result)
         resolve(result);
-        // return result;  
       }
     });
   });
+}
+
+function calcTime(postDate, currentDate){
+
+  var timeDiff;
+  if ((currentDate.getTime() - postDate.getTime())/(1000 * 3600 * 24) > 1) {
+      timeDiff = Math.round((currentDate.getTime() - postDate.getTime())/(1000 * 3600 * 24)) + " days ago";
+  }
+  else if ((currentDate.getTime() - postDate.getTime())/(1000 * 3600) > 1) {
+      timeDiff = Math.round((currentDate.getTime() - postDate.getTime())/(1000 * 3600)) + " hours ago";
+  }
+  else if ((currentDate.getTime() - postDate.getTime())/(1000 * 60) > 1) {
+      timeDiff = Math.round((currentDate.getTime() - postDate.getTime())/(1000 * 60)) + " min. ago";
+  }
+  else if ((currentDate.getTime() - postDate.getTime())/(1000) > 1) {
+      timeDiff = Math.round((currentDate.getTime() - postDate.getTime())/(1000)) + "s ago";
+  }
+  
+  return timeDiff;
+
 }

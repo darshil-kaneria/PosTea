@@ -1,10 +1,9 @@
-//const { query } = require('express');
+
 const db = require('./db_connection.js');
 
 process.on("message", message => {
     db.conn.getConnection(async (err, connection) => {
         if (err) {
-            // connection.release();
             return console.error("error: " + err.message);
         }
 
@@ -13,10 +12,8 @@ process.on("message", message => {
             console.log("Exiting process: " + process.pid);
             process.exit();
         });
-        // process.send({ "result": result });
-        // connection.release();
+
     });
-    // process.exit()
 });
 
 refreshTimeline = async (profileID, offset, time, connection) => {
@@ -28,13 +25,11 @@ refreshTimeline = async (profileID, offset, time, connection) => {
     var topicFollowingList = [];
     var topicFollowingListString;
 
-    // console.log(time);
     //QUERY 1 - to select the dynamic offset
-
     var getFollowingUsers = `SELECT * FROM user_follower WHERE user_follower.profile_id = ${profileID}`;
     var getFollowingTopics = `Select topic_id FROM topic_follower WHERE topic_follower.follower_id=${profileID}`;
 
-    // var query = "SELECT * FROM user_post WHERE profile_id = " + String(profileID) + " ORDER BY creation_date DESC LIMIT " + String(offset) + ", 3"; // change if condition below if you change limit
+    
     return new Promise(async (resolve, reject) => {
         await connection.query({ sql: getFollowingUsers, timeout: 7000 }, async (err, result) => {
 
@@ -53,9 +48,6 @@ refreshTimeline = async (profileID, offset, time, connection) => {
                 followingListString = "(" + followingListString + ")";
 
             }
-            // console.log(followingList);
-
-            // console.log(followingListString);
 
             if (time == null) {
                 isTimeNull = true;
@@ -90,7 +82,6 @@ refreshTimeline = async (profileID, offset, time, connection) => {
                         reject(err.message);
                     }
                     result = JSON.stringify(result);
-                    // result = JSON.parse(result);
                     var numOccurances = result.substring(28, result.indexOf("}"));
                     if (isTimeNull) {
 
@@ -112,30 +103,13 @@ refreshTimeline = async (profileID, offset, time, connection) => {
                             result = JSON.stringify(result);
                             result = JSON.parse(result);
 
-                            // console.log(result);
-
-                            // var list = [];
-                            // for (i = 0; i < length(result); i++) {
-
-                            // }
                             var timeDiff = "";
                             var timeDiffList = [];
                             var currentDate = new Date();
-                            // console.log(currentDate.getDay())
+
                             for (var i = 0; i < result.length; i++) {
                                 var postDate = new Date(result[i]['creation_date']);
-                                if (currentDate.getDate() - postDate.getDate() > 1) {
-                                    timeDiff = (currentDate.getDate() - postDate.getDate()) + " days ago";
-                                }
-                                else if (currentDate.getHours() - postDate.getHours() > 1) {
-                                    timeDiff = (currentDate.getHours() - postDate.getHours()) + " hours ago";
-                                }
-                                else if (currentDate.getMinutes() - postDate.getMinutes() > 1) {
-                                    timeDiff = (currentDate.getMinutes() - postDate.getMinutes()) + " min. ago";
-                                }
-                                else if (currentDate.getSeconds() - postDate.getSeconds() > 1) {
-                                    timeDiff = (currentDate.getSeconds() - postDate.getSeconds()) + "s ago";
-                                }
+                                timeDiff = calcTime(postDate, currentDate);
                                 timeDiffList.push(timeDiff);
                             }
                             var dict = {
@@ -145,7 +119,6 @@ refreshTimeline = async (profileID, offset, time, connection) => {
                             }
                             process.send(dict);
                             console.log("Query complete");
-                            // connection.release();
                             resolve(result);
                         });
 
@@ -159,13 +132,7 @@ refreshTimeline = async (profileID, offset, time, connection) => {
                         if (err) {
                             reject(err.message)
                         }
-                        // result = JSON.stringify(result);
-                        // result = JSON.parse(result);
-                        // console.log("result is .....");
-                        // console.log(result[0].offs);
-                        // console.log(offset);
                         offset = parseInt(result[0].offs) + parseInt(offset);
-                        // console.log(offset);
 
                         if (offset >= numOccurances - 9) { // change if you change limit
                             var limit = numOccurances - offset;
@@ -186,28 +153,12 @@ refreshTimeline = async (profileID, offset, time, connection) => {
 
                                 result = JSON.stringify(result);
                                 result = JSON.parse(result);
-                                // var list = [];
-                                // for (i = 0; i < length(result); i++) {
-
-                                // }
                                 var timeDiff = "";
                                 var timeDiffList = [];
                                 var currentDate = new Date();
-                                // console.log(currentDate.getDay())
                                 for (var i = 0; i < result.length; i++) {
                                     var postDate = new Date(result[i]['creation_date']);
-                                    if (currentDate.getDate() - postDate.getDate() > 1) {
-                                        timeDiff = (currentDate.getDate() - postDate.getDate()) + " days ago";
-                                    }
-                                    else if (currentDate.getHours() - postDate.getHours() > 1) {
-                                        timeDiff = (currentDate.getHours() - postDate.getHours()) + " hours ago";
-                                    }
-                                    else if (currentDate.getMinutes() - postDate.getMinutes() > 1) {
-                                        timeDiff = (currentDate.getMinutes() - postDate.getMinutes()) + " min. ago";
-                                    }
-                                    else if (currentDate.getSeconds() - postDate.getSeconds() > 1) {
-                                        timeDiff = (currentDate.getSeconds() - postDate.getSeconds()) + "s ago";
-                                    }
+                                    timeDiff = calcTime(postDate, currentDate);
                                     timeDiffList.push(timeDiff);
                                 }
                                 var dict = {
@@ -217,7 +168,6 @@ refreshTimeline = async (profileID, offset, time, connection) => {
                                 }
                                 process.send(dict);
                                 console.log("Query Complete");
-                                // connection.release();
                                 resolve(result);
                             });
                         }
@@ -240,28 +190,12 @@ refreshTimeline = async (profileID, offset, time, connection) => {
 
                                 result = JSON.stringify(result);
                                 result = JSON.parse(result);
-                                // var list = [];
-                                // for (i = 0; i < length(result); i++) {
-
-                                // }
                                 var timeDiff = "";
                                 var timeDiffList = [];
                                 var currentDate = new Date();
-                                // console.log(currentDate.getDay())
                                 for (var i = 0; i < result.length; i++) {
                                     var postDate = new Date(result[i]['creation_date']);
-                                    if (currentDate.getDate() - postDate.getDate() > 1) {
-                                        timeDiff = (currentDate.getDate() - postDate.getDate()) + " days ago";
-                                    }
-                                    else if (currentDate.getHours() - postDate.getHours() > 1) {
-                                        timeDiff = (currentDate.getHours() - postDate.getHours()) + " hours ago";
-                                    }
-                                    else if (currentDate.getMinutes() - postDate.getMinutes() > 1) {
-                                        timeDiff = (currentDate.getMinutes() - postDate.getMinutes()) + " min. ago";
-                                    }
-                                    else if (currentDate.getSeconds() - postDate.getSeconds() > 1) {
-                                        timeDiff = (currentDate.getSeconds() - postDate.getSeconds()) + "s ago";
-                                    }
+                                    timeDiff = calcTime(postDate, currentDate);
                                     timeDiffList.push(timeDiff);
                                 }
                                 var dict = {
@@ -271,7 +205,6 @@ refreshTimeline = async (profileID, offset, time, connection) => {
                                 }
                                 process.send(dict);
                                 console.log("Query complete");
-                                // connection.release();
                                 resolve(result);
                             });
 
@@ -281,8 +214,6 @@ refreshTimeline = async (profileID, offset, time, connection) => {
 
                     });
 
-
-                    // resolve(result);
                 });
 
             });
@@ -292,3 +223,23 @@ refreshTimeline = async (profileID, offset, time, connection) => {
         });
     });
 };
+
+function calcTime(postDate, currentDate){
+
+    var timeDiff;
+    if ((currentDate.getTime() - postDate.getTime())/(1000 * 3600 * 24) > 1) {
+        timeDiff = Math.round((currentDate.getTime() - postDate.getTime())/(1000 * 3600 * 24)) + " days ago";
+    }
+    else if ((currentDate.getTime() - postDate.getTime())/(1000 * 3600) > 1) {
+        timeDiff = Math.round((currentDate.getTime() - postDate.getTime())/(1000 * 3600)) + " hours ago";
+    }
+    else if ((currentDate.getTime() - postDate.getTime())/(1000 * 60) > 1) {
+        timeDiff = Math.round((currentDate.getTime() - postDate.getTime())/(1000 * 60)) + " min. ago";
+    }
+    else if ((currentDate.getTime() - postDate.getTime())/(1000) > 1) {
+        timeDiff = Math.round((currentDate.getTime() - postDate.getTime())/(1000)) + "s ago";
+    }
+    
+    return timeDiff;
+
+}

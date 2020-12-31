@@ -1,10 +1,9 @@
-//const { query } = require('express');
+
 const db = require('./db_connection.js');
 
 process.on("message", message => {
     db.conn.getConnection(async (err, connection) => {
         if (err) {
-            // connection.release();
             return console.error("error: " + err.message);
         }
 
@@ -13,10 +12,7 @@ process.on("message", message => {
             console.log("Exiting process: " + process.pid);
             process.exit();
         });
-        // process.send({ "result": result });
-        // connection.release();
     });
-    // process.exit()
 });
 
 refreshTopicTimeline = async (topicID, offset, time, connection) => {
@@ -27,9 +23,7 @@ refreshTopicTimeline = async (topicID, offset, time, connection) => {
     console.log(time);
 
     if(time == null){
-        // getOffset = `SELECT COUNT(*) as offs FROM user_post WHERE profile_id in ${followingListString} ORDER BY creation_date DESC`;
-        isTimeNull = true;
-        
+        isTimeNull = true;        
     }
 
     var getNumPosts = "SELECT COUNT(*) FROM user_post WHERE topic_id=" + String(topicID);
@@ -41,7 +35,6 @@ refreshTopicTimeline = async (topicID, offset, time, connection) => {
                 reject(err.message);
             }
             result = JSON.stringify(result);
-            // result = JSON.parse(result);
             var numOccurances = result.substring(28, result.indexOf("}"));
             if (isTimeNull) {
 
@@ -62,28 +55,13 @@ refreshTopicTimeline = async (topicID, offset, time, connection) => {
 
                     result = JSON.stringify(result);
                     result = JSON.parse(result);
-                    // var list = [];
-                    // for (i = 0; i < length(result); i++) {
-
-                    // }
                     var timeDiff = "";
                     var timeDiffList = [];
                     var currentDate = new Date();
                     console.log(currentDate.getDay())
                     for (var i = 0; i < result.length; i++) {
                         var postDate = new Date(result[i]['creation_date']);
-                        if (currentDate.getDay() - postDate.getDay() > 1) {
-                            timeDiff = (currentDate.getDay() - postDate.getDay()) + " days ago";
-                        }
-                        else if (currentDate.getHours() - postDate.getHours() > 1) {
-                            timeDiff = (currentDate.getHours() - postDate.getHours()) + " hours ago";
-                        }
-                        else if (currentDate.getMinutes() - postDate.getMinutes() > 1) {
-                            timeDiff = (currentDate.getMinutes() - postDate.getMinutes()) + " min. ago";
-                        }
-                        else if (currentDate.getSeconds() - postDate.getSeconds() > 1) {
-                            timeDiff = (currentDate.getSeconds() - postDate.getSeconds()) + "s ago";
-                        }
+                        timeDiff = calcTime(postDate, currentDate);
                         timeDiffList.push(timeDiff);
                     }
                     var dict = {
@@ -93,7 +71,6 @@ refreshTopicTimeline = async (topicID, offset, time, connection) => {
                     }
                     process.send(dict);
                     console.log("Query completeeeeee");
-                    // connection.release();
                     resolve(result);
                 });
 
@@ -108,8 +85,6 @@ refreshTopicTimeline = async (topicID, offset, time, connection) => {
                 if (err) {
                     reject(err.message)
                 }
-                // result = JSON.stringify(result);
-                // result = JSON.parse(result);
                 console.log("result is .....");
                 console.log(result[0].offs);
                 console.log(offset);
@@ -135,28 +110,13 @@ refreshTopicTimeline = async (topicID, offset, time, connection) => {
 
                         result = JSON.stringify(result);
                         result = JSON.parse(result);
-                        // var list = [];
-                        // for (i = 0; i < length(result); i++) {
-
-                        // }
                         var timeDiff = "";
                         var timeDiffList = [];
                         var currentDate = new Date();
                         console.log(currentDate.getDay())
                         for (var i = 0; i < result.length; i++) {
                             var postDate = new Date(result[i]['creation_date']);
-                            if (currentDate.getDay() - postDate.getDay() > 1) {
-                                timeDiff = (currentDate.getDay() - postDate.getDay()) + " days ago";
-                            }
-                            else if (currentDate.getHours() - postDate.getHours() > 1) {
-                                timeDiff = (currentDate.getHours() - postDate.getHours()) + " hours ago";
-                            }
-                            else if (currentDate.getMinutes() - postDate.getMinutes() > 1) {
-                                timeDiff = (currentDate.getMinutes() - postDate.getMinutes()) + " min. ago";
-                            }
-                            else if (currentDate.getSeconds() - postDate.getSeconds() > 1) {
-                                timeDiff = (currentDate.getSeconds() - postDate.getSeconds()) + "s ago";
-                            }
+                            timeDiff = calcTime(postDate, currentDate);
                             timeDiffList.push(timeDiff);
                         }
                         var dict = {
@@ -166,7 +126,6 @@ refreshTopicTimeline = async (topicID, offset, time, connection) => {
                         }
                         process.send(dict);
                         console.log("Query Complete");
-                        // connection.release();
                         resolve(result);
                     });
                 }
@@ -189,28 +148,13 @@ refreshTopicTimeline = async (topicID, offset, time, connection) => {
 
                         result = JSON.stringify(result);
                         result = JSON.parse(result);
-                        // var list = [];
-                        // for (i = 0; i < length(result); i++) {
-
-                        // }
                         var timeDiff = "";
                         var timeDiffList = [];
                         var currentDate = new Date();
                         console.log(currentDate.getDay())
                         for (var i = 0; i < result.length; i++) {
                             var postDate = new Date(result[i]['creation_date']);
-                            if (currentDate.getDay() - postDate.getDay() > 1) {
-                                timeDiff = (currentDate.getDay() - postDate.getDay()) + " days ago";
-                            }
-                            else if (currentDate.getHours() - postDate.getHours() > 1) {
-                                timeDiff = (currentDate.getHours() - postDate.getHours()) + " hours ago";
-                            }
-                            else if (currentDate.getMinutes() - postDate.getMinutes() > 1) {
-                                timeDiff = (currentDate.getMinutes() - postDate.getMinutes()) + " min. ago";
-                            }
-                            else if (currentDate.getSeconds() - postDate.getSeconds() > 1) {
-                                timeDiff = (currentDate.getSeconds() - postDate.getSeconds()) + "s ago";
-                            }
+                            timeDiff = calcTime(postDate, currentDate);
                             timeDiffList.push(timeDiff);
                         }
                         var dict = {
@@ -220,23 +164,32 @@ refreshTopicTimeline = async (topicID, offset, time, connection) => {
                         }
                         process.send(dict);
                         console.log("Query complete");
-                        // connection.release();
                         resolve(result);
                     });
 
                 }
-
-
-
             });
-
-
-            // resolve(result);
-        });
-    
-
-        // return result;
-        
+        });       
     });
+
+}
+
+function calcTime(postDate, currentDate){
+
+    var timeDiff;
+    if ((currentDate.getTime() - postDate.getTime())/(1000 * 3600 * 24) > 1) {
+        timeDiff = Math.round((currentDate.getTime() - postDate.getTime())/(1000 * 3600 * 24)) + " days ago";
+    }
+    else if ((currentDate.getTime() - postDate.getTime())/(1000 * 3600) > 1) {
+        timeDiff = Math.round((currentDate.getTime() - postDate.getTime())/(1000 * 3600)) + " hours ago";
+    }
+    else if ((currentDate.getTime() - postDate.getTime())/(1000 * 60) > 1) {
+        timeDiff = Math.round((currentDate.getTime() - postDate.getTime())/(1000 * 60)) + " min. ago";
+    }
+    else if ((currentDate.getTime() - postDate.getTime())/(1000) > 1) {
+        timeDiff = Math.round((currentDate.getTime() - postDate.getTime())/(1000)) + "s ago";
+    }
+    
+    return timeDiff;
 
 }

@@ -32,27 +32,33 @@ const getAllEngagements = async (profile_id, connection) => {
             result = JSON.stringify(result);
             result = JSON.parse(result);
             
-            var postIDs = "(";
-            for (var i = 0; i < result.length; i++) {
-                if (i == result.length - 1) {
-                    postIDs = postIDs + String(result[i]['post_id']) + ") ORDER BY u.creation_date DESC";
-                } else {
-                    postIDs = postIDs + String(result[i]['post_id']) + ", ";
-                }
+            if(result.length == 0){
+                resolve("No engagements");
             }
-            console.log("postIDs " + postIDs);
-            
-            postQuery = postQuery + postIDs;
-            await connection.query(postQuery, (err, result) => {
-                if (err) {
-                    console.log("ERROR /getAllEngagements: " + err.message);
-                    reject(err.message);
+            else{
+                var postIDs = "(";
+                for (var i = 0; i < result.length; i++) {
+                    if (i == result.length - 1) {
+                        postIDs = postIDs + String(result[i]['post_id']) + ") ORDER BY u.creation_date DESC";
+                    } else {
+                        postIDs = postIDs + String(result[i]['post_id']) + ", ";
+                    }
                 }
-                result = JSON.stringify(result);
-                result = JSON.parse(result);
+                console.log("postIDs " + postIDs);
+                
+                postQuery = postQuery + postIDs;
+                await connection.query(postQuery, (err, result) => {
+                    if (err) {
+                        console.log("ERROR /getAllEngagements: " + err.message);
+                        reject(err.message);
+                    }
+                    result = JSON.stringify(result);
+                    result = JSON.parse(result);
 
-                resolve(result);
-            });
+                    resolve(result);
+                });
+            }
+            
         });
     });
 }
