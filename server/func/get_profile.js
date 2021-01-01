@@ -1,5 +1,5 @@
 const db = require('./db_connection.js');
-
+var totalPosts = 0;
 process.on("message", message => {
   db.conn.getConnection(function (err, connection) {
     if (err) {
@@ -28,7 +28,8 @@ process.on("message", message => {
           username: answer[0].username,
           privacy: privacy,
           name: answer[0].name,
-          biodata: answer[0].bio_data
+          biodata: answer[0].bio_data,
+          total_posts: totalPosts
         }
         process.send({ "message": profileInfoJson });
       }
@@ -55,16 +56,28 @@ function getProfile(flag, user, connection) {
     var selectQuery = "SELECT * FROM profile WHERE profile_id = ?";
   }
   return new Promise(function (resolve, reject) {
-    connection.query(selectQuery, [user], function (err, result) {
+    connection.query(selectQuery, [user], function (err, result1) {
       if (err) {
         console.log(err);
         reject(err.message);
       }
       
-     if (result.length == 0) {
+     if (result1.length == 0) {
         resolve("Account does not exist");
       } else {
-        resolve(result);
+        var totalPostsQuery = "select count(*) from user_post where profile_id = "+user;
+        connection.query(totalPostsQuery, function (err, result) {
+          if(err){
+            reject(err);
+          }
+          else{
+            totalPosts = JSON.stringify(result)
+            totalPosts = JSON.parse(totalPosts);
+            totalPosts = totalPosts[0]['count(*)']
+            resolve(result1);
+          }
+        });
+        
       }
       
     });
