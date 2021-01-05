@@ -489,6 +489,36 @@ app.get("/getTrendingPosts", (req, res) => {
   });
 
 });
+
+app.get("/getTrendingTopics", (req, res) => {
+
+  const handleTrendingTopic = fork('./func/explore_topic.js');
+  console.log("pid forked: "+handleTrendingTopic.pid);
+
+  var data = {
+    "message": "Random"
+  }
+  handleTrendingTopic.send(data);
+  handleTrendingTopic.on("message", message => {
+    res.send(message);
+  });
+
+});
+
+app.get("/getTrendingTopicPosts", (req, res) => {
+
+  const handleTrendingTopicPost = fork('./func/trending_topic_posts.js');
+  console.log("pid forked: "+handleTrendingTopicPost.pid);
+
+  var data = {
+    topic_id: req.body.topicID
+  }
+  handleTrendingTopicPost.send(data);
+  handleTrendingTopicPost.on("message", message => {
+    res.send(message);
+  });
+
+});
 // Refresh topic timeline
 app.get("/refreshTopicTimeline", (req, res) => {
   const handleTopicRefreshTimeline = fork('./func/refreshTopicTimeline.js');
