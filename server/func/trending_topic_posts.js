@@ -29,7 +29,7 @@ getTrendingTopicPost = async (message, connection) => {
         var tempDate = "2020-10-06 20:23:29";
         printDate = tempDate;
         // var getPostsLastHour = `select ti.topic_name, u.topic_id, count(u.topic_id) as post_count from user_post as u, topic_info as ti where u.creation_date >= "${printDate}" and ti.topic_id = u.topic_id GROUP BY topic_id order by post_count desc`;
-        var getEngWithTopic = `select distinct * from engagement e2, user_post up where topic_id = ${message.topic_id} and e2.creation_date >= "${printDate}" and e2.post_id = up.post_id group by up.post_id`;
+        var getEngWithTopic = `select * from engagement e2, user_post up where topic_id = ${message.topic_id} and e2.creation_date >= "${printDate}" and e2.post_id = up.post_id`;
         await connection.query({ sql: getEngWithTopic, timeout: 120000 }, async (err, result) => {
             if(err){
                 reject(err);
@@ -37,7 +37,29 @@ getTrendingTopicPost = async (message, connection) => {
             else{
                 result = JSON.stringify(result);
                 result = JSON.parse(result);
-                console.log(result);
+                
+                if(result.length == 0){
+                    resolve("empty");
+                }
+                var postIdList = [];
+                for (var i = 0; i < result.length; i++) {
+                    postIdList.push(result[i]['post_id']);
+                }
+                var counts = {};
+
+                for (var i = 0; i < postIdList.length; i++) {
+                    var num = postIdList[i];
+                    counts[num] = counts[num] ? counts[num] + 1 : 1;
+                }
+                var sortable = [];
+                for (var key in counts) {
+                    sortable.push([key, counts[key]]);
+                }
+                sortable.sort(function(a, b) {
+                    return a[1] - b[1];
+                }).reverse();
+                console.log(sortable);
+                result[0] = sortable;
                 resolve(result)
             }
         });
