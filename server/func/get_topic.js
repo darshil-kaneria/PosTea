@@ -49,7 +49,7 @@ const getTopic = async(topic_id, connection) => {
                     // console.log("creator name: "+result2[0]['name']);
                     result[0]['creator_name'] = result2[0]['name'];
 
-                    var getFollowers = "select p.name from profile as p, topic_follower as tf where tf.topic_id = "+topic_id+" and tf.follower_id = p.profile_id";
+                    var getFollowers = "select p.name, p.profile_id from profile as p, topic_follower as tf where tf.topic_id = "+topic_id+" and tf.follower_id = p.profile_id";
                     connection.query(getFollowers, function(err, result3){
                       if(err){
                         reject(err);
