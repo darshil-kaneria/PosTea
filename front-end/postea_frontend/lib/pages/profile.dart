@@ -137,15 +137,15 @@ class _ProfileState extends State<Profile> {
     isAccessibilityOn = prefs.getInt("accessibility") == 1;
     username = prefs.getString('username') ?? "";
     var queryString;
-    if (widget.isOwner) {
-      // print("HERE");
-      queryString = "http://postea-server.herokuapp.com/profile?username=" +
-          username.toString();
-    } else {
+    // if (widget.isOwner) {
+    //   // print("HERE");
+    //   queryString = "http://postea-server.herokuapp.com/profile?username=" +
+    //       username.toString();
+    // } else {
       // print("Not here");
       queryString = "http://postea-server.herokuapp.com/profile/" +
           widget.profileId.toString();
-    }
+    // }
     print(username);
     http.Response resp = await http.get(
       queryString,
@@ -814,7 +814,7 @@ class _ProfileState extends State<Profile> {
                                                     .toString(),
                                                 firstPost['post_title']
                                                     .toString(),
-                                                name,
+                                                firstPost['name'].toString(),
                                                 widget.myPID.toString(),
                                                 false,
                                                 firstPost['is_sensitive']
