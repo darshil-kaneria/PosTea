@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart';
 import 'package:postea_frontend/data_models/process_login.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -78,12 +79,18 @@ class _LoginState extends State<Login> {
       User user = (await FirebaseAuth.instance
               .signInWithEmailAndPassword(email: email, password: password))
           .user;
-
-      print("hello from logInUser()");
-      Response response = await get(
-        "http://postea-server.herokuapp.com/profile?username=" + username,
-        headers: {
-          HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+      
+      if (!user.emailVerified) {
+        print("email not verified");
+        await FirebaseAuth.instance.signOut();
+        print("PLEASE VERIFY EMAIL BEFORE LOGGING IN!");
+        Fluttertoast.showToast(msg: "PLEASE VERIFY EMAIL BEFORE LOGGING IN!", toastLength: Toast.LENGTH_SHORT, gravity: ToastGravity.CENTER);
+      } else {
+        print("hello from logInUser()");
+        Response response = await get(
+          "http://postea-server.herokuapp.com/profile?username=" + username,
+          headers: {
+            HttpHeaders.authorizationHeader: "Bearer posteaadmin",
         },
       );
       var respBody = jsonDecode(response.body);
@@ -94,7 +101,7 @@ class _LoginState extends State<Login> {
                 builder: (context) => Onboarding(username: username)));
         print("Error occurred");
       } else if (user != null) {
-        print("hello from logInUser() success");
+        print("LOGIN SUCCESS");
         // print(respBody['message']['profile_id']);
         final SharedPreferences prefs = await SharedPreferences.getInstance();
         // int pid = int.parse(respBody['message']['profile_id']);
@@ -111,6 +118,8 @@ class _LoginState extends State<Login> {
         print("hello from logInUser() err");
         // this.loginSucces = false;
       }
+      }
+
     } catch (e) {
       print(e);
       // username = "";

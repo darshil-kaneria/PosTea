@@ -5,7 +5,6 @@ import 'dart:ui';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-// import 'package:flutter_tts/flutter_tts_web.dart';
 import 'package:http/http.dart' as http;
 import 'package:postea_frontend/customWidgets/topic_pill.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,37 +36,39 @@ class PostTile extends StatefulWidget {
   var isAccessibilityOn;
 
   PostTile(
-      this.post_id,
-      this.profile_id,
-      this.post_description,
-      this.topic_id,
-      this.post_img,
-      this.creation_date,
-      this.post_likes,
-      this.post_dislikes,
-      this.post_comments,
-      this.post_title,
-      this.name,
-      this.myPID,
-      this.isExpanded,
-      this.is_sensitive,
-      this.isAccessibilityOn);
+    this.post_id,
+    this.profile_id,
+    this.post_description,
+    this.topic_id,
+    this.post_img,
+    this.creation_date,
+    this.post_likes,
+    this.post_dislikes,
+    this.post_comments,
+    this.post_title,
+    this.name,
+    this.myPID,
+    this.isExpanded,
+    this.is_sensitive,
+    this.isAccessibilityOn
+  );
 
   @override
   _PostTileState createState() => _PostTileState(
-      this.post_id,
-      this.profile_id,
-      this.post_description,
-      this.topic_id,
-      this.post_img,
-      this.creation_date,
-      this.post_likes,
-      this.post_dislikes,
-      this.post_comments,
-      this.post_title,
-      this.name,
-      this.myPID,
-      this.isExpanded);
+    this.post_id,
+    this.profile_id,
+    this.post_description,
+    this.topic_id,
+    this.post_img,
+    this.creation_date,
+    this.post_likes,
+    this.post_dislikes,
+    this.post_comments,
+    this.post_title,
+    this.name,
+    this.myPID,
+    this.isExpanded
+  );
 }
 
 enum TtsState { playing, stopped, paused, continued }
@@ -94,31 +95,31 @@ class _PostTileState extends State<PostTile> {
   WebSocketChannel webSocketChannel;
 
   _PostTileState(
-      this.post_id,
-      this.profile_id,
-      this.post_description,
-      this.topic_id,
-      this.post_img,
-      this.creation_date,
-      this.post_likes,
-      this.post_dislikes,
-      this.post_comments,
-      this.post_title,
-      this.name,
-      this.myPID,
-      this.isExpanded);
+    this.post_id,
+    this.profile_id,
+    this.post_description,
+    this.topic_id,
+    this.post_img,
+    this.creation_date,
+    this.post_likes,
+    this.post_dislikes,
+    this.post_comments,
+    this.post_title,
+    this.name,
+    this.myPID,
+    this.isExpanded
+  );
+
   SharedPreferences pref;
   Future<http.Response> getLikesDislikes() async {
     http.Response resp;
-    var url = "http://postea-server.herokuapp.com/engagement?post_id=" +
-        post_id.toString();
+    var url = "http://postea-server.herokuapp.com/engagement?post_id=" + post_id.toString();
     resp = await http.get(
       url,
       headers: {
         HttpHeaders.authorizationHeader: "Bearer posteaadmin",
       },
     );
-    // print(resp.body);
     return resp;
   }
 
@@ -188,16 +189,13 @@ class _PostTileState extends State<PostTile> {
   }
 
   Future<http.Response> getPostInfo() async {
-    var url =
-        "http://postea-server.herokuapp.com/post?post_id=" + post_id.toString();
-
+    var url = "http://postea-server.herokuapp.com/post?post_id=" + post_id.toString();
     http.Response resp = await http.get(
       url,
       headers: {
         HttpHeaders.authorizationHeader: "Bearer posteaadmin",
       },
     );
-
     return resp;
   }
 
@@ -215,12 +213,9 @@ class _PostTileState extends State<PostTile> {
   @override
   Widget build(BuildContext context) {
     ValueNotifier<bool> isOwnerTopic = ValueNotifier<bool>(false);
-    ValueNotifier<Color> like_color =
-        ValueNotifier<Color>(Theme.of(context).buttonColor);
-    ValueNotifier<Color> dislike_color =
-        ValueNotifier<Color>(Theme.of(context).buttonColor);
-    ValueNotifier<String> isSensitiveVN =
-        ValueNotifier<String>(widget.is_sensitive.toString());
+    ValueNotifier<Color> like_color = ValueNotifier<Color>(Theme.of(context).buttonColor);
+    ValueNotifier<Color> dislike_color = ValueNotifier<Color>(Theme.of(context).buttonColor);
+    ValueNotifier<String> isSensitiveVN = ValueNotifier<String>(widget.is_sensitive.toString());
     int post_likes = int.parse(widget.post_likes);
     int post_dislikes = int.parse(widget.post_dislikes);
     int post_comments = int.parse(widget.post_comments);
@@ -229,7 +224,6 @@ class _PostTileState extends State<PostTile> {
     String firstHalf = "";
     String secondHalf = "";
 
-    // print("post likes = " + widget.post_likes);
     Future.delayed(Duration(seconds: 2)).then((value) {
       var topic_id_list = pref.getStringList("topicIDList");
       if (topic_id_list.contains(topic_id.toString())) {
@@ -241,17 +235,15 @@ class _PostTileState extends State<PostTile> {
     bool showLikeBadge = post_likes > 0;
     bool showDislikeBadge = post_dislikes > 0;
     bool showCommentsBadge = post_comments > 0;
-    var profilePicName =
-        name == "Anonymous" ? "default-big.png" : profile_id.toString();
+    var profilePicName = name == "Anonymous" ? "default-big.png" : profile_id.toString();
     var screenheight = MediaQuery.of(context).size.height;
     var screenwidth = MediaQuery.of(context).size.width;
     print("IS SENSITIVE: " + widget.is_sensitive.toString());
     return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20),),
       margin: EdgeInsets.only(top: 8, left: 12, right: 12),
       clipBehavior: Clip.antiAlias,
+      elevation: 1,
       child: Column(
         children: [
           ListTile(
@@ -260,8 +252,6 @@ class _PostTileState extends State<PostTile> {
               builder: (context, value, child) {
                 return TopicPill(
                   topicId: topic_id,
-                  // col1: Colors.purple[900],
-                  // col2: Colors.purple[400],
                   col1: Theme.of(context).primaryColorLight,
                   col2: Theme.of(context).primaryColorDark,
                   height: screenheight / 20,
@@ -272,22 +262,12 @@ class _PostTileState extends State<PostTile> {
               },
             ),
             onTap: () => {
-              if (myPID != widget.profile_id)
-                {
-                  Navigator.of(context).push(new MaterialPageRoute(
-                      builder: (context) => Profile(
-                            profileId: int.parse(profile_id),
-                            isOwner: false,
-                          )))
-                }
-              else
-                {
-                  Navigator.of(context).push(new MaterialPageRoute(
-                      builder: (context) => Profile(
-                            profileId: int.parse(profile_id),
-                            isOwner: true,
-                          )))
-                },
+              if (myPID != widget.profile_id) {
+                Navigator.of(context).push(new MaterialPageRoute(builder: (context) => Profile(profileId: int.parse(profile_id), isOwner: false,)))
+              }
+              else {
+                Navigator.of(context).push(new MaterialPageRoute(builder: (context) => Profile(profileId: int.parse(profile_id), isOwner: true,)))
+              },
             },
             leading: FutureBuilder(
               future: FirebaseStorageService.getImage(context, profilePicName),
@@ -310,133 +290,100 @@ class _PostTileState extends State<PostTile> {
               profile_id != -1 ? name : "Anonymous",
               style: Theme.of(context).textTheme.headline1,
             ),
-            // subtitle: Row(
-            //   children: [
-            //     Icon(
-            //       Icons.location_on,
-            //       size: 15,
-            //       color: Colors.grey,
-            //     ),
-            //     Text("with Darshil Kaneria",style: TextStyle(fontSize: 12),)
-            //   ],
-            // ),
           ),
           Container(
             margin: EdgeInsets.symmetric(horizontal: 16),
             padding: EdgeInsets.only(top: 2),
-            decoration: BoxDecoration(
-                border: Border(
-              top: BorderSide(width: 0.5, color: Colors.grey),
-            )),
+            decoration: BoxDecoration(border: Border(top: BorderSide(width: 0.5, color: Colors.grey),)),
             child: ValueListenableBuilder(
               valueListenable: isSensitiveVN,
               builder: (context, value, child) {
                 return ListTile(
-                    onLongPress: () {
-                      if (widget.isAccessibilityOn) {
-                        voiceText = post_description.toString();
-                        speak();
-                      }
-                      isSensitiveVN.value = "0";
-                    },
-                    onTap: () => {
-                          if (isSensitiveVN.value != "1")
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ExpandedPostTile(
-                                  post_id,
-                                  profile_id,
-                                  post_description,
-                                  topic_id,
-                                  post_img,
-                                  creation_date,
-                                  post_likes.toString(),
-                                  post_dislikes.toString(),
-                                  post_comments.toString(),
-                                  post_title,
-                                  name,
-                                  myPID,
-                                  widget.is_sensitive,
-                                  widget.isAccessibilityOn,
-                                ),
-                              ),
-                            )
-                        },
-                    contentPadding:
-                        EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-                    title: isSensitiveVN.value == "1"
-                        ? Text("")
-                        : Text(post_title,
-                            style: Theme.of(context).textTheme.headline2),
-                    subtitle: Container(
-                      child: isSensitiveVN.value != "1"
-                          ? LinkWell(
-                              isSensitiveVN.value == "1"
-                                  ? ""
-                                  : post_description,
-                              style: Theme.of(context).textTheme.headline3,
-                            )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(
-                                  Icons.announcement,
-                                  color: Colors.red[300],
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.only(left: 20),
-                                ),
-                                Text(
-                                  "Sensitive Information.",
-                                  style: TextStyle(color: Colors.red[300]),
-                                )
-                              ],
-                            ),
-                    ));
+                  onLongPress: () {
+                    if (widget.isAccessibilityOn) {
+                      voiceText = post_description.toString();
+                      speak();
+                    }
+                    isSensitiveVN.value = "0";
+                  },
+                  onTap: () => {
+                    if (isSensitiveVN.value != "1") {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ExpandedPostTile(
+                            post_id,
+                            profile_id,
+                            post_description,
+                            topic_id,
+                            post_img,
+                            creation_date,
+                            post_likes.toString(),
+                            post_dislikes.toString(),
+                            post_comments.toString(),
+                            post_title,
+                            name,
+                            myPID,
+                            widget.is_sensitive,
+                            widget.isAccessibilityOn,
+                          ),
+                        ),
+                      )
+                    }
+                  },
+                  contentPadding: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+                  title: isSensitiveVN.value == "1" ? Text("") : Text(post_title, style: Theme.of(context).textTheme.headline2),
+                  subtitle: Container(
+                    child: isSensitiveVN.value != "1" ? LinkWell(isSensitiveVN.value == "1" ? "" : post_description, style: Theme.of(context).textTheme.headline3,)
+                    : Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.announcement, color: Colors.red[300],),
+                        Padding(padding: EdgeInsets.only(left: 20),),
+                        Text("Sensitive Information.", style: TextStyle(color: Colors.red[300]),)
+                      ],
+                    ),
+                  )
+                );
               },
             ),
           ),
           Container(
-              child: FutureBuilder(
+            child: FutureBuilder(
             future: FirebaseStorageService.getImagePost(
-                context, post_id.toString()),
-            builder: (context, snapshot) {
-              if (snapshot.hasData) {
-                return isExpanded == 1
-                    ? Image.network(
-                        snapshot.data,
-                        width: screenwidth,
-                        fit: BoxFit.fitWidth,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          return loadingProgress == null
-                              ? child
-                              : LinearProgressIndicator();
-                        },
-                      )
-                    : ClipRect(
-                        child: Container(
-                          child: Align(
-                            heightFactor: 0.3,
-                            widthFactor: 1.0,
-                            child: Image.network(
-                              snapshot.data,
-                              width: screenwidth,
-                              fit: BoxFit.fitWidth,
-                              loadingBuilder:
-                                  (context, child, loadingProgress) {
-                                return loadingProgress == null
-                                    ? child
-                                    : LinearProgressIndicator();
-                              },
-                            ),
-                          ),
+              context, post_id.toString()),
+              builder: (context, snapshot) {
+                if (snapshot.hasData) {
+                  return isExpanded == 1 ? Image.network(
+                    snapshot.data,
+                    width: screenwidth,
+                    fit: BoxFit.fitWidth,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      return loadingProgress == null ? child : LinearProgressIndicator();
+                    },
+                  )
+                  : ClipRect(
+                    child: Container(
+                      child: Align(
+                        heightFactor: 0.3,
+                        widthFactor: 1.0,
+                        child: Image.network(
+                          snapshot.data,
+                          width: screenwidth,
+                          fit: BoxFit.fitWidth,
+                          loadingBuilder: (context, child, loadingProgress) {
+                            return loadingProgress == null ? child : LinearProgressIndicator();
+                          },
                         ),
-                      );
-              } else
-                return Container();
-            },
-          )),
+                      ),
+                    ),
+                  );
+                } else {
+                  return Container();
+                }
+              },
+            )
+          ),
           Row(
             children: [
               Column(
@@ -453,31 +400,22 @@ class _PostTileState extends State<PostTile> {
                     child: ValueListenableBuilder(
                       valueListenable: like_color,
                       builder: (context, value, child) {
-                        return IconButton(
-                          icon: Icon(
-                            Icons.thumb_up,
-                            // color: Theme.of(context).buttonColor,
-                            color: like_color.value,
-                          ),
+                        return IconButton(icon: Icon(Icons.thumb_up,color: like_color.value,),
                           iconSize: 16,
                           onPressed: () {
                             like_or_dislike = "1";
-                            // setState(() {
                             if (dislike_color.value == Colors.deepOrange[200]) {
-                              dislike_color.value =
-                                  Theme.of(context).buttonColor;
+                              dislike_color.value = Theme.of(context).buttonColor;
                               like_color.value = Colors.deepOrange[200];
                               post_likes++;
                               post_dislikes--;
-                            } else if (like_color.value ==
-                                Colors.deepOrange[200]) {
+                            } else if (like_color.value == Colors.deepOrange[200]) {
                               like_color.value = Theme.of(context).buttonColor;
                               post_likes--;
                             } else {
                               like_color.value = Colors.deepOrange[200];
                               post_likes++;
                             }
-                            // });
                             print(post_id);
                             print(profile_id);
                             print(like_or_dislike);
@@ -491,13 +429,13 @@ class _PostTileState extends State<PostTile> {
                             var sendAnswer = JsonEncoder().convert(data);
                             print(sendAnswer);
                             Future<http.Response> resp = http.post(
-                                'http://postea-server.herokuapp.com/engagement',
-                                headers: {
-                                  'Content-Type': 'application/json',
-                                  HttpHeaders.authorizationHeader:
-                                      "Bearer posteaadmin",
-                                },
-                                body: sendAnswer);
+                              'http://postea-server.herokuapp.com/engagement',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+                              },
+                              body: sendAnswer
+                            );
                           },
                         );
                       },
@@ -507,10 +445,8 @@ class _PostTileState extends State<PostTile> {
               ),
               Badge(
                 badgeContent: Container(
-                    child: Text(
-                  post_dislikes.toString(),
-                  style: TextStyle(fontSize: 10),
-                )),
+                  child: Text(post_dislikes.toString(), style: TextStyle(fontSize: 10),)
+                ),
                 badgeColor: Colors.deepOrange[100],
                 position: BadgePosition.topEnd(top: 1, end: 1),
                 animationType: BadgeAnimationType.fade,
@@ -525,21 +461,18 @@ class _PostTileState extends State<PostTile> {
                       ),
                       iconSize: 16,
                       onPressed: () {
-                        // setState(() {
                         like_or_dislike = "0";
                         if (like_color.value == Colors.deepOrange[200]) {
                           like_color.value = Theme.of(context).buttonColor;
                           dislike_color.value = Colors.deepOrange[200];
                           post_likes--;
                           post_dislikes++;
-                        } else if (dislike_color.value ==
-                            Colors.deepOrange[200]) {
+                        } else if (dislike_color.value == Colors.deepOrange[200]) {
                           dislike_color.value = Theme.of(context).buttonColor;
                           post_dislikes--;
                         } else
                           dislike_color.value = Colors.deepOrange[200];
                         post_dislikes++;
-                        // });
 
                         var data = {
                           "engagement_post_id": post_id,
@@ -549,13 +482,13 @@ class _PostTileState extends State<PostTile> {
                         };
                         var sendAnswer = JsonEncoder().convert(data);
                         Future<http.Response> resp = http.post(
-                            'http://postea-server.herokuapp.com/engagement',
-                            headers: {
-                              'Content-Type': 'application/json',
-                              HttpHeaders.authorizationHeader:
-                                  "Bearer posteaadmin",
-                            },
-                            body: sendAnswer);
+                          'http://postea-server.herokuapp.com/engagement',
+                          headers: {
+                            'Content-Type': 'application/json',
+                            HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+                          },
+                          body: sendAnswer
+                        );
                       },
                     );
                   },
@@ -586,17 +519,18 @@ class _PostTileState extends State<PostTile> {
                 ),
                 onPressed: () {
                   ProcessSavePost processSavePost = new ProcessSavePost(
-                      post_title: post_title,
-                      post_description: post_description,
-                      post_id: post_id,
-                      profile_id: widget.profile_id,
-                      topic_id: topic_id,
-                      name: name,
-                      post_comments: post_comments.toString(),
-                      post_likes: post_likes.toString(),
-                      post_dislikes: post_dislikes.toString(),
-                      post_img: post_img,
-                      creation_date: creation_date);
+                    post_title: post_title,
+                    post_description: post_description,
+                    post_id: post_id,
+                    profile_id: widget.profile_id,
+                    topic_id: topic_id,
+                    name: name,
+                    post_comments: post_comments.toString(),
+                    post_likes: post_likes.toString(),
+                    post_dislikes: post_dislikes.toString(),
+                    post_img: post_img,
+                    creation_date: creation_date
+                  );
                   processSavePost.savePost();
                 },
               ),
@@ -604,10 +538,7 @@ class _PostTileState extends State<PostTile> {
                 child: Container(
                   padding: EdgeInsets.only(right: 15),
                   alignment: Alignment.centerRight,
-                  child: Text(
-                    creation_date,
-                    style: TextStyle(color: Colors.grey, fontSize: 13),
-                  ),
+                  child: Text(creation_date, style: TextStyle(color: Colors.grey, fontSize: 13),),
                 ),
               )
             ],

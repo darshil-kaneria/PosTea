@@ -52,8 +52,8 @@ class CustomNavBar extends StatelessWidget{
             IconButton(icon: Icon(Icons.trending_up, color: Theme.of(context).buttonColor), onPressed: (){
               onTap(2);
               }),
-            IconButton(icon: Icon(Icons.alternate_email, color: Theme.of(context).buttonColor), onPressed: (){
-              onTap(3);
+              IconButton(icon: Icon(Icons.apps), onPressed: () {
+                onTap(4);
               })
           ],
         )

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:ui';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
@@ -13,6 +14,8 @@ import 'package:postea_frontend/data_models/process_topic.dart';
 import 'package:http/http.dart' as http;
 import 'package:postea_frontend/pages/homepage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../customWidgets/topicCurve.dart';
+import '../customWidgets/topicCard.dart';
 
 import '../colors.dart';
 
@@ -36,6 +39,7 @@ class _TopicState extends State<Topic> {
 
   TextEditingController topicNameController = new TextEditingController();
   TextEditingController topicDescController = new TextEditingController();
+  var _scrollController = new ScrollController();
 
   SharedPreferences prefs;
   bool isAccessibilityOn = false;
@@ -218,315 +222,467 @@ class _TopicState extends State<Topic> {
     var screenHeight = MediaQuery.of(context).size.height;
     var screenWidth = MediaQuery.of(context).size.width;
     print("TOPIC ID is " + widget.topicId.toString());
-    return PageView(
-      controller: topicPageController,
-      children: [
-        SafeArea(
-          child: Scaffold(
-            extendBodyBehindAppBar: true,
-            appBar: AppBar(
-              actions: [
-                widget.isOwner
-                    ? IconButton(
-                        icon: Icon(Icons.edit),
-                        onPressed: () {
-                          topicPageController.jumpToPage(1);
-                        },
-                      )
-                    : Container()
-              ],
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-            ),
-            body: Container(
-              height: screenHeight,
-              width: screenWidth,
-              child: Column(
-                children: [
-                  Expanded(
-                    flex: 3,
-                    child: Container(
-                      // color: Colors.greenAccent,
-                      alignment: Alignment.center,
-                      height: MediaQuery.of(context).size.height / 4,
-                      width: double.maxFinite,
-                      decoration: BoxDecoration(
-                          image: DecorationImage(
-                              image: NetworkImage(
-                                  "https://picsum.photos/250?image=180"),
-                              fit: BoxFit.cover)),
-                      child: ClipRRect(
-                        child: BackdropFilter(
-                          filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                alignment: Alignment.center,
-                                color: Colors.grey.withOpacity(0.1),
-                                child: ValueListenableBuilder(
-                                    valueListenable: topicNameNotifier,
-                                    builder: (_, value, __) {
-                                      return Text(
-                                        // "Chess",
-                                        value,
-                                        style: TextStyle(
-                                            fontSize: 40,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white),
-                                      );
-                                    }),
+        return PageView(
+          controller: topicPageController,
+          children: [
+            SafeArea(
+              child: Scaffold(
+                extendBodyBehindAppBar: true,
+                appBar: AppBar(
+                  title: Text("Topic", style: Theme.of(context).textTheme.headline4,),
+                  iconTheme: IconThemeData(color: Theme.of(context).iconTheme.color),
+                  actions: [
+                    widget.isOwner
+                        ? IconButton(
+                            icon: Icon(Icons.edit),
+                            onPressed: () {
+                              topicPageController.jumpToPage(2);
+                            },
+                          )
+                        : Container()
+                  ],
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                ),
+                body: Container(
+                  height: screenHeight,
+                  width: screenWidth,
+                  // margin: EdgeInsets.only(top: 55),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CustomPaint(
+                          painter: TopicCurve(),
+                          child: Container(
+                            margin: EdgeInsets.only(top: 40),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [
+                              Row(
+                                // mainAxisAlignment: MainAxisAlignment.center,
+                                // crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 50, right: 30),
+                                    child: Column(
+                                    children: [
+                                      Text("Followers", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                                      Text("100k")
+                                    ],
+                                    ),
+                                  ),
+                                  Container(
+                                    decoration: ShapeDecoration(
+                                      shape: CircleBorder(
+                                        side: BorderSide(
+                                        width: 5,
+                                        color: Colors.blue[300]))),
+                                    child: Container(
+                                      height: screenWidth / 4,
+                                      width: screenWidth / 4,
+                                      decoration: ShapeDecoration(
+                                        shape: CircleBorder(
+                                          side: BorderSide(
+                                            width: 4,
+                                            color: Colors.orange[50]))),
+                                      child: FutureBuilder(
+                                        future: FirebaseStorageService.getImage(context, widget.profileId.toString()),
+                                        builder: (context, AsyncSnapshot<dynamic> snapshot) {
+                                          if (snapshot.hasData) {
+                                            return CircleAvatar(
+                                              backgroundImage: NetworkImage(snapshot.data),
+                                              maxRadius: screenWidth / 8,
+                                              );
+                                          } else {
+                                            return CircleAvatar(
+                                              backgroundImage: NetworkImage('https://picsum.photos/250?image=18'),
+                                              maxRadius: screenWidth / 8,
+                                            );
+                                            // return CircularProgressIndicator(
+                                            //   strokeWidth: 2,
+                                            //   backgroundColor:
+                                            //       bgColor,
+                                            //   valueColor:
+                                            //       AlwaysStoppedAnimation(
+                                            //           loginButtonEnd),
+                                            // );
+                                          }
+                                        }),
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 30, right: 50),
+                                    child: Column(
+                                    children: [
+                                      Text("Posts", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
+                                      Text("100")
+                                    ],
+                                    ),
+                                  ),
+                                ],
                               ),
-                              widget.isOwner == false
-                                  ? Container(
-                                      height: screenHeight / 14,
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: screenWidth / 15,
-                                          vertical: 10),
-                                      child: ValueListenableBuilder(
-                                        valueListenable: isFollow,
-                                        builder: (_, isFollowValue, __) =>
-                                            ButtonTheme(
-                                                buttonColor: buttonColor.value,
-                                                shape: RoundedRectangleBorder(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            30)),
-                                                minWidth: screenWidth / 5,
-                                                child: RaisedButton(
-                                                    elevation: 2,
-                                                    clipBehavior:
-                                                        Clip.antiAlias,
-                                                    child: Text(
-                                                        topicFollowingText
-                                                            .value),
-                                                    onPressed: () async {
-                                                      print(
-                                                          "IS FOLLOW VALUE: " +
-                                                              isFollowValue
-                                                                  .toString());
-
-                                                      if (isFollowValue) {
-                                                        buttonColor.value =
-                                                            Colors.red[50];
-                                                        isFollow.value = false;
-                                                        topicFollowingText
-                                                            .value = "Follow";
-                                                        final request =
-                                                            http.Request(
-                                                                "DELETE",
-                                                                Uri.parse(
-                                                                    "http://postea-server.herokuapp.com/topicfollowdata"));
-                                                        request.headers.addAll({
-                                                          'Content-Type':
-                                                              'application/json',
-                                                          HttpHeaders
-                                                                  .authorizationHeader:
-                                                              "Bearer posteaadmin",
-                                                        });
-                                                        request.body =
-                                                            jsonEncode({
-                                                          "topic_id":
-                                                              widget.topicId,
-                                                          "follower_id":
-                                                              widget.profileId
-                                                        });
-                                                        request.send();
-                                                      } else {
-                                                        buttonColor.value =
-                                                            Colors
-                                                                .redAccent[100];
-                                                        isFollow.value = true;
-                                                        topicFollowingText
-                                                                .value =
-                                                            "Following";
-                                                        var addfollowing = {
-                                                          "topic_id":
-                                                              widget.topicId,
-                                                          "follower_id":
-                                                              widget.profileId
-                                                        };
-                                                        var addfollowingJson =
-                                                            JsonEncoder().convert(
-                                                                addfollowing);
-                                                        http.post(
-                                                            "http://postea-server.herokuapp.com/topicfollowdata",
-                                                            headers: {
-                                                              'Content-Type':
-                                                                  'application/json',
-                                                              HttpHeaders
-                                                                      .authorizationHeader:
-                                                                  "Bearer posteaadmin",
-                                                            },
-                                                            body:
-                                                                addfollowingJson);
-                                                      }
-
-                                                      // setState(() {});
-                                                    })),
-                                      ),
+                              ValueListenableBuilder(
+                                valueListenable: topicNameNotifier,
+                                builder: (context, value, child) {
+                                  return AutoSizeText(
+                                  value,
+                                  maxFontSize: 29,
+                                  minFontSize: 27,
+                                  softWrap: true,
+                                  style: Theme.of(context).textTheme.bodyText2,
+                                  );
+                                },
+                              ),
+                              widget.isOwner ? Padding(
+                                padding: const EdgeInsets.only(bottom: 15),
+                                child: AutoSizeText(
+                                  "Created by Vidit Shah",
+                                  maxFontSize: 20,
+                                  minFontSize: 15,
+                                  softWrap: true,
+                                  style: Theme.of(context).textTheme.bodyText2,
+                                ),
+                              ) : AutoSizeText(
+                                "Created by Vidit Shah",
+                                maxFontSize: 20,
+                                minFontSize: 15,
+                                softWrap: true,
+                                style: Theme.of(context).textTheme.bodyText2,
+                              ),
+                              widget.isOwner == false ? Container(
+                                height: screenHeight / 14,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth / 15,
+                                    vertical: 10),
+                                child: ValueListenableBuilder(
+                                  valueListenable: isFollow,
+                                  builder: (_, isFollowValue, __) => ButtonTheme(
+                                    buttonColor: buttonColor.value,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                                    minWidth: screenWidth / 5,
+                                    child: RaisedButton(
+                                        elevation: 2,
+                                        clipBehavior: Clip.antiAlias,
+                                        child: Text(topicFollowingText.value),
+                                        onPressed: () async {
+                                          print("IS FOLLOW VALUE: " + isFollowValue.toString());
+                                          if (isFollowValue) {
+                                            buttonColor.value = Colors.red[50];
+                                            isFollow.value = false;
+                                            topicFollowingText.value = "Follow";
+                                            final request = http.Request(
+                                                    "DELETE",
+                                                    Uri.parse("http://postea-server.herokuapp.com/topicfollowdata"));
+                                            request.headers.addAll({
+                                              'Content-Type': 'application/json',
+                                              HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+                                            });
+                                            request.body = jsonEncode({"topic_id": widget.topicId, "follower_id": widget.profileId});
+                                            request.send();
+                                          } else {
+                                            buttonColor.value = Colors.redAccent[100];
+                                            isFollow.value = true;
+                                            topicFollowingText.value = "Following";
+                                            var addfollowing = {"topic_id": widget.topicId, "follower_id": widget.profileId};
+                                            var addfollowingJson = JsonEncoder().convert(addfollowing);
+                                            http.post(
+                                                "http://postea-server.herokuapp.com/topicfollowdata",
+                                                headers: {
+                                                  'Content-Type': 'application/json',
+                                                  HttpHeaders.authorizationHeader: "Bearer posteaadmin",
+                                                },
+                                                body: addfollowingJson
+                                              );
+                                          }
+                                        }
                                     )
-                                  : Container(),
+                                  ),
+                                ),
+                              )
+                              : Container(),
+                                // widget.isOwner ? Padding(
+                                //   padding: EdgeInsets.only(bottom: 15),
+                                //   child: AutoSizeText(
+                                //     "9 Posts",
+                                //     maxFontSize: 20,
+                                //     minFontSize: 15,
+                                //     softWrap: true,
+                                //     style: Theme.of(context).textTheme.bodyText2,
+                                //   ),
+                                // ) : AutoSizeText(
+                                //   "9 Posts",
+                                //   maxFontSize: 20,
+                                //   minFontSize: 15,
+                                //   softWrap: true,
+                                //   style: Theme.of(context).textTheme.bodyText2,
+                                // ),
+                                //         SizedBox(
+                                //   height: screenHeight / 25,
+                                // ),
+                            ],
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15, right: 15, bottom: 8,),
+                          child: AutoSizeText(
+                            "About",
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Card(
+                          margin: EdgeInsets.only(left: 12, right: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius:BorderRadius.circular(20),
+                          ),
+                          elevation: 1,
+                          clipBehavior: Clip.antiAlias,
+                          child: ValueListenableBuilder(
+                            valueListenable: topicDescNotifier,
+                            builder: (context, value, child) {
+                              return Padding(
+                                padding: const EdgeInsets.all(20.0),
+                                child: Container(child: Text(value),),
+                            );
+                            },
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15, top: 15, right: 15, bottom: 8),
+                              child: AutoSizeText(
+                                "Posts",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight:
+                                        FontWeight.bold),
+                              ),
+                            ),
+                            Spacer(),
+                            InkWell(
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 15, top: 15, right: 15, bottom: 8),
+                                child: AutoSizeText(
+                                  "View all",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      decoration: TextDecoration.underline
+                                  ),
+                                ),
+                              ),
+                              onTap: () {
+                                topicPageController
+                                    .animateToPage(1,
+                                        duration: Duration(
+                                            milliseconds:
+                                                100),
+                                        curve: Curves.easeIn);
+                              },
+                            ),
+                          ],
+                        ),
+                        Container(
+                          child: FutureBuilder(future: getTopicContent(), builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return PostTile(
+                                    topic.postList.elementAt(0).post_id,
+                                    topic.postList.elementAt(0).profile_id,
+                                    topic.postList.elementAt(0).post_description,
+                                    topic.postList.elementAt(0).topic_id,
+                                    topic.postList.elementAt(0).post_img,
+                                    topic.postList.elementAt(0).creation_date,
+                                    topic.postList.elementAt(0).post_likes,
+                                    topic.postList.elementAt(0).post_dislikes,
+                                    topic.postList.elementAt(0).post_comments,
+                                    topic.postList.elementAt(0).post_title,
+                                    topic.postList.elementAt(0).post_name,
+                                    widget.profileId.toString(),
+                                    0,
+                                    topic.postList.elementAt(0).is_sensitive,
+                                    isAccessibilityOn
+                                );
+                            } else {
+                              return Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(bgGradEnd),));
+                            }
+                          }),
+                        ),
+                        Row(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 15, top: 15, right: 15, bottom: 8),
+                              child: AutoSizeText(
+                                "Trending...",
+                                style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Spacer(),
+                            InkWell(
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 15, top: 15, right: 15, bottom: 8),
+                                child: AutoSizeText(
+                                  "View all",
+                                  style: TextStyle(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.bold,
+                                      decoration: TextDecoration.underline
+                                  ),
+                                ),
+                              ),
+                              onTap: () {
+                                topicPageController
+                                    .animateToPage(1,
+                                        duration: Duration(
+                                            milliseconds:
+                                                100),
+                                        curve: Curves.easeIn);
+                              },
+                            ),
+                          ],
+                        ),
+                        Container(
+                          child: FutureBuilder(future: getTopicContent(), builder: (context, snapshot) {
+                            if (snapshot.hasData) {
+                              return PostTile(
+                                    topic.postList.elementAt(0).post_id,
+                                    topic.postList.elementAt(0).profile_id,
+                                    topic.postList.elementAt(0).post_description,
+                                    topic.postList.elementAt(0).topic_id,
+                                    topic.postList.elementAt(0).post_img,
+                                    topic.postList.elementAt(0).creation_date,
+                                    topic.postList.elementAt(0).post_likes,
+                                    topic.postList.elementAt(0).post_dislikes,
+                                    topic.postList.elementAt(0).post_comments,
+                                    topic.postList.elementAt(0).post_title,
+                                    topic.postList.elementAt(0).post_name,
+                                    widget.profileId.toString(),
+                                    0,
+                                    topic.postList.elementAt(0).is_sensitive,
+                                    isAccessibilityOn
+                                );
+                            } else {
+                              return Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation(bgGradEnd),));
+                            }
+                          }),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 15, top: 15, right: 15, bottom: 8),
+                          child: AutoSizeText(
+                            "Explore Other Topics...",
+                            style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        Container(
+                          height: screenHeight / 4.5,
+                          width: screenWidth,
+                          child: ListView(
+                            controller: _scrollController,
+                            scrollDirection: Axis.horizontal,
+                            children: [
+                              TopicCard(
+                                topicId: 2,
+                                col1: Theme.of(context).primaryColorLight,
+                                col2: Theme.of(context).primaryColorDark,
+                                height: screenHeight / 2,
+                                width: screenWidth / 2,
+                                profileId: widget.profileId,
+                                isOwner: true,
+                              ),
+                              TopicCard(
+                                topicId: 26894,
+                                col1: Theme.of(context).primaryColorLight,
+                                col2: Theme.of(context).primaryColorDark,
+                                height: screenHeight / 2,
+                                width: screenWidth / 2,
+                                profileId: widget.profileId,
+                                isOwner: true,
+                              ),
+                              TopicCard(
+                                topicId: 51561,
+                                col1: Theme.of(context).primaryColorLight,
+                                col2: Theme.of(context).primaryColorDark,
+                                height: screenHeight / 2,
+                                width: screenWidth / 2,
+                                profileId: widget.profileId,
+                                isOwner: true,
+                              ),
+                              TopicCard(
+                                topicId: 99841,
+                                col1: Theme.of(context).primaryColorLight,
+                                col2: Theme.of(context).primaryColorDark,
+                                height: screenHeight / 2,
+                                width: screenWidth / 2,
+                                profileId: widget.profileId,
+                                isOwner: true,
+                              )
                             ],
                           ),
                         ),
-                      ),
-                    ),
+                    ],
+                ),
                   ),
-                  // Expanded(
-                  //   flex: 1,
-                  //   child: Container(
-                  //     alignment: Alignment.center,
-                  //     child: ValueListenableBuilder(
-                  //         valueListenable: topicNameNotifier,
-                  //         builder: (_, value, __) {
-                  //           return Text(
-                  //             // "Chess",
-                  //             value,
-                  //             style: TextStyle(fontSize: 20),
-                  //           );
-                  //         }),
-                  //   ),
-                  // ),
-                  // Expanded(
-                  //     flex: 1,
-                  //     child: widget.isOwner == false
-                  //         ? Container(
-                  //             height: screenHeight / 14,
-                  //             padding: EdgeInsets.symmetric(
-                  //                 horizontal: screenWidth / 15, vertical: 10),
-                  //             child: ButtonTheme(
-                  //                 buttonColor: buttonColor,
-                  //                 shape: RoundedRectangleBorder(
-                  //                     borderRadius: BorderRadius.circular(30)),
-                  //                 minWidth: screenWidth / 5,
-                  //                 child: RaisedButton(
-                  //                     elevation: 2,
-                  //                     clipBehavior: Clip.antiAlias,
-                  //                     child: Text(topicFollowingText),
-                  //                     onPressed: () async {
-                  //                       print(isFollow);
-
-                  //                       if (isFollow) {
-                  //                         buttonColor = Colors.red[50];
-                  //                         isFollow = false;
-                  //                         topicFollowingText = "Follow";
-                  //                         final request = http.Request(
-                  //                             "DELETE",
-                  //                             Uri.parse(
-                  //                                 "http://postea-server.herokuapp.com/topicfollowdata"));
-                  //                         request.headers.addAll(
-                  //                             {'Content-Type': 'application/json'});
-                  //                         request.body = jsonEncode({
-                  //                           "topic_id": widget.topicId,
-                  //                           "follower_id": widget.profileId
-                  //                         });
-                  //                         request.send();
-                  //                       } else {
-                  //                         buttonColor = Colors.redAccent[100];
-                  //                         isFollow = true;
-                  //                         topicFollowingText = "Following";
-                  //                         var addfollowing = {
-                  //                           "topic_id": widget.topicId,
-                  //                           "follower_id": widget.profileId
-                  //                         };
-                  //                         var addfollowingJson =
-                  //                             JsonEncoder().convert(addfollowing);
-                  //                         http.post(
-                  //                             "http://postea-server.herokuapp.com/topicfollowdata",
-                  //                             headers: {
-                  //                               'Content-Type': 'application/json'
-                  //                             },
-                  //                             body: addfollowingJson);
-                  //                       }
-
-                  //                       setState(() {});
-                  //                     })),
-                  //           )
-                  //         : Container()),
-                  Expanded(
-                    flex: 1,
-                    child: Card(
-                      // margin: EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-                      clipBehavior: Clip.hardEdge,
-                      elevation: 0,
-                      child: Container(
-                        color: bgGradStart,
-                        width: screenWidth,
-                        child: SingleChildScrollView(
-                            child: ValueListenableBuilder(
-                                valueListenable: topicDescNotifier,
-                                builder: (_, value, __) {
-                                  return Padding(
-                                    padding: const EdgeInsets.only(
-                                        top: 20, left: 10),
-                                    child: Text(
-                                      value,
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  );
-                                })),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 6,
-                    // child: Container(
-                    //   // color: Colors.limeAccent,
-                    //   child: ListView(
-                    //     addRepaintBoundaries: false,
-                    //     shrinkWrap: true,
-                    //     padding: EdgeInsets.all(0),
-                    //     children: [
-                    //       Container(height: screenHeight/3, width: screenWidth, color: Colors.grey,),
-                    //       Container(height: screenHeight/3, width: screenWidth, color: Colors.pinkAccent,),
-                    //       Container(height: screenHeight/3, width: screenWidth, color: Colors.orangeAccent,),
-                    //       Container(height: screenHeight/3, width: screenWidth, color: Colors.yellowAccent,),
-                    //       Container(height: screenHeight/3, width: screenWidth, color: Colors.blueAccent,)
-                    //     ],
-                    //   ),
-                    // )
-                    child: FutureBuilder(
-                      future: getTopicContent(),
-                      builder: (context, AsyncSnapshot snapshot) {
-                        if (snapshot.hasData)
-                          return ListView.builder(
-                            padding: EdgeInsets.all(0),
-                            physics: BouncingScrollPhysics(),
-                            controller: checkPosScrollController,
-                            itemCount: topic.postList.length,
-                            itemBuilder: (context, index) {
-                              return PostTile(
-                                  topic.postList.elementAt(index).post_id,
-                                  topic.postList.elementAt(index).profile_id,
-                                  topic.postList
-                                      .elementAt(index)
-                                      .post_description,
-                                  topic.postList.elementAt(index).topic_id,
-                                  topic.postList.elementAt(index).post_img,
-                                  topic.postList.elementAt(index).creation_date,
-                                  topic.postList.elementAt(index).post_likes,
-                                  topic.postList.elementAt(index).post_dislikes,
-                                  topic.postList.elementAt(index).post_comments,
-                                  topic.postList.elementAt(index).post_title,
-                                  topic.postList.elementAt(index).post_name,
-                                  widget.profileId.toString(),
-                                  0,
-                                  topic.postList.elementAt(index).is_sensitive,
-                                  isAccessibilityOn);
-                            },
-                          );
-                        else
-                          return Center(
-                              child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation(bgGradEnd),
-                          ));
+            ),
+          ),
+        ),
+        WillPopScope(
+          onWillPop: () async {
+            topicPageController.jumpToPage(0);
+            return false;
+          },
+          child: Scaffold(
+            extendBodyBehindAppBar: true,
+            appBar: new AppBar(
+              iconTheme: IconThemeData(color: Theme.of(context).iconTheme.color),
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              title: Text("Posts", style: Theme.of(context).textTheme.headline1,),
+            ),
+            body: Container(
+              width: screenWidth,
+              height: screenHeight,
+              margin: EdgeInsets.only(top: 70),
+              child: FutureBuilder(
+                future: getTopicContent(),
+                builder: (context, AsyncSnapshot snapshot) {
+                  if (snapshot.hasData)
+                    return ListView.builder(
+                      padding: EdgeInsets.all(0),
+                      physics: BouncingScrollPhysics(),
+                      controller: checkPosScrollController,
+                      itemCount: topic.postList.length,
+                      itemBuilder: (context, index) {
+                        return PostTile(
+                            topic.postList.elementAt(index).post_id,
+                            topic.postList.elementAt(index).profile_id,
+                            topic.postList.elementAt(index).post_description,
+                            topic.postList.elementAt(index).topic_id,
+                            topic.postList.elementAt(index).post_img,
+                            topic.postList.elementAt(index).creation_date,
+                            topic.postList.elementAt(index).post_likes,
+                            topic.postList.elementAt(index).post_dislikes,
+                            topic.postList.elementAt(index).post_comments,
+                            topic.postList.elementAt(index).post_title,
+                            topic.postList.elementAt(index).post_name,
+                            widget.profileId.toString(),
+                            0,
+                            topic.postList.elementAt(index).is_sensitive,
+                            isAccessibilityOn
+                        );
                       },
-                    ),
-                  )
-                ],
+                    );
+                  else
+                    return Center(
+                        child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation(bgGradEnd),
+                    ));
+                },
               ),
             ),
           ),
@@ -685,7 +841,7 @@ class _TopicState extends State<Topic> {
               ),
             ),
           ),
-        )
+        ),
       ],
     );
   }
